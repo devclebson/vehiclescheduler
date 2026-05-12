@@ -1,0 +1,395 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Vinicius Lopes
+# This file is distributed under the same license as the Vehicle Scheduler plugin.
+# Vinicius Lopes <generalvini@gmail.com>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Vehicle Scheduler 1.0.0\n"
+"Report-Msgid-Bugs-To: generalvini@gmail.com\n"
+"POT-Creation-Date: 2026-04-14 16:32+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: vehiclescheduler\n"
+
+msgid "Vehicle Scheduler"
+msgstr ""
+
+msgid "Fleet Management"
+msgstr ""
+
+msgid "Fleet Reservation"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Calendar"
+msgstr ""
+
+msgid "Management"
+msgstr ""
+
+msgid "Administration"
+msgstr ""
+
+msgid "Reports"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Vehicle"
+msgstr ""
+
+msgid "Vehicles"
+msgstr ""
+
+msgid "Driver"
+msgstr ""
+
+msgid "Drivers"
+msgstr ""
+
+msgid "Schedule"
+msgstr ""
+
+msgid "Schedules"
+msgstr ""
+
+msgid "Reservation"
+msgstr ""
+
+msgid "Reservations"
+msgstr ""
+
+msgid "Incident"
+msgstr ""
+
+msgid "Incidents"
+msgstr ""
+
+msgid "Maintenance"
+msgstr ""
+
+msgid "Maintenances"
+msgstr ""
+
+msgid "Insurance Claim"
+msgstr ""
+
+msgid "Insurance Claims"
+msgstr ""
+
+msgid "Fine"
+msgstr ""
+
+msgid "Fines"
+msgstr ""
+
+msgid "Plate"
+msgstr ""
+
+msgid "Brand"
+msgstr ""
+
+msgid "Model"
+msgstr ""
+
+msgid "Year"
+msgstr ""
+
+msgid "Color"
+msgstr ""
+
+msgid "Category"
+msgstr ""
+
+msgid "Fuel"
+msgstr ""
+
+msgid "Seats"
+msgstr ""
+
+msgid "Mileage"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Unavailable"
+msgstr ""
+
+msgid "In maintenance"
+msgstr ""
+
+msgid "Vehicle Scheduling"
+msgstr ""
+
+msgid "Reservation Request"
+msgstr ""
+
+msgid "Reservation %s - %s"
+msgstr ""
+
+msgid "Requester"
+msgstr ""
+
+msgid "Request date"
+msgstr ""
+
+msgid "Start date"
+msgstr ""
+
+msgid "End date"
+msgstr ""
+
+msgid "Start time"
+msgstr ""
+
+msgid "End time"
+msgstr ""
+
+msgid "Departure"
+msgstr ""
+
+msgid "Return"
+msgstr ""
+
+msgid "Origin"
+msgstr ""
+
+msgid "Destination"
+msgstr ""
+
+msgid "Purpose"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Description/Purpose"
+msgstr ""
+
+msgid "Describe the purpose of this reservation"
+msgstr ""
+
+msgid "Number of passengers"
+msgstr ""
+
+msgid "Passengers"
+msgstr ""
+
+msgid "Assigned driver"
+msgstr ""
+
+msgid "Assigned vehicle"
+msgstr ""
+
+msgid "Contact Phone"
+msgstr ""
+
+msgid "Department/Sector"
+msgstr ""
+
+msgid "Additional Comments"
+msgstr ""
+
+msgid "Additional observations"
+msgstr ""
+
+msgid "Related Ticket"
+msgstr ""
+
+msgid "Vehicle Report"
+msgstr ""
+
+msgid "Vehicle Reports"
+msgstr ""
+
+msgid "Report Type"
+msgstr ""
+
+msgid "Report Date"
+msgstr ""
+
+msgid "Reporter"
+msgstr ""
+
+msgid "Maintenance Needed"
+msgstr ""
+
+msgid "Problem/Issue"
+msgstr ""
+
+msgid "Accident"
+msgstr ""
+
+msgid "Observation"
+msgstr ""
+
+msgid "Describe the issue, observation or situation in detail"
+msgstr ""
+
+msgid "New"
+msgstr ""
+
+msgid "Pending"
+msgstr ""
+
+msgid "Approved"
+msgstr ""
+
+msgid "Rejected"
+msgstr ""
+
+msgid "Cancelled"
+msgstr ""
+
+msgid "Completed"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Closed"
+msgstr ""
+
+msgid "Open"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Approve"
+msgstr ""
+
+msgid "Reject"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Filter"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "Clear filters"
+msgstr ""
+
+msgid "Approved reservations"
+msgstr ""
+
+msgid "Pending requests"
+msgstr ""
+
+msgid "Rejected requests"
+msgstr ""
+
+msgid "Reservations by status"
+msgstr ""
+
+msgid "Operational overview"
+msgstr ""
+
+msgid "Management overview"
+msgstr ""
+
+msgid "Executive overview"
+msgstr ""
+
+msgid "Department is required"
+msgstr ""
+
+msgid "Contact phone is required"
+msgstr ""
+
+msgid "Description/Purpose is required"
+msgstr ""
+
+msgid "Description is required"
+msgstr ""
+
+msgid "Vehicle is required"
+msgstr ""
+
+msgid "Start date is required"
+msgstr ""
+
+msgid "End date is required"
+msgstr ""
+
+msgid "Destination is required"
+msgstr ""
+
+msgid "Driver is required"
+msgstr ""
+
+msgid "Invalid period"
+msgstr ""
+
+msgid "The selected vehicle is not available for this period"
+msgstr ""
+
+msgid "The selected driver is not available for this period"
+msgstr ""
+
+msgid "Item added successfully"
+msgstr ""
+
+msgid "Item updated successfully"
+msgstr ""
+
+msgid "Item deleted successfully"
+msgstr ""
+
+msgid "Reservation approved successfully"
+msgstr ""
+
+msgid "Reservation rejected successfully"
+msgstr ""
+
+msgid "Unable to save data"
+msgstr ""
+
+msgid "An unexpected error occurred"
+msgstr ""
+
+msgid "Vehicle Reservation: %s - %s"
+msgstr ""
+
+msgid "Vehicle Reservation Details:\\n\\nVehicle: %s\\nRequester: %s\\nStart: %s\\nEnd: %s\\nDestination: %s\\nPassengers: %d\\nPurpose: %s"
+msgstr ""
+

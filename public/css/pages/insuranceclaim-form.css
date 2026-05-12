@@ -1,0 +1,299 @@
+.vs-claim-form-page {
+    max-width: 1120px;
+    margin: 10px auto 12px;
+    padding: 0 6px;
+    position: relative;
+    color: var(--vs-text-color, #0f172a);
+}
+
+.vs-claim-form-surface {
+    position: relative;
+    border-radius: 26px;
+    overflow: hidden;
+    padding: 18px;
+}
+
+.vs-claim-form-surface::before {
+    content: "";
+    position: absolute;
+    inset: -140px;
+    background:
+        radial-gradient(820px 520px at 20% 10%, color-mix(in srgb, var(--vs-primary, #3b82f6) 35%, transparent) 0%, transparent 60%),
+        radial-gradient(720px 520px at 85% 35%, color-mix(in srgb, var(--vs-secondary, #22c55e) 22%, transparent) 0%, transparent 62%),
+        radial-gradient(680px 520px at 55% 92%, color-mix(in srgb, var(--vs-primary, #3b82f6) 16%, transparent) 0%, transparent 62%),
+        linear-gradient(135deg, var(--vs-bg-start, #f8fafc), var(--vs-bg-end, #eef2ff));
+    filter: blur(18px);
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.vs-claim-form-surface::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.02);
+    pointer-events: none;
+}
+
+.vs-claim-form-card {
+    position: relative;
+    border-radius: 22px;
+    background: var(--vs-card-bg, rgba(255, 255, 255, 0.92));
+    border: 1px solid var(--vs-border, rgba(15, 23, 42, 0.1));
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+        0 16px 50px rgba(2, 8, 23, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+.vs-claim-form-head {
+    padding: 16px 18px 14px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    border-bottom: 1px solid color-mix(in srgb, var(--vs-border, rgba(15, 23, 42, 0.1)) 80%, transparent);
+}
+
+.vs-claim-form-title {
+    margin: 0;
+    font-weight: 950;
+    letter-spacing: -0.01em;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vs-claim-form-title i {
+    font-size: 1.35rem;
+    color: color-mix(in srgb, var(--vs-primary, #3b82f6) 75%, var(--vs-text-color, #0f172a));
+    transform: translateZ(0);
+    transition: transform 0.25s ease;
+}
+
+.vs-claim-form-card:hover .vs-claim-form-title i {
+    transform: translateY(-2px) scale(1.08);
+}
+
+.vs-claim-form-subtitle {
+    margin: 4px 0 0;
+    font-size: 0.92rem;
+    opacity: 0.85;
+}
+
+.vs-claim-form-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--vs-border, rgba(15, 23, 42, 0.1)) 80%, transparent);
+    background: color-mix(in srgb, var(--vs-card-bg, rgba(255, 255, 255, 0.92)) 60%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    font-weight: 900;
+    font-size: 0.82rem;
+    white-space: nowrap;
+}
+
+.vs-claim-form-pill-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.vs-claim-form-pill-dot--opened {
+    background: #17a2b8;
+    box-shadow: 0 0 0 4px rgba(23, 162, 184, 0.18);
+}
+
+.vs-claim-form-pill-dot--analysis {
+    background: #ffc107;
+    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.18);
+}
+
+.vs-claim-form-pill-dot--approved {
+    background: #28a745;
+    box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.18);
+}
+
+.vs-claim-form-pill-dot--rejected {
+    background: #dc3545;
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.18);
+}
+
+.vs-claim-form-pill-dot--closed {
+    background: #6c757d;
+    box-shadow: 0 0 0 4px rgba(108, 117, 125, 0.18);
+}
+
+.vs-claim-form-grid {
+    padding: 16px 18px 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.vs-claim-form-field {
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--vs-border, rgba(15, 23, 42, 0.1)) 80%, transparent);
+    background: color-mix(in srgb, var(--vs-card-bg, rgba(255, 255, 255, 0.92)) 70%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 10px 26px rgba(2, 8, 23, 0.08);
+    padding: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.vs-claim-form-field:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--vs-primary, #3b82f6) 25%, var(--vs-border, rgba(15, 23, 42, 0.1)));
+    box-shadow: 0 16px 44px rgba(2, 8, 23, 0.12);
+}
+
+.vs-claim-form-field--full {
+    grid-column: 1 / -1;
+}
+
+.vs-claim-form-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-weight: 950;
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+    margin: 0 0 8px;
+}
+
+.vs-claim-form-field input[type="text"],
+.vs-claim-form-field input[type="number"],
+.vs-claim-form-field textarea,
+.vs-claim-form-field select,
+.vs-claim-form-field input[type="date"] {
+    width: 100%;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    padding: 10px 12px;
+    background: #fff;
+    color: #0f172a;
+}
+
+.vs-claim-form-field textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.vs-claim-form-field :is(input, select, textarea):focus {
+    outline: none;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--vs-primary, #3b82f6) 22%, transparent);
+    border-color: color-mix(in srgb, var(--vs-primary, #3b82f6) 45%, var(--vs-border, rgba(15, 23, 42, 0.1)));
+}
+
+.vs-claim-form-related {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.vs-claim-form-actions {
+    padding: 16px 18px;
+    border-top: 1px solid color-mix(in srgb, var(--vs-border, rgba(15, 23, 42, 0.1)) 80%, transparent);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.vs-claim-form-button,
+.vs-claim-form-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--vs-border, rgba(15, 23, 42, 0.1)) 80%, transparent);
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.vs-claim-form-button:hover,
+.vs-claim-form-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(2, 8, 23, 0.15);
+    text-decoration: none;
+}
+
+.vs-claim-form-button--primary {
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    border: none;
+    color: #fff;
+}
+
+.vs-claim-form-button--danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: none;
+    color: #fff;
+}
+
+.vs-claim-form-link {
+    background: color-mix(in srgb, var(--vs-card-bg, rgba(255, 255, 255, 0.92)) 80%, transparent);
+    color: var(--vs-text-color, #0f172a);
+}
+
+@media (max-width: 980px) {
+    .vs-claim-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vs-claim-form-head {
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vs-claim-form-field,
+    .vs-claim-form-title i {
+        transition: none !important;
+    }
+
+    .vs-claim-form-field:hover,
+    .vs-claim-form-button:hover,
+    .vs-claim-form-link:hover {
+        transform: none !important;
+    }
+}
+
+.theme-dark .vs-claim-form-card {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(100, 116, 139, 0.2);
+}
+
+.theme-dark .vs-claim-form-field {
+    background: rgba(51, 65, 85, 0.8);
+    border-color: rgba(100, 116, 139, 0.2);
+}
+
+.theme-dark .vs-claim-form-label,
+.theme-dark .vs-claim-form-title,
+.theme-dark .vs-claim-form-link,
+.theme-dark .vs-claim-form-related {
+    color: #f1f5f9;
+}
+
+.theme-dark .vs-claim-form-field input[type="text"],
+.theme-dark .vs-claim-form-field input[type="number"],
+.theme-dark .vs-claim-form-field textarea,
+.theme-dark .vs-claim-form-field select,
+.theme-dark .vs-claim-form-field input[type="date"] {
+    background: rgba(30, 41, 59, 0.9);
+    color: #f1f5f9;
+    border-color: rgba(100, 116, 139, 0.3);
+}

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+   <name>SisViaturas</name>
+   <key>vehiclescheduler</key>
+   <state>stable</state>
+
+   <logo>https://raw.githubusercontent.com/GeneralVini/vehiclescheduler/main/docs/assets/logo-40x40.png</logo>
+
+   <description>
+      <short>
+         <en>Fleet scheduling and vehicle reservation management for GLPI 11.</en>
+         <pt_BR>Gestão de reservas, agendamentos e uso de viaturas para GLPI 11.</pt_BR>
+      </short>
+      <long>
+         <en><![CDATA[
+# SisViaturas for GLPI 11
+
+SisViaturas is a fleet management plugin for GLPI 11 focused on vehicle reservations, trip scheduling, approval workflow, and operational control.
+
+## Main features
+
+- Vehicle reservation and scheduling
+- Approval and rejection workflow
+- Driver and vehicle allocation
+- Conflict validation for dates and times
+- Management and operational dashboards
+- GLPI 11-oriented plugin architecture
+- Separation between backend business logic, front-end rendering, styles, and client-side behavior
+- Search, validation, and fleet operation support for institutional environments
+
+## Installation
+
+1. Download the latest release package
+2. Extract it into the `<GLPI_ROOT>/plugins/vehiclescheduler` directory
+3. Go to **Setup > Plugins**
+4. Install and enable **SisViaturas**
+
+## Project links
+
+- Repository: `https://github.com/GeneralVini/vehiclescheduler`
+- Issues: `https://github.com/GeneralVini/vehiclescheduler/issues`
+
+## Compatibility
+
+- GLPI 11.x
+- Production-oriented plugin structure
+- Maintained with focus on stability, UI consistency, and operational workflow
+         ]]></en>
+         <pt_BR><![CDATA[
+# SisViaturas para GLPI 11
+
+SisViaturas é um plugin de gestão de frotas para GLPI 11 com foco em reservas de veículos, agendamentos, fluxo de aprovação e controle operacional.
+
+## Principais funcionalidades
+
+- Reserva e agendamento de viaturas
+- Fluxo de aprovação e recusa
+- Vinculação de motorista e veículo
+- Validação de conflitos de data e horário
+- Painéis gerenciais e operacionais
+- Arquitetura orientada ao GLPI 11
+- Separação entre lógica de negócio, renderização, estilos e comportamento cliente
+- Apoio a pesquisa, validação e operação de frotas em ambiente institucional
+
+## Instalação
+
+1. Baixe o pacote da versão mais recente
+2. Extraia em `<GLPI_ROOT>/plugins/vehiclescheduler`
+3. Acesse **Setup > Plugins**
+4. Instale e habilite o **SisViaturas**
+
+## Links do projeto
+
+- Repositório: `https://github.com/GeneralVini/vehiclescheduler`
+- Issues: `https://github.com/GeneralVini/vehiclescheduler/issues`
+
+## Compatibilidade
+
+- GLPI 11.x
+- Estrutura orientada a produção
+- Mantido com foco em estabilidade, consistência visual e fluxo operacional
+         ]]></pt_BR>
+      </long>
+   </description>
+
+   <homepage>https://github.com/GeneralVini/vehiclescheduler</homepage>
+   <download>https://github.com/GeneralVini/vehiclescheduler/releases</download>
+   <issues>https://github.com/GeneralVini/vehiclescheduler/issues</issues>
+   <readme>https://raw.githubusercontent.com/GeneralVini/vehiclescheduler/main/README.md</readme>
+   <changelog>https://raw.githubusercontent.com/GeneralVini/vehiclescheduler/main/CHANGELOG.md</changelog>
+
+   <authors>
+      <author>Vinicius Lopes &lt;generalvini@gmail.com&gt; (@ViniciusHonorato)</author>
+   </authors>
+
+   <versions>
+      <version>
+         <num>1.0.0</num>
+         <compatibility>~11.0.0</compatibility>
+         <download_url>https://github.com/GeneralVini/vehiclescheduler/releases/download/v1.0.0/vehiclescheduler-1.0.0.zip</download_url>
+      </version>
+   </versions>
+
+   <langs>
+      <lang>en_GB</lang>
+      <lang>pt_BR</lang>
+   </langs>
+
+   <license>PolyForm Noncommercial License 1.0.0</license>
+
+   <tags>
+      <en>
+         <tag>Fleet</tag>
+         <tag>Vehicles</tag>
+         <tag>Reservation</tag>
+         <tag>Scheduling</tag>
+         <tag>Workflow</tag>
+      </en>
+      <pt_BR>
+         <tag>Frotas</tag>
+         <tag>Viaturas</tag>
+         <tag>Reservas</tag>
+         <tag>Agendamento</tag>
+         <tag>Aprovação</tag>
+      </pt_BR>
+   </tags>
+
+   <screenshots>
+      <screenshot>https://raw.githubusercontent.com/GeneralVini/vehiclescheduler/main/docs/assets/screenshots/dashboard.png</screenshot>
+      <screenshot>https://raw.githubusercontent.com/GeneralVini/vehiclescheduler/main/docs/assets/screenshots/request-form.png</screenshot>
+      <screenshot>https://raw.githubusercontent.com/GeneralVini/vehiclescheduler/main/docs/assets/screenshots/management.png</screenshot>
+   </screenshots>
+</root>

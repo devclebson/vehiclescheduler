@@ -1,0 +1,678 @@
+/* =========================================================
+   Vehiclescheduler - Management page
+   Operational console layout
+   ========================================================= */
+
+.vs-page-management .vs-dashboard-wrap {
+    max-width: 1680px;
+    margin: 10px auto 18px;
+    padding: 0 10px 14px;
+}
+
+.vs-page-management .vs-management-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 10px;
+    padding: 18px 22px;
+    border-radius: 16px;
+    background: #111827;
+    color: #fff;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, .16);
+}
+
+.vs-page-management .vs-management-header__main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.vs-page-management .vs-management-header__mark {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .14);
+    color: #bfdbfe;
+    font-size: 1.25rem;
+}
+
+.vs-page-management .vs-management-header__copy {
+    min-width: 0;
+}
+
+.vs-page-management .vs-management-header h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.42rem;
+    line-height: 1.15;
+    font-weight: 850;
+}
+
+.vs-page-management .vs-management-header p {
+    margin: 4px 0 0;
+    color: rgba(226, 232, 240, .86);
+    font-size: .92rem;
+    line-height: 1.35;
+}
+
+.vs-page-management .vs-management-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.vs-page-management .vs-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: #2563eb;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, .08);
+    font-size: .88rem;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: none;
+    transition: background .16s ease, border-color .16s ease, transform .16s ease;
+}
+
+.vs-page-management .vs-action-btn:hover {
+    background: #1d4ed8;
+    color: #fff !important;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.vs-page-management .vs-action-btn--ghost {
+    background: rgba(255, 255, 255, .08);
+    border-color: rgba(255, 255, 255, .16);
+}
+
+.vs-page-management .vs-action-btn--ghost:hover {
+    background: rgba(255, 255, 255, .14);
+}
+
+.vs-page-management .vs-management-status {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.vs-page-management .vs-status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    min-height: 68px;
+    padding: 10px 12px;
+    border: 1px solid rgba(148, 163, 184, .2);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .96);
+    color: #0f172a;
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, .04);
+    transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+.vs-page-management .vs-status-item:hover {
+    border-color: rgba(37, 99, 235, .28);
+    background: #fff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.vs-page-management .vs-status-item__icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(37, 99, 235, .08);
+    color: #2563eb;
+}
+
+.vs-page-management .vs-status-item__body {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.vs-page-management .vs-status-item strong {
+    color: #0f172a;
+    font-size: 1.34rem;
+    line-height: 1;
+    font-weight: 900;
+}
+
+.vs-page-management .vs-status-item__body > span {
+    color: #64748b;
+    font-size: .74rem;
+    line-height: 1.15;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.vs-page-management .vs-status-item--danger .vs-status-item__icon,
+.vs-page-management .vs-status-item--danger strong {
+    color: #dc2626;
+}
+
+.vs-page-management .vs-status-item--danger .vs-status-item__icon {
+    background: rgba(220, 38, 38, .08);
+}
+
+.vs-page-management .vs-status-item--warning .vs-status-item__icon,
+.vs-page-management .vs-status-item--warning strong {
+    color: #b45309;
+}
+
+.vs-page-management .vs-status-item--warning .vs-status-item__icon {
+    background: rgba(245, 158, 11, .12);
+}
+
+.vs-page-management .vs-status-item--neutral .vs-status-item__icon,
+.vs-page-management .vs-status-item--neutral strong {
+    color: #475569;
+}
+
+.vs-page-management .vs-status-item--neutral .vs-status-item__icon {
+    background: rgba(100, 116, 139, .1);
+}
+
+.vs-page-management .vs-management-workbench {
+    display: grid;
+    grid-template-columns: 290px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+}
+
+.vs-page-management .vs-quick-panel,
+.vs-page-management .vs-card,
+.vs-page-management .vs-visual-controls {
+    border: 1px solid rgba(148, 163, 184, .2);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .045);
+}
+
+.vs-page-management .vs-quick-panel {
+    position: sticky;
+    top: 78px;
+    overflow: hidden;
+}
+
+.vs-page-management .vs-panel-header,
+.vs-page-management .vs-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    padding: 11px 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, .16);
+    background: rgba(248, 250, 252, .9);
+}
+
+.vs-page-management .vs-panel-title,
+.vs-page-management .vs-card-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f172a;
+    font-size: .9rem;
+    line-height: 1.2;
+    font-weight: 900;
+}
+
+.vs-page-management .vs-card-link {
+    color: #2563eb;
+    font-size: .82rem;
+    font-weight: 850;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.vs-page-management .vs-card-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.vs-page-management .vs-module-list {
+    display: grid;
+    gap: 0;
+}
+
+.vs-page-management .vs-module-link {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 18px;
+    align-items: center;
+    gap: 10px;
+    min-height: 58px;
+    padding: 10px 12px;
+    color: #0f172a;
+    border-bottom: 1px solid rgba(148, 163, 184, .12);
+    text-decoration: none;
+}
+
+.vs-page-management .vs-module-link:last-child {
+    border-bottom: 0;
+}
+
+.vs-page-management .vs-module-link:hover {
+    background: rgba(37, 99, 235, .045);
+    color: #0f172a;
+    text-decoration: none;
+}
+
+.vs-page-management .vs-module-link__icon {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: rgba(100, 116, 139, .08);
+    color: #334155;
+    font-size: .98rem;
+}
+
+.vs-page-management .vs-module-link__body {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.vs-page-management .vs-module-link strong {
+    overflow: hidden;
+    color: #0f172a;
+    font-size: .9rem;
+    line-height: 1.15;
+    font-weight: 850;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vs-page-management .vs-module-link small {
+    overflow: hidden;
+    color: #64748b;
+    font-size: .76rem;
+    line-height: 1.15;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vs-page-management .vs-module-link__arrow {
+    color: #94a3b8;
+}
+
+.vs-page-management .vs-workbench-main {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+}
+
+.vs-page-management .vs-visual-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    min-height: 38px;
+    padding: 4px;
+}
+
+.vs-page-management .vs-management-header__actions .vs-visual-controls {
+    width: auto;
+    border-color: rgba(255, 255, 255, .14);
+    background: rgba(255, 255, 255, .07);
+    box-shadow: none;
+}
+
+.vs-page-management .vs-visual-controls__label {
+    color: #64748b;
+    font-size: .74rem;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.vs-page-management .vs-management-header__actions .vs-visual-controls__label {
+    padding: 0 4px 0 6px;
+    color: rgba(226, 232, 240, .8);
+}
+
+.vs-page-management .vs-control-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px;
+    border: 1px solid rgba(148, 163, 184, .2);
+    border-radius: 10px;
+    background: rgba(248, 250, 252, .9);
+}
+
+.vs-page-management .vs-management-header__actions .vs-control-group {
+    border-color: rgba(255, 255, 255, .14);
+    background: rgba(15, 23, 42, .28);
+}
+
+.vs-page-management .vs-control-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #334155;
+    font-size: .82rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.vs-page-management .vs-management-header__actions .vs-control-btn {
+    color: #e2e8f0;
+}
+
+.vs-page-management .vs-control-btn:hover {
+    background: #fff;
+    border-color: rgba(148, 163, 184, .24);
+}
+
+.vs-page-management .vs-management-header__actions .vs-control-btn:hover {
+    background: rgba(255, 255, 255, .12);
+    border-color: rgba(255, 255, 255, .18);
+}
+
+.vs-page-management .vs-control-btn--label {
+    width: auto;
+    min-width: auto;
+    padding: 0 10px;
+    border-color: rgba(148, 163, 184, .2);
+    background: rgba(248, 250, 252, .9);
+}
+
+.vs-page-management .vs-management-header__actions .vs-control-btn--label {
+    border-color: rgba(255, 255, 255, .14);
+    background: rgba(255, 255, 255, .08);
+}
+
+.vs-page-management .vs-theme-toggle input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.vs-page.vs-page-management .vs-theme-toggle label {
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    width: 68px;
+    height: 32px;
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, .22);
+    background: rgba(248, 250, 252, .96);
+    cursor: pointer;
+}
+
+.vs-page.vs-page-management .vs-management-header__actions .vs-theme-toggle label {
+    border-color: rgba(255, 255, 255, .14);
+    background: rgba(15, 23, 42, .28);
+}
+
+.vs-page.vs-page-management .vs-theme-toggle label::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: #2563eb;
+    transition: transform .18s ease;
+}
+
+.vs-page.vs-page-management .vs-theme-toggle input:checked + label::after {
+    left: 3px;
+    transform: translateX(36px);
+}
+
+.vs-page.vs-page-management .vs-theme-toggle label span {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: .88rem;
+}
+
+.vs-page.vs-page-management .vs-theme-toggle input:not(:checked) + label .vs-theme-toggle__sun,
+.vs-page.vs-page-management .vs-theme-toggle input:checked + label .vs-theme-toggle__moon {
+    color: #fff;
+}
+
+.vs-page-management .vs-main-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.vs-page-management .vs-main-grid--primary {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.vs-page-management .vs-card {
+    overflow: hidden;
+}
+
+.vs-page-management .vs-empty-state {
+    padding: 16px 14px;
+    color: #64748b;
+    font-size: .9rem;
+    font-weight: 650;
+}
+
+.vs-page-management .vs-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.vs-page-management .vs-table th {
+    padding: 9px 12px;
+    color: #475569;
+    background: #f8fafc;
+    border-bottom: 1px solid rgba(148, 163, 184, .16);
+    font-size: .68rem;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.vs-page-management .vs-table td {
+    padding: 10px 12px;
+    color: #0f172a;
+    border-bottom: 1px solid rgba(148, 163, 184, .12);
+    font-size: .9rem;
+    line-height: 1.3;
+    vertical-align: middle;
+}
+
+.vs-page-management .vs-table tbody tr:nth-child(even) td {
+    background: rgba(248, 250, 252, .7);
+}
+
+.vs-page-management .vs-table tbody tr:hover td {
+    background: rgba(37, 99, 235, .045);
+}
+
+.vs-page-management .vs-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.vs-page-management .vs-btn-sm,
+.vs-page-management .vs-icon-link {
+    min-width: 32px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: .78rem;
+}
+
+.vs-page-management .vs-badge {
+    min-width: 78px;
+    height: 24px;
+    border-radius: 999px;
+    font-size: .72rem;
+}
+
+.vs-page-management.vs-dark-mode .vs-status-item,
+.vs-page-management.vs-dark-mode .vs-quick-panel,
+.vs-page-management.vs-dark-mode .vs-card,
+.vs-page-management.vs-dark-mode .vs-visual-controls {
+    background: rgba(15, 23, 42, .92);
+    border-color: rgba(148, 163, 184, .22);
+}
+
+.vs-page-management.vs-dark-mode .vs-panel-header,
+.vs-page-management.vs-dark-mode .vs-card-header,
+.vs-page-management.vs-dark-mode .vs-table th,
+.vs-page-management.vs-dark-mode .vs-control-group,
+.vs-page-management.vs-dark-mode .vs-control-btn--label,
+.vs-page-management.vs-dark-mode .vs-theme-toggle label {
+    background: rgba(30, 41, 59, .9);
+    border-color: rgba(148, 163, 184, .18);
+}
+
+.vs-page-management.vs-dark-mode .vs-status-item,
+.vs-page-management.vs-dark-mode .vs-status-item strong,
+.vs-page-management.vs-dark-mode .vs-panel-title,
+.vs-page-management.vs-dark-mode .vs-card-title,
+.vs-page-management.vs-dark-mode .vs-module-link,
+.vs-page-management.vs-dark-mode .vs-module-link strong,
+.vs-page-management.vs-dark-mode .vs-table td {
+    color: #e2e8f0;
+}
+
+.vs-page-management.vs-dark-mode .vs-status-item__body > span,
+.vs-page-management.vs-dark-mode .vs-module-link small,
+.vs-page-management.vs-dark-mode .vs-empty-state,
+.vs-page-management.vs-dark-mode .vs-visual-controls__label,
+.vs-page-management.vs-dark-mode .vs-control-btn,
+.vs-page-management.vs-dark-mode .vs-table th {
+    color: #94a3b8;
+}
+
+.vs-page-management.vs-dark-mode .vs-module-link:hover,
+.vs-page-management.vs-dark-mode .vs-table tbody tr:hover td {
+    background: rgba(59, 130, 246, .1);
+}
+
+.vs-page-management.vs-dark-mode .vs-table tbody tr:nth-child(even) td {
+    background: rgba(15, 23, 42, .36);
+}
+
+.vs-page-management.vs-dark-mode .vs-status-item--danger .vs-status-item__icon,
+.vs-page-management.vs-dark-mode .vs-status-item--danger strong {
+    color: #f87171;
+}
+
+.vs-page-management.vs-dark-mode .vs-status-item--warning .vs-status-item__icon,
+.vs-page-management.vs-dark-mode .vs-status-item--warning strong {
+    color: #fbbf24;
+}
+
+.vs-page-management.vs-dark-mode .vs-status-item--primary .vs-status-item__icon,
+.vs-page-management.vs-dark-mode .vs-status-item--primary strong {
+    color: #60a5fa;
+}
+
+@media (max-width: 1400px) {
+    .vs-page-management .vs-management-status {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1100px) {
+    .vs-page-management .vs-management-workbench {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .vs-page-management .vs-quick-panel {
+        position: static;
+    }
+
+    .vs-page-management .vs-module-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .vs-page-management .vs-module-link {
+        border-right: 1px solid rgba(148, 163, 184, .12);
+    }
+}
+
+@media (max-width: 860px) {
+    .vs-page-management .vs-management-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .vs-page-management .vs-management-header__actions,
+    .vs-page-management .vs-visual-controls {
+        justify-content: flex-start;
+    }
+
+    .vs-page-management .vs-main-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 680px) {
+    .vs-page-management .vs-dashboard-wrap {
+        padding: 0 8px 12px;
+    }
+
+    .vs-page-management .vs-management-header {
+        padding: 16px;
+    }
+
+    .vs-page-management .vs-management-status,
+    .vs-page-management .vs-module-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .vs-page-management .vs-management-header__actions,
+    .vs-page-management .vs-visual-controls {
+        width: 100%;
+    }
+
+    .vs-page-management .vs-management-header__actions .vs-visual-controls {
+        justify-content: space-between;
+        order: 3;
+    }
+
+    .vs-page-management .vs-action-btn {
+        flex: 1 1 140px;
+    }
+}

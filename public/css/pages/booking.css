@@ -1,0 +1,211 @@
+.vs-booking-page {
+    max-width: 1400px;
+    margin: 0 auto 32px;
+    padding: 0 12px;
+}
+
+.vs-booking-hero {
+    margin-bottom: 22px;
+    padding: 28px 32px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: #fff;
+}
+
+.vs-booking-hero h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.vs-booking-hero p {
+    margin: 8px 0 0;
+    opacity: .92;
+    font-size: .95rem;
+    max-width: 760px;
+}
+
+.vs-booking-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.vs-booking-tab {
+    display: inline-flex;
+    padding: 10px 20px;
+    border-bottom: 3px solid transparent;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: .88rem;
+}
+
+.vs-booking-tab.is-active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+}
+
+.vs-booking-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 14px;
+}
+
+.vs-booking-nav h2 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.vs-booking-nav__actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.vs-booking-nav__link {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #f1f5f9;
+    color: #334155;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.vs-booking-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 18px;
+}
+
+.vs-booking-sidebar,
+.vs-booking-calendar-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+}
+
+.vs-booking-sidebar {
+    padding: 14px;
+}
+
+.vs-booking-sidebar h3 {
+    margin: 0 0 12px;
+    color: #1e293b;
+    font-size: 1rem;
+}
+
+.vs-booking-empty {
+    color: #94a3b8;
+    font-size: .86rem;
+}
+
+.vs-booking-vehicles {
+    display: grid;
+    gap: 8px;
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+.vs-booking-vehicle {
+    padding: 10px;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.vs-booking-vehicle strong {
+    display: block;
+    font-size: .88rem;
+    color: #1e293b;
+}
+
+.vs-booking-vehicle span {
+    display: block;
+    margin-top: 4px;
+    font-size: .76rem;
+    color: #64748b;
+}
+
+.vs-booking-calendar {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .8rem;
+}
+
+.vs-booking-calendar th {
+    background: #f8fafc;
+    padding: 10px 8px;
+    text-align: center;
+    color: #64748b;
+    font-weight: 700;
+    font-size: .72rem;
+    text-transform: uppercase;
+    border: 1px solid #e2e8f0;
+}
+
+.vs-booking-calendar td {
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    vertical-align: top;
+    min-width: 50px;
+    height: 60px;
+}
+
+.vs-booking-calendar__day {
+    font-size: .75rem;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.vs-booking-event {
+    padding: 2px 4px;
+    margin-top: 4px;
+    border-left: 3px solid #3b82f6;
+    border-radius: 4px;
+    background: #dbeafe;
+    font-size: .7rem;
+}
+
+.vs-booking-event.is-approved {
+    border-left-color: #22c55e;
+    background: #dcfce7;
+}
+
+.vs-booking-event.is-pending {
+    border-left-color: #f59e0b;
+    background: #fef3c7;
+}
+
+.vs-booking-cta {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 24px;
+    border-radius: 999px;
+    background: #3b82f6;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, .4);
+}
+
+@media (max-width: 900px) {
+    .vs-booking-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vs-booking-nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

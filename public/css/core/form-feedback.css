@@ -1,0 +1,47 @@
+.vs-form-feedback {
+    display: flex;
+    align-items: center;
+    min-height: 38px;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(239, 68, 68, 0.18);
+    background: rgba(239, 68, 68, 0.08);
+    color: #991b1b;
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.vs-form-feedback[hidden] {
+    display: none;
+}
+
+.vs-field-feedback {
+    margin-top: 6px;
+    color: #b91c1c;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.vs-field-feedback[hidden] {
+    display: none;
+}
+
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+    border-color: rgba(220, 38, 38, 0.65) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.vs-page.vs-dark-mode .vs-form-feedback {
+    border-color: rgba(248, 113, 113, 0.22);
+    background: rgba(127, 29, 29, 0.26);
+    color: #fecaca;
+}
+
+.vs-page.vs-dark-mode .vs-field-feedback {
+    color: #fecaca;
+}

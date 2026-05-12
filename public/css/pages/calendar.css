@@ -1,0 +1,532 @@
+.vs-calendar-page {
+    max-width: 1600px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.vs-calendar-surface {
+    position: relative;
+    border-radius: 26px;
+    overflow: hidden;
+    padding: 18px;
+}
+
+.vs-calendar-surface::before {
+    content: "";
+    position: absolute;
+    inset: -140px;
+    background:
+        radial-gradient(820px 520px at 20% 10%, color-mix(in srgb, var(--vs-primary, #3b82f6) 35%, transparent) 0%, transparent 60%),
+        radial-gradient(720px 520px at 85% 35%, color-mix(in srgb, var(--vs-secondary, #22c55e) 22%, transparent) 0%, transparent 62%),
+        radial-gradient(680px 520px at 55% 92%, color-mix(in srgb, var(--vs-primary, #3b82f6) 16%, transparent) 0%, transparent 62%),
+        linear-gradient(135deg, var(--vs-bg-start, #f8fafc), var(--vs-bg-end, #eef2ff));
+    filter: blur(18px);
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.vs-calendar-card {
+    position: relative;
+    border-radius: 22px;
+    background: var(--vs-card-bg, rgba(255, 255, 255, 0.92));
+    border: 1px solid var(--vs-border, rgba(15, 23, 42, 0.1));
+    backdrop-filter: blur(18px);
+    box-shadow: 0 16px 50px rgba(2, 8, 23, 0.12);
+    overflow: hidden;
+}
+
+.vs-calendar-header {
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.vs-calendar-title {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.vs-calendar-subtitle {
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 0.95rem;
+    max-width: 680px;
+}
+
+.vs-calendar-nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.vs-calendar-nav-btn {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--vs-primary, #1e40af);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vs-calendar-nav-btn:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+}
+
+.vs-calendar-overview {
+    background: rgba(255, 255, 255, 0.45);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    padding: 18px 24px;
+}
+
+.vs-calendar-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.vs-calendar-overview-card {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+
+.vs-calendar-overview-value {
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: var(--vs-primary, #1d4ed8);
+    line-height: 1;
+}
+
+.vs-calendar-overview-label {
+    margin-top: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+}
+
+.vs-calendar-legend {
+    background: rgba(255, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    padding: 16px 24px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.vs-calendar-legend-title {
+    color: var(--vs-text-color, #1e293b);
+    font-weight: 800;
+}
+
+.vs-calendar-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.vs-calendar-legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.vs-calendar-legend-color--reservation {
+    background: #3b82f6;
+}
+
+.vs-calendar-legend-color--maintenance {
+    background: #f59e0b;
+}
+
+.vs-calendar-legend-color--incident {
+    background: #ef4444;
+}
+
+.vs-calendar-legend-summary {
+    margin-left: auto;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.vs-calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.vs-calendar-table th {
+    background: rgba(248, 250, 252, 0.8);
+    padding: 14px 8px;
+    text-align: center;
+    color: var(--vs-text-color, #64748b);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid rgba(15, 23, 42, 0.08);
+}
+
+.vs-calendar-table td {
+    padding: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    vertical-align: top;
+    min-height: 120px;
+    height: 132px;
+    position: relative;
+    background: rgba(255, 255, 255, 0.3);
+    transition: background 0.2s ease;
+}
+
+.vs-calendar-table td:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.vs-calendar-day--today {
+    background: color-mix(in srgb, var(--vs-primary, #3b82f6) 8%, rgba(255, 255, 255, 0.3));
+    box-shadow: inset 0 0 0 2px var(--vs-primary, #3b82f6);
+}
+
+.vs-calendar-day--outside {
+    background: rgba(248, 250, 252, 0.5);
+    color: #cbd5e1;
+}
+
+.vs-calendar-day-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.vs-calendar-day-number {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--vs-text-color, #1e293b);
+    padding: 2px 6px;
+    display: inline-block;
+    border-radius: 6px;
+}
+
+.vs-calendar-day--today .vs-calendar-day-number {
+    background: var(--vs-primary, #3b82f6);
+    color: #fff;
+}
+
+.vs-calendar-day-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.08);
+    color: #475569;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0 6px;
+}
+
+.vs-calendar-events {
+    display: grid;
+    gap: 4px;
+}
+
+.vs-calendar-event {
+    padding: 5px 8px;
+    font-size: 0.72rem;
+    border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    border-left: 3px solid;
+}
+
+.vs-calendar-event:hover {
+    transform: translateX(3px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.vs-calendar-event--reservation {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left-color: #3b82f6;
+}
+
+.vs-calendar-event--reservation-approved {
+    background: #dcfce7;
+    color: #166534;
+    border-left-color: #22c55e;
+}
+
+.vs-calendar-event--maintenance {
+    background: #fef3c7;
+    color: #92400e;
+    border-left-color: #f59e0b;
+}
+
+.vs-calendar-event--incident {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left-color: #ef4444;
+}
+
+.vs-calendar-shortcuts {
+    padding: 20px 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.vs-calendar-shortcut {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    color: #fff;
+}
+
+.vs-calendar-shortcut:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    color: #fff;
+}
+
+.vs-calendar-shortcut--dashboard {
+    background: #3b82f6;
+}
+
+.vs-calendar-shortcut--schedule {
+    background: #22c55e;
+}
+
+.vs-calendar-shortcut--maintenance {
+    background: #f59e0b;
+}
+
+.vs-calendar-shortcut--incident {
+    background: #ef4444;
+}
+
+.vs-calendar-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.vs-calendar-modal.is-open {
+    display: flex;
+}
+
+.vs-calendar-modal-content {
+    background: #fff;
+    border-radius: 20px;
+    padding: 0;
+    max-width: 640px;
+    width: 92%;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.vs-calendar-modal-header {
+    padding: 24px 28px;
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.vs-calendar-modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 900;
+}
+
+.vs-calendar-modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.vs-calendar-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.vs-calendar-modal-body {
+    padding: 24px 28px;
+    overflow-y: auto;
+}
+
+.vs-calendar-detail-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.vs-calendar-detail-row:last-child {
+    border-bottom: none;
+}
+
+.vs-calendar-detail-label {
+    font-weight: 700;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.vs-calendar-detail-value {
+    font-weight: 600;
+    color: var(--vs-text-color, #1e293b);
+}
+
+.vs-calendar-modal-footer {
+    padding: 20px 28px;
+    background: #f8fafc;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.vs-calendar-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vs-calendar-btn:hover {
+    text-decoration: none;
+}
+
+.vs-calendar-btn--primary {
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    color: #fff;
+}
+
+.vs-calendar-btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    color: #fff;
+}
+
+.vs-calendar-btn--secondary {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.vs-calendar-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.vs-calendar-status-badge--new {
+    background: #17a2b8;
+}
+
+.vs-calendar-status-badge--approved {
+    background: #28a745;
+}
+
+.vs-calendar-status-badge--rejected {
+    background: #dc3545;
+}
+
+.vs-calendar-status-badge--cancelled {
+    background: #6c757d;
+}
+
+@media (max-width: 1200px) {
+    .vs-calendar-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .vs-calendar-nav {
+        justify-content: center;
+    }
+
+    .vs-calendar-legend-summary {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 900px) {
+    .vs-calendar-table td {
+        height: 112px;
+        min-height: 112px;
+    }
+
+    .vs-calendar-detail-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+}

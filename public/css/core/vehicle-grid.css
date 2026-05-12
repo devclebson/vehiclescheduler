@@ -1,0 +1,36 @@
+/* vehicle-grid.css */
+.vs-vehicle-grid{display:flex;flex-direction:column;gap:16px}
+.vs-vehicle-grid__toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px 18px;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid rgba(148,163,184,.16);box-shadow:0 10px 28px rgba(15,23,42,.08)}
+.vs-vehicle-grid__search-wrap{position:relative;flex:1 1 280px;min-width:220px}
+.vs-vehicle-grid__search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#64748b;font-size:1rem}
+.vs-vehicle-grid__search-wrap input{width:100%;min-height:42px;padding:10px 14px 10px 36px;border-radius:12px;border:1px solid rgba(148,163,184,.24);background:#fff}
+.vs-vehicle-grid__results-text{color:#475569;font-weight:700;white-space:nowrap}
+.vs-vehicle-grid__filters{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.vs-vehicle-grid__filter{display:flex;flex-direction:column;gap:6px;min-width:140px}
+.vs-vehicle-grid__filter span{font-size:.82rem;font-weight:800;color:#334155}
+.vs-vehicle-grid__filter select{min-height:40px;border-radius:10px}
+.vs-vehicle-grid__clear{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:12px;border:1px solid rgba(148,163,184,.24);background:#fff;font-weight:800;cursor:pointer}
+.vs-vehicle-grid__table-wrap{overflow:auto;border-radius:18px;background:rgba(255,255,255,.94);border:1px solid rgba(148,163,184,.16);box-shadow:0 10px 28px rgba(15,23,42,.08)}
+.vs-vehicle-grid__table{width:100%;border-collapse:collapse;min-width:1080px}
+.vs-vehicle-grid__table thead th{padding:12px 14px;text-align:left;font-size:.74rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:#64748b;background:rgba(248,250,252,.98);border-bottom:1px solid rgba(148,163,184,.18)}
+.vs-vehicle-grid__table tbody td{padding:14px;vertical-align:middle;border-top:1px solid rgba(148,163,184,.12);color:#0f172a}
+.vs-vehicle-grid__table tbody tr:hover{background:rgba(37,99,235,.03)}
+.vs-vehicle-grid__identity{display:flex;align-items:center;gap:12px;min-width:0}
+.vs-vehicle-grid__avatar{width:42px;height:42px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:rgba(37,99,235,.12);color:#1d4ed8;font-weight:900;flex:0 0 42px}
+.vs-vehicle-grid__identity-body{min-width:0}
+.vs-vehicle-grid__name{font-weight:900;color:#0f172a;margin-bottom:2px}
+.vs-vehicle-grid__subline{display:flex;align-items:center;gap:6px;color:#64748b;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}
+.vs-vehicle-grid__chip-list,.vs-vehicle-grid__pill-stack{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.vs-vehicle-grid__chip,.vs-vehicle-grid__pill{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:4px 10px;border-radius:999px;font-size:.76rem;font-weight:900}
+.vs-vehicle-grid__chip{background:rgba(59,130,246,.10);color:#1d4ed8}
+.vs-vehicle-grid__chip--a{background:rgba(245,158,11,.14);color:#92400e}
+.vs-vehicle-grid__chip--b{background:rgba(59,130,246,.14);color:#1d4ed8}
+.vs-vehicle-grid__chip--d{background:rgba(34,197,94,.14);color:#166534}
+.vs-vehicle-grid__pill--active{background:rgba(34,197,94,.14);color:#166534}
+.vs-vehicle-grid__pill--inactive{background:rgba(239,68,68,.14);color:#991b1b}
+.vs-vehicle-grid__actions-col{width:112px}
+.vs-vehicle-grid__action{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 12px;border-radius:10px;background:rgba(37,99,235,.10);color:#1d4ed8;font-weight:800;text-decoration:none}
+.vs-vehicle-grid__action:hover{text-decoration:none;background:rgba(37,99,235,.16)}
+.vs-vehicle-grid__empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:26px 20px;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid rgba(148,163,184,.16);box-shadow:0 10px 28px rgba(15,23,42,.08);text-align:center}
+.vs-vehicle-grid__empty-icon{width:52px;height:52px;border-radius:16px;display:inline-flex;align-items:center;justify-content:center;background:rgba(37,99,235,.10);color:#1d4ed8;font-size:1.3rem}
+@media (max-width:1100px){.vs-vehicle-grid__toolbar{align-items:stretch}.vs-vehicle-grid__results-text{width:100%}}

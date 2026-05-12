@@ -1,0 +1,356 @@
+.vs-checklist-form-page {
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 0 20px;
+    position: relative;
+}
+
+.vs-checklist-form-page::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(820px 520px at 20% 10%, color-mix(in srgb, var(--vs-primary, #3b82f6) 25%, transparent) 0%, transparent 60%),
+        radial-gradient(720px 520px at 85% 35%, color-mix(in srgb, var(--vs-secondary, #22c55e) 18%, transparent) 0%, transparent 62%),
+        linear-gradient(135deg, var(--vs-bg-start, #f8fafc), var(--vs-bg-end, #eef2ff));
+    filter: blur(18px);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.vs-checklist-form-page .vs-back-btn {
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    margin-bottom: 20px;
+}
+
+.vs-checklist-form-page .vs-back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+    color: #fff;
+    text-decoration: none;
+}
+
+.vs-checklist-form-page .tab_cadre_fixe {
+    background: var(--vs-card-bg, rgba(255, 255, 255, 0.95)) !important;
+    backdrop-filter: blur(18px);
+    border-radius: 16px !important;
+    border: 1px solid var(--vs-border, rgba(15, 23, 42, 0.1)) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden !important;
+}
+
+.vs-checklist-form-page .tab_cadre_fixe > tbody > tr:first-child {
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e)) !important;
+}
+
+.vs-checklist-form-page .tab_cadre_fixe > tbody > tr:first-child th {
+    color: #fff !important;
+    font-weight: 900 !important;
+    font-size: 1.4rem !important;
+    padding: 24px !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.vs-checklist-form-page .tab_bg_1 {
+    background: rgba(255, 255, 255, 0.7) !important;
+    transition: all 0.2s ease;
+}
+
+.vs-checklist-form-page .tab_bg_1:hover {
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.vs-checklist-form-page .tab_bg_2 {
+    background: rgba(248, 250, 252, 0.7) !important;
+}
+
+.vs-checklist-form-page .tab_cadre_fixe td:first-child {
+    font-weight: 700 !important;
+    color: var(--vs-text-color, #1e293b) !important;
+    font-size: 0.95rem !important;
+}
+
+.vs-checklist-form-page input[type="text"],
+.vs-checklist-form-page textarea,
+.vs-checklist-form-page select {
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    transition: all 0.2s ease !important;
+    background: #fff !important;
+    color: #1e293b !important;
+    font-size: 0.95rem !important;
+}
+
+.vs-checklist-form-page input[type="text"]:focus,
+.vs-checklist-form-page textarea:focus,
+.vs-checklist-form-page select:focus {
+    outline: none !important;
+    border-color: var(--vs-primary, #3b82f6) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+.vs-checklist-form-page .submit,
+.vs-checklist-form-page button[type="submit"] {
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e)) !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 12px 24px !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.vs-checklist-form-page .submit:hover,
+.vs-checklist-form-page button[type="submit"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+}
+
+.vs-checklist-form-page .submit[name="delete"],
+.vs-checklist-form-page .submit[name="purge"],
+.vs-checklist-form-page button[name="delete"] {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+}
+
+.vs-checklist-form-page .ui-tabs-nav {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: none !important;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 8px !important;
+    backdrop-filter: blur(10px);
+}
+
+.vs-checklist-form-page .ui-tabs-nav li {
+    border: none !important;
+    background: transparent !important;
+    margin-right: 4px !important;
+}
+
+.vs-checklist-form-page .ui-tabs-nav li a {
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    transition: all 0.2s ease !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+}
+
+.vs-checklist-form-page .ui-tabs-nav .ui-tabs-active {
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e)) !important;
+    border: none !important;
+}
+
+.vs-checklist-form-page .ui-tabs-nav .ui-tabs-active a {
+    color: #fff !important;
+    font-weight: 700 !important;
+}
+
+.vs-checklist-form-page .ui-tabs-nav li:not(.ui-tabs-active) a:hover {
+    background: rgba(59, 130, 246, 0.1) !important;
+    color: var(--vs-primary, #3b82f6) !important;
+}
+
+.vs-checklist-form-page .ui-tabs-panel {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 0 0 12px 12px !important;
+    padding: 20px !important;
+    border: none !important;
+}
+
+.vs-checklist-form-page .red {
+    color: #ef4444 !important;
+    font-weight: 900 !important;
+}
+
+.vs-checklist-form-page .tab_cadre_fixe td {
+    padding: 14px 18px !important;
+}
+
+.vs-checklist-form-page .vs-checklist-form__textarea {
+    width: 98%;
+    min-height: 110px;
+}
+
+.vs-checklist-form-content {
+    padding: 24px;
+}
+
+.vs-checklist-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.vs-checklist-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vs-checklist-form-field--full {
+    grid-column: 1 / -1;
+}
+
+.vs-checklist-form-label {
+    font-weight: 700;
+    color: var(--vs-text-color, #1e293b);
+}
+
+.vs-checklist-form-input,
+.vs-checklist-form-select,
+.vs-checklist-form-textarea {
+    width: 100%;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    background: #fff;
+    color: #1e293b;
+    transition: all 0.2s ease;
+}
+
+.vs-checklist-form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.vs-checklist-form-input:focus,
+.vs-checklist-form-select:focus,
+.vs-checklist-form-textarea:focus {
+    outline: none;
+    border-color: var(--vs-primary, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.vs-checklist-form-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-top: 20px;
+}
+
+.vs-checklist-form-button {
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.vs-checklist-form-button:hover {
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.vs-checklist-form-button--primary {
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    color: #fff;
+}
+
+.vs-checklist-form-button--danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+}
+
+.vs-checklist-form-button--secondary {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.vs-checklist-items-panel {
+    margin-top: 24px;
+}
+
+.vs-checklist-items-panel__header {
+    padding: 24px 24px 0;
+}
+
+.vs-checklist-items-panel__header h2 {
+    margin: 0 0 8px;
+    font-size: 1.25rem;
+    color: var(--vs-text-color, #1e293b);
+}
+
+.vs-checklist-items-panel__header p {
+    margin: 0;
+    color: #64748b;
+}
+
+.theme-dark .vs-checklist-form-page::before {
+    background:
+        radial-gradient(820px 520px at 20% 10%, color-mix(in srgb, var(--vs-primary, #3b82f6) 20%, transparent) 0%, transparent 60%),
+        radial-gradient(720px 520px at 85% 35%, color-mix(in srgb, var(--vs-secondary, #22c55e) 15%, transparent) 0%, transparent 62%),
+        linear-gradient(135deg, #0f172a, #1e293b);
+}
+
+.theme-dark .vs-checklist-form-page .tab_cadre_fixe {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border-color: rgba(100, 116, 139, 0.2) !important;
+}
+
+.theme-dark .vs-checklist-form-page .tab_bg_1 {
+    background: rgba(51, 65, 85, 0.7) !important;
+}
+
+.theme-dark .vs-checklist-form-page .tab_bg_1:hover {
+    background: rgba(51, 65, 85, 0.9) !important;
+}
+
+.theme-dark .vs-checklist-form-page .tab_bg_2 {
+    background: rgba(30, 41, 59, 0.7) !important;
+}
+
+.theme-dark .vs-checklist-form-page .tab_cadre_fixe td {
+    color: #f1f5f9 !important;
+}
+
+.theme-dark .vs-checklist-form-page input[type="text"],
+.theme-dark .vs-checklist-form-page textarea,
+.theme-dark .vs-checklist-form-page select {
+    background: rgba(15, 23, 42, 0.9) !important;
+    color: #f1f5f9 !important;
+    border-color: rgba(100, 116, 139, 0.4) !important;
+}
+
+.theme-dark .vs-checklist-form-page .ui-tabs-nav {
+    background: rgba(30, 41, 59, 0.8) !important;
+}
+
+.theme-dark .vs-checklist-form-page .ui-tabs-nav li a {
+    color: #cbd5e1 !important;
+}
+
+.theme-dark .vs-checklist-form-page .ui-tabs-panel {
+    background: rgba(30, 41, 59, 0.6) !important;
+}
+
+.theme-dark .vs-checklist-form-label,
+.theme-dark .vs-checklist-items-panel__header h2 {
+    color: #f1f5f9;
+}
+
+.theme-dark .vs-checklist-items-panel__header p {
+    color: #cbd5e1;
+}
+
+@media (max-width: 960px) {
+    .vs-checklist-form-grid {
+        grid-template-columns: 1fr;
+    }
+}

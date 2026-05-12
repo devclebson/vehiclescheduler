@@ -1,0 +1,11 @@
+# 1. Entre na pasta do repositório (ou clone antes se não tiver localmente)
+cd vehiclescheduler
+
+# 2. Certifique-se de estar no branch main
+git checkout main
+
+# 3. Reset para o commit desejado
+git reset --hard a16bf2a
+
+# 4. Force o push
+git push origin main --force

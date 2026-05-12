@@ -1,0 +1,27 @@
+@import url("./core/legacy-base.css");
+@import url("./core/form-feedback.css");
+@import url("./pages/management.css");
+@import url("./pages/schedule.css");
+@import url("./pages/schedule-form.css");
+@import url("./pages/checklist-list.css");
+@import url("./pages/checklist-form.css");
+@import url("./pages/checklist-items.css");
+@import url("./pages/incident-form.css");
+@import url("./pages/insuranceclaim-form.css");
+@import url("./pages/maintenance-form.css");
+@import url("./pages/dashboard.css");
+@import url("./pages/calendar.css");
+@import url("./pages/booking.css");
+@import url("./pages/checklistresponse-form.css");
+@import url("./pages/driverfine-form.css");
+@import url("./pages/driverfine-tab.css");
+@import url("./pages/driver-form.css");
+@import url("./pages/vehicle-form.css");
+@import url("./pages/fines.css");
+@import url("./pages/reports.css");
+@import url("./pages/reports-view.css");
+@import url("./pages/theme-config.css");
+@import url("./pages/vehiclereport-form.css");
+@import url("./pages/driverfine.render.css");
+@import url("./core/flash.css");
+

@@ -1,0 +1,98 @@
+/* =========================================================
+   Generic flash messages
+   Scope: GLPI messages after redirect / alerts
+   ========================================================= */
+
+.vs-flash {
+    position: relative;
+    border-radius: 14px !important;
+    padding: 14px 16px !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.vs-flash,
+.vs-flash * {
+    font-weight: 700;
+}
+
+.vs-flash--success {
+    background: #ecfdf5 !important;
+    border-color: #86efac !important;
+    color: #166534 !important;
+}
+
+.vs-flash--success a {
+    color: #166534 !important;
+}
+
+.vs-flash--error {
+    background: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+    color: #991b1b !important;
+}
+
+.vs-flash--error a {
+    color: #991b1b !important;
+}
+
+.vs-flash--warning {
+    background: #fffbeb !important;
+    border-color: #fcd34d !important;
+    color: #92400e !important;
+}
+
+.vs-flash--warning a {
+    color: #92400e !important;
+}
+
+.vs-flash--info {
+    background: #eff6ff !important;
+    border-color: #93c5fd !important;
+    color: #1d4ed8 !important;
+}
+
+.vs-flash--info a {
+    color: #1d4ed8 !important;
+}
+
+.vs-dark .vs-flash--success {
+    background: rgba(22, 163, 74, 0.18) !important;
+    border-color: rgba(134, 239, 172, 0.28) !important;
+    color: #bbf7d0 !important;
+}
+
+.vs-dark .vs-flash--success a {
+    color: #bbf7d0 !important;
+}
+
+.vs-dark .vs-flash--error {
+    background: rgba(220, 38, 38, 0.18) !important;
+    border-color: rgba(252, 165, 165, 0.24) !important;
+    color: #fecaca !important;
+}
+
+.vs-dark .vs-flash--error a {
+    color: #fecaca !important;
+}
+
+.vs-dark .vs-flash--warning {
+    background: rgba(217, 119, 6, 0.18) !important;
+    border-color: rgba(252, 211, 77, 0.24) !important;
+    color: #fde68a !important;
+}
+
+.vs-dark .vs-flash--warning a {
+    color: #fde68a !important;
+}
+
+.vs-dark .vs-flash--info {
+    background: rgba(37, 99, 235, 0.18) !important;
+    border-color: rgba(147, 197, 253, 0.24) !important;
+    color: #bfdbfe !important;
+}
+
+.vs-dark .vs-flash--info a {
+    color: #bfdbfe !important;
+}

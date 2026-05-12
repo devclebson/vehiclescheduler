@@ -1,0 +1,17 @@
+# Exclude repository-only files from source archives created with git archive
+
+.github/ export-ignore
+docs/ export-ignore
+tests/ export-ignore
+node_modules/ export-ignore
+
+.gitignore export-ignore
+.gitattributes export-ignore
+.editorconfig export-ignore
+phpstan.neon export-ignore
+phpunit.xml export-ignore
+
+AGENTS.md export-ignore
+CODEX_HANDOFF.md export-ignore
+*.bk export-ignore
+*.bak export-ignore

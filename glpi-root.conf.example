@@ -1,0 +1,26 @@
+<VirtualHost *:80>
+    ServerName localhost
+    DocumentRoot /var/www/glpi/public
+
+    ErrorLog /var/log/httpd/glpi_error.log
+    CustomLog /var/log/httpd/glpi_access.log combined
+
+    <Directory /var/www/glpi/public>
+        Require all granted
+        Options FollowSymLinks
+        AllowOverride None
+        DirectoryIndex index.php
+
+        RewriteEngine On
+
+        RewriteCond %{HTTP:Authorization} ^(.+)$
+        RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php [QSA,L]
+
+        <FilesMatch \.php$>
+            SetHandler "proxy:fcgi://127.0.0.1:9000"
+        </FilesMatch>
+    </Directory>
+</VirtualHost>

@@ -1,0 +1,397 @@
+/* public/css/pages/driver-form.css */
+
+.vs-driver-wrap {
+    max-width: 960px;
+    margin: 4px auto 8px;
+    padding: 0 4px;
+    position: relative;
+    color: var(--vs-text-color, #0f172a);
+}
+
+.vs-driver-surface {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    padding: 8px;
+}
+
+.vs-driver-surface::before {
+    content: '';
+    position: absolute;
+    inset: -110px;
+    background:
+        radial-gradient(720px 420px at 20% 10%, color-mix(in srgb, var(--vs-primary, #3b82f6) 24%, transparent) 0%, transparent 60%),
+        radial-gradient(620px 420px at 85% 35%, color-mix(in srgb, var(--vs-secondary, #22c55e) 16%, transparent) 0%, transparent 62%),
+        linear-gradient(135deg, var(--vs-bg-start, #f8fafc), var(--vs-bg-end, #eef2ff));
+    filter: blur(14px);
+    opacity: 0.78;
+    pointer-events: none;
+}
+
+.vs-driver-surface::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.02);
+    pointer-events: none;
+}
+
+.vs-driver-card {
+    position: relative;
+    border-radius: 16px;
+    background: var(--vs-card-bg, rgba(255, 255, 255, 0.95));
+    border: 1px solid var(--vs-border, rgba(15, 23, 42, 0.10));
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 22px rgba(2, 8, 23, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.20);
+    overflow: hidden;
+}
+
+.vs-driver-head {
+    padding: 10px 12px 8px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--vs-border, rgba(15, 23, 42, 0.10)) 80%, transparent);
+}
+
+.vs-driver-title {
+    margin: 0;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    font-size: 0.96rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vs-driver-title i {
+    font-size: 1.08rem;
+    color: color-mix(in srgb, var(--vs-primary, #3b82f6) 75%, var(--vs-text-color, #0f172a));
+    transition: transform 0.18s ease;
+}
+
+.vs-driver-card:hover .vs-driver-title i {
+    transform: translateY(-1px);
+}
+
+.vs-driver-sub {
+    margin: 2px 0 0;
+    font-size: 0.78rem;
+    line-height: 1.25;
+    opacity: 0.82;
+}
+
+.vs-driver-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--vs-border, rgba(15, 23, 42, 0.10)) 80%, transparent);
+    background: color-mix(in srgb, var(--vs-card-bg, rgba(255, 255, 255, 0.95)) 70%, transparent);
+    font-weight: 800;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.vs-driver-pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--vs-secondary, #22c55e);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--vs-secondary, #22c55e) 16%, transparent);
+}
+
+.vs-driver-privacy {
+    margin: 8px 12px 0;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--vs-secondary, #22c55e) 18%, transparent);
+    background: color-mix(in srgb, var(--vs-secondary, #22c55e) 8%, var(--vs-card-bg, rgba(255, 255, 255, 0.95)));
+    box-shadow: 0 4px 12px rgba(2, 8, 23, 0.04);
+    font-size: 0.76rem;
+    line-height: 1.22rem;
+}
+
+.vs-driver-form-grid {
+    padding: 10px 12px 12px;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.vs-driver-field {
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--vs-border, rgba(15, 23, 42, 0.10)) 80%, transparent);
+    background: color-mix(in srgb, var(--vs-card-bg, rgba(255, 255, 255, 0.95)) 78%, transparent);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(2, 8, 23, 0.05);
+    padding: 8px 9px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.vs-driver-field:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--vs-primary, #3b82f6) 18%, var(--vs-border, rgba(15, 23, 42, 0.10)));
+    box-shadow: 0 8px 18px rgba(2, 8, 23, 0.06);
+}
+
+.vs-driver-field--user {
+    order: 10;
+    grid-column: span 6;
+}
+
+.vs-driver-field--categories {
+    order: 20;
+    grid-column: span 6;
+}
+
+.vs-driver-field--registration {
+    order: 30;
+    grid-column: span 4;
+}
+
+.vs-driver-field--group {
+    order: 31;
+    grid-column: span 4;
+}
+
+.vs-driver-field--phone {
+    order: 32;
+    grid-column: span 4;
+}
+
+.vs-driver-field--expiry {
+    order: 40;
+    grid-column: span 4;
+}
+
+.vs-driver-field--active {
+    order: 41;
+    grid-column: span 2;
+}
+
+.vs-driver-field--comment {
+    order: 42;
+    grid-column: span 6;
+}
+
+.vs-driver-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 5px;
+    font-weight: 850;
+    font-size: 0.74rem;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+}
+
+.vs-driver-hint,
+.vs-driver-hint-inline {
+    font-size: 0.69rem;
+    font-weight: 700;
+    opacity: 0.74;
+}
+
+.vs-driver-hint {
+    margin-top: 5px;
+    line-height: 1.18;
+}
+
+.vs-driver-field input[type='text'],
+.vs-driver-field input[type='tel'],
+.vs-driver-field input[type='date'],
+.vs-driver-field input:not([type]),
+.vs-driver-field textarea,
+.vs-driver-field select {
+    width: 100% !important;
+    min-height: 34px;
+    border-radius: 10px !important;
+    font-size: 0.84rem !important;
+}
+
+.vs-driver-field textarea {
+    min-height: 62px;
+    resize: vertical;
+}
+
+.vs-driver-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 6px;
+}
+
+.vs-driver-category-option {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 8px;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--vs-border, rgba(15, 23, 42, 0.10)) 80%, transparent);
+    background: rgba(255, 255, 255, 0.62);
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.vs-driver-category-option input[type='checkbox'] {
+    margin-top: 0;
+    transform: scale(0.92);
+}
+
+.vs-driver-category-option:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--vs-primary, #3b82f6) 24%, var(--vs-border, rgba(15, 23, 42, 0.10)));
+    box-shadow: 0 6px 14px rgba(2, 8, 23, 0.05);
+}
+
+.vs-driver-category-option:has(input:checked),
+.vs-driver-category-option.is-selected {
+    background: color-mix(in srgb, var(--vs-primary, #3b82f6) 10%, rgba(255, 255, 255, 0.84));
+    border-color: color-mix(in srgb, var(--vs-primary, #3b82f6) 32%, var(--vs-border, rgba(15, 23, 42, 0.10)));
+}
+
+.vs-driver-category-option__icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--vs-primary, #3b82f6) 12%, rgba(255, 255, 255, 0.92));
+    color: color-mix(in srgb, var(--vs-primary, #3b82f6) 82%, #0f172a);
+    flex: 0 0 26px;
+}
+
+.vs-driver-category-option__icon i {
+    font-size: 0.88rem;
+}
+
+.vs-driver-category-option__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.vs-driver-category-option__code {
+    min-width: 18px;
+    font-weight: 900;
+    font-size: 0.74rem;
+}
+
+.vs-driver-category-option__text {
+    font-size: 0.7rem;
+    line-height: 1.12;
+}
+
+.vs-driver-field :is(input, select, textarea):focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--vs-primary, #3b82f6) 16%, transparent) !important;
+    border-color: color-mix(in srgb, var(--vs-primary, #3b82f6) 40%, var(--vs-border, rgba(15, 23, 42, 0.10))) !important;
+}
+
+.vs-driver-foot {
+    padding: 0 12px 12px;
+    font-size: 0.71rem;
+    line-height: 1.22;
+    opacity: 0.8;
+}
+
+.vs-driver-badge-slot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.vs-driver-expiry-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.66rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.vs-driver-expiry-badge--ok {
+    background: #16a34a;
+}
+
+.vs-driver-expiry-badge--warning {
+    background: #ea580c;
+}
+
+.vs-driver-expiry-badge--critical {
+    background: #dc2626;
+}
+
+.vs-driver-expiry-badge--expired {
+    background: #64748b;
+}
+
+.vs-driver-expiry-badge--unknown {
+    background: #94a3b8;
+}
+
+@media (max-width: 980px) {
+    .vs-driver-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vs-driver-field--user,
+    .vs-driver-field--categories,
+    .vs-driver-field--registration,
+    .vs-driver-field--group,
+    .vs-driver-field--phone,
+    .vs-driver-field--expiry,
+    .vs-driver-field--active,
+    .vs-driver-field--comment {
+        order: initial;
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 640px) {
+    .vs-driver-wrap {
+        max-width: 100%;
+        padding: 0 2px;
+    }
+
+    .vs-driver-surface {
+        padding: 4px;
+    }
+
+    .vs-driver-head {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .vs-driver-pill {
+        width: fit-content;
+    }
+
+    .vs-driver-privacy {
+        margin: 8px 10px 0;
+    }
+
+    .vs-driver-form-grid {
+        padding: 9px 10px 10px;
+        gap: 7px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vs-driver-field,
+    .vs-driver-title i,
+    .vs-driver-category-option {
+        transition: none !important;
+    }
+
+    .vs-driver-field:hover,
+    .vs-driver-category-option:hover {
+        transform: none !important;
+    }
+}

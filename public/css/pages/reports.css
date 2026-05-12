@@ -1,0 +1,125 @@
+.vs-reports-page {
+    max-width: 1460px;
+    margin: 24px auto 32px;
+    padding: 0 20px;
+}
+
+.vs-reports-back {
+    margin-bottom: 18px;
+}
+
+.vs-reports-hero__note strong,
+.vs-theme-config-hero__tip strong {
+    font-size: .94rem;
+}
+
+.vs-reports-hero__note span,
+.vs-theme-config-hero__tip span {
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.vs-reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
+}
+
+.vs-report-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 22px;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 22px;
+    background: var(--vs-card-bg, rgba(255, 255, 255, .94));
+    box-shadow: 0 14px 36px rgba(15, 23, 42, .08);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.vs-report-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 42px rgba(15, 23, 42, .12);
+}
+
+.vs-report-card__header {
+    display: flex;
+    gap: 14px;
+}
+
+.vs-report-card__icon {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    color: #fff;
+    font-size: 1.5rem;
+}
+
+.vs-report-card__header h2 {
+    margin: 0 0 6px;
+    font-size: 1.08rem;
+    font-weight: 900;
+}
+
+.vs-report-card__header p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.55;
+}
+
+.vs-report-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.vs-report-card__meta span {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, .08);
+    color: #1e40af;
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+.vs-report-card__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.vs-report-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 23, 42, .12);
+    text-decoration: none;
+    font-weight: 800;
+    color: var(--vs-text-color, #0f172a);
+    background: rgba(255, 255, 255, .7);
+}
+
+.vs-report-btn--primary {
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    border-color: transparent;
+    color: #fff;
+}
+
+.vs-report-btn:hover {
+    color: inherit;
+}
+
+@media (max-width: 720px) {
+    .vs-report-card__actions {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,394 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Vinicius Lopes
+# This file is distributed under the same license as the Vehicle Scheduler plugin.
+# Vinicius Lopes <generalvini@gmail.com>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Vehicle Scheduler 1.0.0\n"
+"Report-Msgid-Bugs-To: generalvini@gmail.com\n"
+"POT-Creation-Date: 2026-04-14 00:00+0000\n"
+"PO-Revision-Date: 2026-04-14 00:00+0000\n"
+"Last-Translator: Vinicius Lopes <generalvini@gmail.com>\n"
+"Language-Team: es_ES\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: vehiclescheduler\n"
+
+msgid "Vehicle Scheduler"
+msgstr "Planificador de vehículos"
+
+msgid "Fleet Management"
+msgstr "Gestión de flotas"
+
+msgid "Fleet Reservation"
+msgstr "Reserva de flota"
+
+msgid "Dashboard"
+msgstr "Panel"
+
+msgid "Calendar"
+msgstr "Calendario"
+
+msgid "Management"
+msgstr "Gestión"
+
+msgid "Administration"
+msgstr "Administración"
+
+msgid "Reports"
+msgstr "Informes"
+
+msgid "Settings"
+msgstr "Configuración"
+
+msgid "Vehicle"
+msgstr "Vehículo"
+
+msgid "Vehicles"
+msgstr "Vehículos"
+
+msgid "Driver"
+msgstr "Conductor"
+
+msgid "Drivers"
+msgstr "Conductores"
+
+msgid "Schedule"
+msgstr "Reserva"
+
+msgid "Schedules"
+msgstr "Reservas"
+
+msgid "Reservation"
+msgstr "Reserva"
+
+msgid "Reservations"
+msgstr "Reservas"
+
+msgid "Incident"
+msgstr "Incidente"
+
+msgid "Incidents"
+msgstr "Incidentes"
+
+msgid "Maintenance"
+msgstr "Mantenimiento"
+
+msgid "Maintenances"
+msgstr "Mantenimientos"
+
+msgid "Insurance Claim"
+msgstr "Siniestro"
+
+msgid "Insurance Claims"
+msgstr "Siniestros"
+
+msgid "Fine"
+msgstr "Multa"
+
+msgid "Fines"
+msgstr "Multas"
+
+msgid "Plate"
+msgstr "Matrícula"
+
+msgid "Brand"
+msgstr "Marca"
+
+msgid "Model"
+msgstr "Modelo"
+
+msgid "Year"
+msgstr "Año"
+
+msgid "Color"
+msgstr "Color"
+
+msgid "Category"
+msgstr "Categoría"
+
+msgid "Fuel"
+msgstr "Combustible"
+
+msgid "Seats"
+msgstr "Asientos"
+
+msgid "Mileage"
+msgstr "Kilometraje"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Available"
+msgstr "Disponible"
+
+msgid "Unavailable"
+msgstr "No disponible"
+
+msgid "In maintenance"
+msgstr "En mantenimiento"
+
+msgid "Vehicle Scheduling"
+msgstr "Programación de vehículos"
+
+msgid "Reservation Request"
+msgstr "Solicitud de reserva"
+
+msgid "Reservation %s - %s"
+msgstr "Reserva %s - %s"
+
+msgid "Requester"
+msgstr "Solicitante"
+
+msgid "Request date"
+msgstr "Fecha de solicitud"
+
+msgid "Start date"
+msgstr "Fecha de inicio"
+
+msgid "End date"
+msgstr "Fecha de fin"
+
+msgid "Start time"
+msgstr "Hora de salida"
+
+msgid "End time"
+msgstr "Hora de regreso"
+
+msgid "Departure"
+msgstr "Salida"
+
+msgid "Return"
+msgstr "Retorno"
+
+msgid "Origin"
+msgstr "Origen"
+
+msgid "Destination"
+msgstr "Destino"
+
+msgid "Purpose"
+msgstr "Finalidad"
+
+msgid "Description"
+msgstr "Descripción"
+
+msgid "Description/Purpose"
+msgstr "Descripción/Finalidad"
+
+msgid "Describe the purpose of this reservation"
+msgstr "Describa la finalidad de esta reserva"
+
+msgid "Number of passengers"
+msgstr "Número de pasajeros"
+
+msgid "Passengers"
+msgstr "Pasajeros"
+
+msgid "Assigned driver"
+msgstr "Conductor asignado"
+
+msgid "Assigned vehicle"
+msgstr "Vehículo asignado"
+
+msgid "Contact Phone"
+msgstr "Teléfono de contacto"
+
+msgid "Department/Sector"
+msgstr "Departamento/Sector"
+
+msgid "Additional Comments"
+msgstr "Comentarios adicionales"
+
+msgid "Additional observations"
+msgstr "Observaciones adicionales"
+
+msgid "Related Ticket"
+msgstr "Ticket relacionado"
+
+msgid "Vehicle Report"
+msgstr "Reporte de vehículo"
+
+msgid "Vehicle Reports"
+msgstr "Reportes de vehículo"
+
+msgid "Report Type"
+msgstr "Tipo de reporte"
+
+msgid "Report Date"
+msgstr "Fecha del reporte"
+
+msgid "Reporter"
+msgstr "Reportado por"
+
+msgid "Maintenance Needed"
+msgstr "Requiere mantenimiento"
+
+msgid "Problem/Issue"
+msgstr "Problema/Incidencia"
+
+msgid "Accident"
+msgstr "Accidente"
+
+msgid "Observation"
+msgstr "Observación"
+
+msgid "Describe the issue, observation or situation in detail"
+msgstr "Describa el problema, la observación o la situación en detalle"
+
+msgid "New"
+msgstr "Nuevo"
+
+msgid "Pending"
+msgstr "Pendiente"
+
+msgid "Approved"
+msgstr "Aprobado"
+
+msgid "Rejected"
+msgstr "Rechazado"
+
+msgid "Cancelled"
+msgstr "Cancelado"
+
+msgid "Completed"
+msgstr "Completado"
+
+msgid "Active"
+msgstr "Activo"
+
+msgid "Closed"
+msgstr "Cerrado"
+
+msgid "Open"
+msgstr "Abrir"
+
+msgid "View"
+msgstr "Ver"
+
+msgid "Add"
+msgstr "Agregar"
+
+msgid "Create"
+msgstr "Crear"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Update"
+msgstr "Actualizar"
+
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+msgid "Approve"
+msgstr "Aprobar"
+
+msgid "Reject"
+msgstr "Rechazar"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Close"
+msgstr "Cerrar"
+
+msgid "Filter"
+msgstr "Filtrar"
+
+msgid "Search"
+msgstr "Buscar"
+
+msgid "Clear filters"
+msgstr "Limpiar filtros"
+
+msgid "Approved reservations"
+msgstr "Reservas aprobadas"
+
+msgid "Pending requests"
+msgstr "Solicitudes pendientes"
+
+msgid "Rejected requests"
+msgstr "Solicitudes rechazadas"
+
+msgid "Reservations by status"
+msgstr "Reservas por estado"
+
+msgid "Operational overview"
+msgstr "Vista operativa"
+
+msgid "Management overview"
+msgstr "Vista de gestión"
+
+msgid "Executive overview"
+msgstr "Vista ejecutiva"
+
+msgid "Department is required"
+msgstr "El departamento es obligatorio"
+
+msgid "Contact phone is required"
+msgstr "El teléfono de contacto es obligatorio"
+
+msgid "Description/Purpose is required"
+msgstr "La descripción/finalidad es obligatoria"
+
+msgid "Description is required"
+msgstr "La descripción es obligatoria"
+
+msgid "Vehicle is required"
+msgstr "El vehículo es obligatorio"
+
+msgid "Start date is required"
+msgstr "La fecha de inicio es obligatoria"
+
+msgid "End date is required"
+msgstr "La fecha de fin es obligatoria"
+
+msgid "Destination is required"
+msgstr "El destino es obligatorio"
+
+msgid "Driver is required"
+msgstr "El conductor es obligatorio"
+
+msgid "Invalid period"
+msgstr "Período inválido"
+
+msgid "The selected vehicle is not available for this period"
+msgstr "El vehículo seleccionado no está disponible para este período"
+
+msgid "The selected driver is not available for this period"
+msgstr "El conductor seleccionado no está disponible para este período"
+
+msgid "Item added successfully"
+msgstr "Elemento agregado con éxito"
+
+msgid "Item updated successfully"
+msgstr "Elemento actualizado con éxito"
+
+msgid "Item deleted successfully"
+msgstr "Elemento eliminado con éxito"
+
+msgid "Reservation approved successfully"
+msgstr "Reserva aprobada con éxito"
+
+msgid "Reservation rejected successfully"
+msgstr "Reserva rechazada con éxito"
+
+msgid "Unable to save data"
+msgstr "No se pudieron guardar los datos"
+
+msgid "An unexpected error occurred"
+msgstr "Ocurrió un error inesperado"
+
+msgid "Vehicle Reservation: %s - %s"
+msgstr "Reserva de vehículo: %s - %s"
+
+msgid "Vehicle Reservation Details:\\n\\nVehicle: %s\\nRequester: %s\\nStart: %s\\nEnd: %s\\nDestination: %s\\nPassengers: %d\\nPurpose: %s"
+msgstr "Detalles de la reserva de vehículo:\\n\\nVehículo: %s\\nSolicitante: %s\\nInicio: %s\\nFin: %s\\nDestino: %s\\nPasajeros: %d\\nFinalidad: %s"

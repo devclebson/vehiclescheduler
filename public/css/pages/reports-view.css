@@ -1,0 +1,215 @@
+.vs-report-view-page {
+    max-width: 1440px;
+    margin: 24px auto 32px;
+    padding: 0 20px;
+}
+
+.vs-report-view-hero,
+.vs-report-view-filters,
+.vs-report-view-table-card {
+    border: 1px solid rgba(15, 23, 42, .1);
+    border-radius: 24px;
+    background: var(--vs-card-bg, rgba(255, 255, 255, .94));
+    box-shadow: 0 16px 40px rgba(15, 23, 42, .10);
+}
+
+.vs-report-view-hero {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    padding: 28px 30px;
+    margin-bottom: 20px;
+}
+
+.vs-report-view-hero__icon {
+    width: 72px;
+    height: 72px;
+    flex: 0 0 72px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    color: #fff;
+    font-size: 2rem;
+}
+
+.vs-report-view-hero__content h1 {
+    margin: 0 0 10px;
+    font-size: 1.75rem;
+    font-weight: 900;
+}
+
+.vs-report-view-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.vs-report-view-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vs-report-view-filters {
+    padding: 20px 22px;
+    margin-bottom: 18px;
+}
+
+.vs-report-view-filters__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+}
+
+.vs-report-view-field {
+    min-width: 180px;
+    flex: 1;
+}
+
+.vs-report-view-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: .84rem;
+    font-weight: 800;
+    color: #64748b;
+}
+
+.vs-report-view-field input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #dbe2ea;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.vs-report-view-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.vs-report-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 16px;
+    border: 1px solid rgba(15, 23, 42, .12);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .86);
+    color: var(--vs-text-color, #0f172a);
+    text-decoration: none;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.vs-report-view-btn--primary {
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    color: #fff;
+}
+
+.vs-report-view-btn:hover {
+    color: inherit;
+}
+
+.vs-report-view-totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.vs-report-view-total-card {
+    padding: 20px;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 20px;
+    background: var(--vs-card-bg, rgba(255, 255, 255, .94));
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .08);
+}
+
+.vs-report-view-total-card strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    font-weight: 900;
+    color: #1d4ed8;
+}
+
+.vs-report-view-total-card span {
+    color: #64748b;
+    font-size: .8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.vs-report-view-table-wrap {
+    overflow-x: auto;
+}
+
+.vs-report-view-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.vs-report-view-table th {
+    padding: 13px 14px;
+    background: linear-gradient(135deg, var(--vs-primary, #3b82f6), var(--vs-secondary, #22c55e));
+    color: #fff;
+    text-align: left;
+    font-size: .78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.vs-report-view-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid rgba(15, 23, 42, .06);
+}
+
+.vs-report-view-table tbody tr:nth-child(even) td {
+    background: rgba(248, 250, 252, .8);
+}
+
+.vs-report-view-table tbody tr:hover td {
+    background: rgba(219, 234, 254, .45);
+}
+
+.vs-report-view-empty {
+    padding: 50px 18px;
+    text-align: center;
+    color: #64748b;
+}
+
+.vs-report-view-empty__icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+@media print {
+    .vs-report-view-filters,
+    .vs-report-view-actions {
+        display: none !important;
+    }
+
+    .vs-report-view-page {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+@media (max-width: 900px) {
+    .vs-report-view-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
