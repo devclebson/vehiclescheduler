@@ -4,6 +4,18 @@ Fleet management and vehicle scheduling plugin for **GLPI 11**.
 
 **SisViaturas** (`vehiclescheduler`) supports vehicle reservation requests, approval flow, operational assignment, conflict validation, and dashboard visibility for day-to-day fleet operations.
 
+## Screenshots
+
+![SisViaturas screenshot 1](docs/screenshots/screen01.png)
+
+![SisViaturas screenshot 2](docs/screenshots/screen02.png)
+
+![SisViaturas screenshot 3](docs/screenshots/screen03.png)
+
+![SisViaturas screenshot 4](docs/screenshots/screen04.png)
+
+![SisViaturas screenshot 5](docs/screenshots/screen05.png)
+
 ## Current MVP Scope
 
 - vehicle CRUD
