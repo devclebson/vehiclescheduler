@@ -22,6 +22,15 @@ $LANG['plugin_vehiclescheduler'] = [
     'Administration' => 'Administration',
     'Reports' => 'Rapports',
     'Settings' => 'Paramètres',
+    'Plugin settings' => 'Paramètres du plugin',
+    'Operational settings for SisViaturas behavior.' => 'Paramètres opérationnels pour ajuster le comportement de SisViaturas.',
+    'Language' => 'Langue',
+    'Plugin language' => 'Langue du plugin',
+    'Choose the language used by SisViaturas screens.' => 'Choisissez la langue utilisée par les écrans de SisViaturas.',
+    'Portuguese' => 'Portugais',
+    'English' => 'Anglais',
+    'Spanish' => 'Espagnol',
+    'French' => 'Français',
 
     // Main entities
     'Vehicle' => 'Véhicule',
@@ -122,6 +131,9 @@ $LANG['plugin_vehiclescheduler'] = [
     'Filter' => 'Filtrer',
     'Search' => 'Rechercher',
     'Clear filters' => 'Effacer les filtres',
+    'Checklist' => 'Checklist',
+    'Automatic departure checklist' => 'Checklist de sortie automatique',
+    'Open the first checklist after reservation approval.' => 'Ouvre le premier checklist après l’approbation de la réservation.',
 
     // Dashboard / KPI
     'Approved reservations' => 'Réservations approuvées',
@@ -154,6 +166,12 @@ $LANG['plugin_vehiclescheduler'] = [
     'Reservation rejected successfully' => 'Réservation rejetée avec succès',
     'Unable to save data' => 'Impossible d’enregistrer les données',
     'An unexpected error occurred' => 'Une erreur inattendue est survenue',
+    'Settings saved successfully.' => 'Paramètres enregistrés avec succès.',
+    'Unable to save plugin settings.' => 'Impossible d’enregistrer les paramètres du plugin.',
+    'Plugin language saved successfully.' => 'Langue du plugin enregistrée avec succès.',
+    'Unable to save plugin language.' => 'Impossible d’enregistrer la langue du plugin.',
+    'You are not allowed to access plugin settings.' => 'Vous n’êtes pas autorisé à accéder aux paramètres du plugin.',
+    'You are not allowed to change plugin settings.' => 'Vous n’êtes pas autorisé à modifier les paramètres du plugin.',
 
     // Notifications / tickets
     'Vehicle Reservation: %s - %s' => 'Réservation de véhicule : %s - %s',

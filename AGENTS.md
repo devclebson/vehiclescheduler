@@ -241,11 +241,38 @@ If the issue is about:
 
 Fix it in backend/domain code.
 
+## Language and localization rules
+
+Technical base language is English.
+
+Use English for:
+- class names
+- method names
+- constants
+- internal field names
+- translation keys
+- gettext `msgid`
+
+Rules:
+- All new user-facing text must be translatable through `locales/`
+- Prefer English `msgid` values with the `vehiclescheduler` domain
+- Keep Portuguese, Spanish, and French text in locale files, not hardcoded in PHP/JS
+- Existing hardcoded Portuguese may remain temporarily, but do not add new hardcoded user-facing Portuguese
+- Enums/status labels must expose translated labels through helper methods
+
+Examples:
+```php
+__('Service Order', 'vehiclescheduler');
+__('Workshop', 'vehiclescheduler');
+__('Estimated cost', 'vehiclescheduler');
+__('Approval status', 'vehiclescheduler');
+```
+
 ## Coding standards
 - PHP must follow PSR-12
 - Cache abstractions should follow PSR-6
 - Technical comments/documentation must be in English
-- User-facing labels may remain in Portuguese
+- User-facing labels must use locales for new code
 - Prefer production-ready, maintainable, minimal solutions
 
 ## Delivery rule for AI

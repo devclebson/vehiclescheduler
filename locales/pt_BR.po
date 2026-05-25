@@ -392,3 +392,57 @@ msgstr "Reserva de Veículo: %s - %s"
 
 msgid "Vehicle Reservation Details:\\n\\nVehicle: %s\\nRequester: %s\\nStart: %s\\nEnd: %s\\nDestination: %s\\nPassengers: %d\\nPurpose: %s"
 msgstr "Detalhes da Reserva de Veículo:\\n\\nVeículo: %s\\nSolicitante: %s\\nInício: %s\\nFim: %s\\nDestino: %s\\nPassageiros: %d\\nFinalidade: %s"
+
+msgid "Portuguese"
+msgstr "Português"
+
+msgid "English"
+msgstr "Inglês"
+
+msgid "Spanish"
+msgstr "Espanhol"
+
+msgid "French"
+msgstr "Francês"
+
+msgid "You are not allowed to access plugin settings."
+msgstr "Você não tem permissão para acessar as configurações do plugin."
+
+msgid "You are not allowed to change plugin settings."
+msgstr "Você não tem permissão para alterar as configurações do plugin."
+
+msgid "Settings saved successfully."
+msgstr "Configurações salvas com sucesso."
+
+msgid "Unable to save plugin settings."
+msgstr "Não foi possível salvar as configurações do plugin."
+
+msgid "Plugin language saved successfully."
+msgstr "Idioma do plugin salvo com sucesso."
+
+msgid "Unable to save plugin language."
+msgstr "Não foi possível salvar o idioma do plugin."
+
+msgid "Plugin settings"
+msgstr "Configurações do plugin"
+
+msgid "Operational settings for SisViaturas behavior."
+msgstr "Configurações operacionais para ajustar o comportamento do SisViaturas."
+
+msgid "Checklist"
+msgstr "Checklist"
+
+msgid "Automatic departure checklist"
+msgstr "Checklist de saída automático"
+
+msgid "Open the first checklist after reservation approval."
+msgstr "Abre o primeiro checklist após a aprovação da reserva."
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Plugin language"
+msgstr "Idioma do plugin"
+
+msgid "Choose the language used by SisViaturas screens."
+msgstr "Escolha o idioma usado nas telas do SisViaturas."

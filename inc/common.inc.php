@@ -310,3 +310,36 @@ function plugin_vehiclescheduler_flash_error(string $message): void
 {
     plugin_vehiclescheduler_add_flash($message, 'error', true);
 }
+
+/**
+ * Apply the plugin language selected in SisViaturas settings.
+ */
+function plugin_vehiclescheduler_apply_configured_locale(): void
+{
+    global $DB;
+
+    static $applied = false;
+
+    if ($applied) {
+        return;
+    }
+
+    $applied = true;
+
+    if (!class_exists('PluginVehicleschedulerConfig') || !class_exists('Session')) {
+        return;
+    }
+
+    try {
+        if (!isset($DB) || !$DB->tableExists(PluginVehicleschedulerConfig::getTable())) {
+            return;
+        }
+
+        $locale = PluginVehicleschedulerConfig::getPluginLocale();
+        Session::loadLanguage($locale);
+    } catch (Throwable $exception) {
+        // Keep GLPI's current language if plugin settings are not available yet.
+    }
+}
+
+plugin_vehiclescheduler_apply_configured_locale();

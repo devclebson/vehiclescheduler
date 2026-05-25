@@ -2,7 +2,7 @@
 <root>
    <name>SisViaturas</name>
    <key>vehiclescheduler</key>
-   <state>stable</state>
+   <state>testing</state>
 
    <logo>https://raw.githubusercontent.com/GeneralVini/vehiclescheduler/main/docs/assets/logo-40x40.png</logo>
 
@@ -95,9 +95,9 @@ SisViaturas é um plugin de gestão de frotas para GLPI 11 com foco em reservas 
 
    <versions>
       <version>
-         <num>1.0.0</num>
+         <num>0.1.0-dev</num>
          <compatibility>~11.0.0</compatibility>
-         <download_url>https://github.com/GeneralVini/vehiclescheduler/releases/download/v1.0.0/vehiclescheduler-1.0.0.zip</download_url>
+         <download_url>https://github.com/GeneralVini/vehiclescheduler/releases/download/v0.1.0-dev/vehiclescheduler-0.1.0-dev.zip</download_url>
       </version>
    </versions>
 

@@ -393,3 +393,56 @@ msgstr ""
 msgid "Vehicle Reservation Details:\\n\\nVehicle: %s\\nRequester: %s\\nStart: %s\\nEnd: %s\\nDestination: %s\\nPassengers: %d\\nPurpose: %s"
 msgstr ""
 
+msgid "Portuguese"
+msgstr ""
+
+msgid "English"
+msgstr ""
+
+msgid "Spanish"
+msgstr ""
+
+msgid "French"
+msgstr ""
+
+msgid "You are not allowed to access plugin settings."
+msgstr ""
+
+msgid "You are not allowed to change plugin settings."
+msgstr ""
+
+msgid "Settings saved successfully."
+msgstr ""
+
+msgid "Unable to save plugin settings."
+msgstr ""
+
+msgid "Plugin language saved successfully."
+msgstr ""
+
+msgid "Unable to save plugin language."
+msgstr ""
+
+msgid "Plugin settings"
+msgstr ""
+
+msgid "Operational settings for SisViaturas behavior."
+msgstr ""
+
+msgid "Checklist"
+msgstr ""
+
+msgid "Automatic departure checklist"
+msgstr ""
+
+msgid "Open the first checklist after reservation approval."
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Plugin language"
+msgstr ""
+
+msgid "Choose the language used by SisViaturas screens."
+msgstr ""

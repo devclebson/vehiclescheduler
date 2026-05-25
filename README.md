@@ -2,6 +2,10 @@
 
 Fleet management and vehicle scheduling plugin for **GLPI 11**.
 
+> [!WARNING]
+> **This plugin is under active development.**
+> The codebase, screens, data model, translations, CSS structure, and maintenance module are changing frequently. Do not treat the current branch as a stable production release without prior validation.
+
 **SisViaturas** (`vehiclescheduler`) supports vehicle reservation requests, approval flow, operational assignment, conflict validation, and dashboard visibility for day-to-day fleet operations.
 
 ## Screenshots
@@ -24,6 +28,20 @@ Fleet management and vehicle scheduling plugin for **GLPI 11**.
 - dashboard
 
 Additional operational modules may be present or evolving, including maintenance, incidents, reports, checklists, fines, insurance claims, and theme/UI helpers.
+
+## Maintenance Module Direction
+
+The maintenance module is being scoped around a simple operational MVP:
+
+- service orders linked to existing vehicles
+- simple workshop registry for own and accredited workshops
+- workshop specialties used as an auxiliary filter
+- estimated and final maintenance costs recorded on the service order
+- essential flow from opening, analysis, workshop assignment, diagnosis/budget, approval, execution, conclusion, and vehicle release
+
+Contract control for accredited workshops is planned for a future phase. The MVP does not manage contract balances, contract consumption by service order, contract managers, or administrative/technical inspectors.
+
+See [docs/modulo_manutencao_viaturas_markdown.md](docs/modulo_manutencao_viaturas_markdown.md) for the maintenance module specification.
 
 ## Documentation
 

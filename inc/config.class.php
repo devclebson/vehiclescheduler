@@ -57,6 +57,31 @@ class PluginVehicleschedulerConfig extends CommonDBTM
 
     public static function setBool(string $key, bool $value): bool
     {
+        return self::setString($key, $value ? '1' : '0');
+    }
+
+    public static function getString(string $key, string $default = ''): string
+    {
+        global $DB;
+
+        if (!self::ensureTable()) {
+            return $default;
+        }
+
+        $row = $DB->request([
+            'FROM'  => self::getTable(),
+            'WHERE' => ['config_key' => $key],
+        ])->current();
+
+        if (!$row) {
+            return $default;
+        }
+
+        return (string) ($row['config_value'] ?? $default);
+    }
+
+    public static function setString(string $key, string $value): bool
+    {
         global $DB;
 
         if (!self::ensureTable()) {
@@ -70,7 +95,7 @@ class PluginVehicleschedulerConfig extends CommonDBTM
 
         $payload = [
             'config_key'   => $key,
-            'config_value' => $value ? '1' : '0',
+            'config_value' => $value,
             'date_mod'     => date('Y-m-d H:i:s'),
         ];
 
@@ -86,5 +111,46 @@ class PluginVehicleschedulerConfig extends CommonDBTM
     public static function shouldAutoOpenDepartureChecklistAfterApproval(): bool
     {
         return self::getBool('auto_departure_checklist_after_approval', true);
+    }
+
+    /**
+     * @return array<string, array{label: string, native: string}>
+     */
+    public static function getSupportedLocales(): array
+    {
+        return [
+            'pt_BR' => [
+                'label'  => __('Portuguese', 'vehiclescheduler'),
+                'native' => 'Português',
+            ],
+            'en_GB' => [
+                'label'  => __('English', 'vehiclescheduler'),
+                'native' => 'English',
+            ],
+            'es_ES' => [
+                'label'  => __('Spanish', 'vehiclescheduler'),
+                'native' => 'Español',
+            ],
+            'fr_FR' => [
+                'label'  => __('French', 'vehiclescheduler'),
+                'native' => 'Français',
+            ],
+        ];
+    }
+
+    public static function getPluginLocale(): string
+    {
+        $locale = self::getString('plugin_locale', 'pt_BR');
+
+        return array_key_exists($locale, self::getSupportedLocales()) ? $locale : 'pt_BR';
+    }
+
+    public static function setPluginLocale(string $locale): bool
+    {
+        if (!array_key_exists($locale, self::getSupportedLocales())) {
+            return false;
+        }
+
+        return self::setString('plugin_locale', $locale);
     }
 }

@@ -2,6 +2,10 @@
 
 Plugin de gestão de frota e agendamento de veículos para **GLPI 11**.
 
+> [!WARNING]
+> **Este plugin está em desenvolvimento ativo.**
+> O código, as telas, o modelo de dados, as traduções, a estrutura de CSS e o módulo de manutenção estão mudando com frequência. Não trate a branch atual como release estável de produção sem validação prévia.
+
 **SisViaturas** (`vehiclescheduler`) apoia solicitações de reserva de veículos, fluxo de aprovação, alocação operacional, validação de conflitos e visibilidade por dashboards para a operação diária da frota.
 
 ## Escopo Atual do MVP
@@ -12,6 +16,20 @@ Plugin de gestão de frota e agendamento de veículos para **GLPI 11**.
 - dashboard
 
 Módulos operacionais adicionais podem estar presentes ou em evolução, incluindo manutenção, incidentes, relatórios, checklists, multas, sinistros e helpers de tema/interface.
+
+## Direção do Módulo de Manutenção
+
+O módulo de manutenção está sendo recortado em um MVP simples e operacional:
+
+- ordens de serviço vinculadas às viaturas existentes
+- cadastro simples de oficinas próprias e credenciadas
+- especialidades da oficina usadas como filtro auxiliar
+- custos estimado e final registrados na OS
+- fluxo essencial de abertura, análise, vinculação da oficina, diagnóstico/orçamento, aprovação, execução, conclusão e liberação da viatura
+
+O controle de contratos de oficinas credenciadas ficará para fase futura. O MVP não controla saldo contratual, consumo por OS, gestor do contrato, fiscal administrativo ou fiscal técnico.
+
+Consulte [docs/modulo_manutencao_viaturas_markdown.md](docs/modulo_manutencao_viaturas_markdown.md) para a especificação do módulo de manutenção.
 
 ## Documentação
 

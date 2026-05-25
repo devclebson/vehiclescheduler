@@ -22,6 +22,15 @@ $LANG['plugin_vehiclescheduler'] = [
     'Administration' => 'Administration',
     'Reports' => 'Reports',
     'Settings' => 'Settings',
+    'Plugin settings' => 'Plugin settings',
+    'Operational settings for SisViaturas behavior.' => 'Operational settings for SisViaturas behavior.',
+    'Language' => 'Language',
+    'Plugin language' => 'Plugin language',
+    'Choose the language used by SisViaturas screens.' => 'Choose the language used by SisViaturas screens.',
+    'Portuguese' => 'Portuguese',
+    'English' => 'English',
+    'Spanish' => 'Spanish',
+    'French' => 'French',
 
     // Main entities
     'Vehicle' => 'Vehicle',
@@ -123,6 +132,9 @@ $LANG['plugin_vehiclescheduler'] = [
     'Filter' => 'Filter',
     'Search' => 'Search',
     'Clear filters' => 'Clear filters',
+    'Checklist' => 'Checklist',
+    'Automatic departure checklist' => 'Automatic departure checklist',
+    'Open the first checklist after reservation approval.' => 'Open the first checklist after reservation approval.',
 
     // Dashboard / KPI
     'Approved reservations' => 'Approved reservations',
@@ -155,6 +167,12 @@ $LANG['plugin_vehiclescheduler'] = [
     'Reservation rejected successfully' => 'Reservation rejected successfully',
     'Unable to save data' => 'Unable to save data',
     'An unexpected error occurred' => 'An unexpected error occurred',
+    'Settings saved successfully.' => 'Settings saved successfully.',
+    'Unable to save plugin settings.' => 'Unable to save plugin settings.',
+    'Plugin language saved successfully.' => 'Plugin language saved successfully.',
+    'Unable to save plugin language.' => 'Unable to save plugin language.',
+    'You are not allowed to access plugin settings.' => 'You are not allowed to access plugin settings.',
+    'You are not allowed to change plugin settings.' => 'You are not allowed to change plugin settings.',
 
     // Notifications / tickets
     'Vehicle Reservation: %s - %s' => 'Vehicle Reservation: %s - %s',

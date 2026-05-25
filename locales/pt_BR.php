@@ -22,6 +22,15 @@ $LANG['plugin_vehiclescheduler'] = [
     'Administration' => 'Administração',
     'Reports' => 'Relatórios',
     'Settings' => 'Configurações',
+    'Plugin settings' => 'Configurações do plugin',
+    'Operational settings for SisViaturas behavior.' => 'Configurações operacionais para ajustar o comportamento do SisViaturas.',
+    'Language' => 'Idioma',
+    'Plugin language' => 'Idioma do plugin',
+    'Choose the language used by SisViaturas screens.' => 'Escolha o idioma usado nas telas do SisViaturas.',
+    'Portuguese' => 'Português',
+    'English' => 'Inglês',
+    'Spanish' => 'Espanhol',
+    'French' => 'Francês',
 
     // Main entities
     'Vehicle' => 'Veículo',
@@ -122,6 +131,9 @@ $LANG['plugin_vehiclescheduler'] = [
     'Filter' => 'Filtrar',
     'Search' => 'Pesquisar',
     'Clear filters' => 'Limpar filtros',
+    'Checklist' => 'Checklist',
+    'Automatic departure checklist' => 'Checklist de saída automático',
+    'Open the first checklist after reservation approval.' => 'Abre o primeiro checklist após a aprovação da reserva.',
 
     // Dashboard / KPI
     'Approved reservations' => 'Reservas aprovadas',
@@ -154,6 +166,12 @@ $LANG['plugin_vehiclescheduler'] = [
     'Reservation rejected successfully' => 'Reserva recusada com sucesso',
     'Unable to save data' => 'Não foi possível salvar os dados',
     'An unexpected error occurred' => 'Ocorreu um erro inesperado',
+    'Settings saved successfully.' => 'Configurações salvas com sucesso.',
+    'Unable to save plugin settings.' => 'Não foi possível salvar as configurações do plugin.',
+    'Plugin language saved successfully.' => 'Idioma do plugin salvo com sucesso.',
+    'Unable to save plugin language.' => 'Não foi possível salvar o idioma do plugin.',
+    'You are not allowed to access plugin settings.' => 'Você não tem permissão para acessar as configurações do plugin.',
+    'You are not allowed to change plugin settings.' => 'Você não tem permissão para alterar as configurações do plugin.',
 
     // Notifications / tickets
     'Vehicle Reservation: %s - %s' => 'Reserva de Veículo: %s - %s',
