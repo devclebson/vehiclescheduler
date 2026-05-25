@@ -1,98 +1,238 @@
 /* =========================================================
-   Generic flash messages
+   Design-system style flash alerts
    Scope: GLPI messages after redirect / alerts
    ========================================================= */
 
 .vs-flash {
+    --vs-alert-accent: #92400e;
+    --vs-alert-title: #78350f;
+    --vs-alert-message: #6b4e16;
+    --vs-alert-outer-bg: #fffbeb;
+    --vs-alert-outer-border: #fcd34d;
+    --vs-alert-surface: #ffffff;
+    --vs-alert-surface-border: rgba(146, 64, 14, 0.12);
+    --vs-alert-icon-bg: #ffffff;
+    --vs-alert-icon-border: rgba(146, 64, 14, 0.22);
+    --vs-alert-close-hover: rgba(146, 64, 14, 0.08);
+
+    width: 100%;
+    display: flex !important;
+    align-items: flex-start;
+    gap: 10px;
     position: relative;
-    border-radius: 14px !important;
-    padding: 14px 16px !important;
-    border-width: 1px !important;
-    border-style: solid !important;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    margin: 0 0 16px !important;
+    padding: 8px !important;
+    border: 1px solid var(--vs-alert-outer-border) !important;
+    border-radius: 10px !important;
+    background: var(--vs-alert-outer-bg) !important;
+    color: var(--vs-alert-title) !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+.vs-flash > :not(.vs-flash__body):not(.vs-flash__dismiss) {
+    display: none !important;
 }
 
 .vs-flash,
 .vs-flash * {
-    font-weight: 700;
+    color: inherit !important;
+}
+
+.vs-flash__body,
+.alert-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--vs-alert-surface-border);
+    border-radius: 8px;
+    background: var(--vs-alert-surface);
+}
+
+.vs-flash__title,
+.alert-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--vs-alert-title) !important;
+    font-size: 15px;
+    font-weight: 650;
+    line-height: 1.25;
+}
+
+.vs-flash__title-text {
+    font-weight: 650;
+}
+
+.vs-flash__icon,
+.alert-icon {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    flex: 0 0 22px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--vs-alert-icon-border);
+    border-radius: 999px;
+    background: var(--vs-alert-icon-bg);
+    color: var(--vs-alert-accent) !important;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.vs-flash__icon::before {
+    content: "i";
+}
+
+.vs-flash__icon[data-vs-flash-icon="success"]::before,
+.vs-flash__icon[data-vs-flash-icon="check"]::before {
+    content: "\2713";
+}
+
+.vs-flash__icon[data-vs-flash-icon="warning"]::before,
+.vs-flash__icon[data-vs-flash-icon="danger"]::before {
+    content: "!";
+}
+
+.vs-flash__message,
+.alert-message {
+    margin: 8px 0 0;
+    padding-left: 30px;
+    color: var(--vs-alert-message) !important;
+    font-size: 14px;
+    font-weight: 450;
+    line-height: 1.45;
+}
+
+.vs-flash__dismiss,
+.alert-close {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    flex: 0 0 30px;
+    align-items: center;
+    justify-content: center;
+    margin: 2px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--vs-alert-accent) !important;
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1;
+    opacity: 0.62;
+    cursor: pointer;
+}
+
+.vs-flash__dismiss:hover,
+.vs-flash__dismiss:focus,
+.alert-close:hover,
+.alert-close:focus {
+    background: var(--vs-alert-close-hover);
+    opacity: 1;
+}
+
+.vs-flash .btn-close,
+.vs-flash .close,
+.vs-flash [data-bs-dismiss="alert"],
+.vs-flash .ui-pnotify-title,
+.vs-flash .ui-pnotify-sticker,
+.vs-flash .ui-pnotify-closer,
+.vs-flash .ui-pnotify-icon {
+    display: none !important;
 }
 
 .vs-flash--success {
-    background: #ecfdf5 !important;
-    border-color: #86efac !important;
-    color: #166534 !important;
-}
-
-.vs-flash--success a {
-    color: #166534 !important;
+    --vs-alert-accent: #166534;
+    --vs-alert-title: #14532d;
+    --vs-alert-message: #166534;
+    --vs-alert-outer-bg: #f0fdf4;
+    --vs-alert-outer-border: #bbf7d0;
+    --vs-alert-surface-border: rgba(22, 101, 52, 0.12);
+    --vs-alert-icon-border: rgba(22, 101, 52, 0.22);
+    --vs-alert-close-hover: rgba(22, 101, 52, 0.08);
 }
 
 .vs-flash--error {
-    background: #fef2f2 !important;
-    border-color: #fca5a5 !important;
-    color: #991b1b !important;
-}
-
-.vs-flash--error a {
-    color: #991b1b !important;
+    --vs-alert-accent: #991b1b;
+    --vs-alert-title: #7f1d1d;
+    --vs-alert-message: #991b1b;
+    --vs-alert-outer-bg: #fef2f2;
+    --vs-alert-outer-border: #fecaca;
+    --vs-alert-surface-border: rgba(153, 27, 27, 0.12);
+    --vs-alert-icon-border: rgba(153, 27, 27, 0.22);
+    --vs-alert-close-hover: rgba(153, 27, 27, 0.08);
 }
 
 .vs-flash--warning {
-    background: #fffbeb !important;
-    border-color: #fcd34d !important;
-    color: #92400e !important;
-}
-
-.vs-flash--warning a {
-    color: #92400e !important;
+    --vs-alert-accent: #92400e;
+    --vs-alert-title: #78350f;
+    --vs-alert-message: #6b4e16;
+    --vs-alert-outer-bg: #fffbeb;
+    --vs-alert-outer-border: #fcd34d;
+    --vs-alert-surface-border: rgba(146, 64, 14, 0.12);
+    --vs-alert-icon-border: rgba(146, 64, 14, 0.22);
+    --vs-alert-close-hover: rgba(146, 64, 14, 0.08);
 }
 
 .vs-flash--info {
-    background: #eff6ff !important;
-    border-color: #93c5fd !important;
-    color: #1d4ed8 !important;
+    --vs-alert-accent: #0369a1;
+    --vs-alert-title: #075985;
+    --vs-alert-message: #0369a1;
+    --vs-alert-outer-bg: #f0f9ff;
+    --vs-alert-outer-border: #bae6fd;
+    --vs-alert-surface-border: rgba(3, 105, 161, 0.12);
+    --vs-alert-icon-border: rgba(3, 105, 161, 0.22);
+    --vs-alert-close-hover: rgba(3, 105, 161, 0.08);
 }
 
-.vs-flash--info a {
-    color: #1d4ed8 !important;
+.vs-dark .vs-flash {
+    --vs-alert-surface: var(--vs-card-bg, #111827);
+    --vs-alert-icon-bg: var(--vs-card-bg, #111827);
+    box-shadow: none !important;
 }
 
 .vs-dark .vs-flash--success {
-    background: rgba(22, 163, 74, 0.18) !important;
-    border-color: rgba(134, 239, 172, 0.28) !important;
-    color: #bbf7d0 !important;
-}
-
-.vs-dark .vs-flash--success a {
-    color: #bbf7d0 !important;
+    --vs-alert-accent: #86efac;
+    --vs-alert-title: #bbf7d0;
+    --vs-alert-message: #d1fae5;
+    --vs-alert-outer-bg: rgba(22, 101, 52, 0.18);
+    --vs-alert-outer-border: rgba(187, 247, 208, 0.30);
+    --vs-alert-surface-border: rgba(187, 247, 208, 0.16);
+    --vs-alert-icon-border: rgba(187, 247, 208, 0.28);
+    --vs-alert-close-hover: rgba(187, 247, 208, 0.10);
 }
 
 .vs-dark .vs-flash--error {
-    background: rgba(220, 38, 38, 0.18) !important;
-    border-color: rgba(252, 165, 165, 0.24) !important;
-    color: #fecaca !important;
-}
-
-.vs-dark .vs-flash--error a {
-    color: #fecaca !important;
+    --vs-alert-accent: #fca5a5;
+    --vs-alert-title: #fecaca;
+    --vs-alert-message: #fee2e2;
+    --vs-alert-outer-bg: rgba(153, 27, 27, 0.18);
+    --vs-alert-outer-border: rgba(254, 202, 202, 0.30);
+    --vs-alert-surface-border: rgba(254, 202, 202, 0.16);
+    --vs-alert-icon-border: rgba(254, 202, 202, 0.28);
+    --vs-alert-close-hover: rgba(254, 202, 202, 0.10);
 }
 
 .vs-dark .vs-flash--warning {
-    background: rgba(217, 119, 6, 0.18) !important;
-    border-color: rgba(252, 211, 77, 0.24) !important;
-    color: #fde68a !important;
-}
-
-.vs-dark .vs-flash--warning a {
-    color: #fde68a !important;
+    --vs-alert-accent: #fcd34d;
+    --vs-alert-title: #fde68a;
+    --vs-alert-message: #fef3c7;
+    --vs-alert-outer-bg: rgba(120, 53, 15, 0.22);
+    --vs-alert-outer-border: rgba(252, 211, 77, 0.34);
+    --vs-alert-surface-border: rgba(252, 211, 77, 0.16);
+    --vs-alert-icon-border: rgba(252, 211, 77, 0.28);
+    --vs-alert-close-hover: rgba(252, 211, 77, 0.10);
 }
 
 .vs-dark .vs-flash--info {
-    background: rgba(37, 99, 235, 0.18) !important;
-    border-color: rgba(147, 197, 253, 0.24) !important;
-    color: #bfdbfe !important;
-}
-
-.vs-dark .vs-flash--info a {
-    color: #bfdbfe !important;
+    --vs-alert-accent: #7dd3fc;
+    --vs-alert-title: #bae6fd;
+    --vs-alert-message: #e0f2fe;
+    --vs-alert-outer-bg: rgba(7, 89, 133, 0.18);
+    --vs-alert-outer-border: rgba(186, 230, 253, 0.30);
+    --vs-alert-surface-border: rgba(186, 230, 253, 0.16);
+    --vs-alert-icon-border: rgba(186, 230, 253, 0.28);
+    --vs-alert-close-hover: rgba(186, 230, 253, 0.10);
 }

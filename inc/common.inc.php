@@ -185,6 +185,7 @@ function plugin_vehiclescheduler_load_css(array $extra_css = []): void
     plugin_vehiclescheduler_load_theme_css();
 
     plugin_vehiclescheduler_load_script('js/plugin-shell.js');
+    plugin_vehiclescheduler_load_script('js/flash.js');
     plugin_vehiclescheduler_load_script('js/action-confirm.js');
 }
 
@@ -247,12 +248,19 @@ function plugin_vehiclescheduler_add_flash(string $message, string $kind = 'info
 {
     $allowedKinds = ['success', 'error', 'warning', 'info'];
     $kind = in_array($kind, $allowedKinds, true) ? $kind : 'info';
+    $messageType = INFO;
+
+    if ($kind === 'error' || $isError) {
+        $messageType = ERROR;
+    } elseif ($kind === 'warning') {
+        $messageType = WARNING;
+    }
 
     $safeMessage = '<span data-vs-flash-kind="'
         . htmlspecialchars($kind, ENT_QUOTES, 'UTF-8')
         . '">' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</span>';
 
-    Session::addMessageAfterRedirect($safeMessage, $isError, $isError ? ERROR : INFO, true);
+    Session::addMessageAfterRedirect($safeMessage, $isError, $messageType, true);
 }
 
 /**

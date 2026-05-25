@@ -15,11 +15,35 @@
     ];
 
     const CLASS_BASE = 'vs-flash';
+    const CLASS_DISMISS = 'vs-flash__dismiss';
+    const CLASS_ICON = 'vs-flash__icon';
+    const CLASS_TITLE = 'vs-flash__title';
+    const CLASS_BODY = 'vs-flash__body';
+    const CLASS_MESSAGE = 'vs-flash__message';
+    const CLASS_TITLE_TEXT = 'vs-flash__title-text';
     const CLASS_MAP = {
         success: 'vs-flash--success',
         info: 'vs-flash--info',
         warning: 'vs-flash--warning',
         error: 'vs-flash--error'
+    };
+    const ALERT_CLASS_MAP = {
+        success: 'alert-success',
+        info: 'alert-info',
+        warning: 'alert-warning',
+        error: 'alert-danger'
+    };
+    const ICON_MAP = {
+        success: 'check',
+        info: 'info',
+        warning: 'warning',
+        error: 'danger'
+    };
+    const TITLE_MAP = {
+        success: 'Sucesso',
+        info: 'Informação',
+        warning: 'Aviso',
+        error: 'Erro'
     };
 
     function normalize(value) {
@@ -167,10 +191,106 @@
         node.classList.remove(CLASS_MAP.info);
         node.classList.remove(CLASS_MAP.warning);
         node.classList.remove(CLASS_MAP.error);
+        node.classList.remove('alert-success');
+        node.classList.remove('alert-info');
+        node.classList.remove('alert-warning');
+        node.classList.remove('alert-danger');
+    }
+
+    function removeNativeControls(node) {
+        const nativeControls = node.querySelectorAll([
+            '.ui-pnotify-title',
+            '.ui-pnotify-sticker',
+            '.ui-pnotify-closer',
+            '.ui-pnotify-icon',
+            '.btn-close',
+            '[data-bs-dismiss="alert"]',
+            '.close'
+        ].join(','));
+
+        nativeControls.forEach((control) => {
+            control.remove();
+        });
+    }
+
+    function getFlashMessage(node) {
+        const marked = node.querySelector('[data-vs-flash-kind]');
+
+        if (marked && marked.textContent) {
+            return marked.textContent.trim();
+        }
+
+        return (node.textContent || '').trim();
+    }
+
+    function rebuildFlash(node, kind, messageText) {
+        node.replaceChildren();
+
+        const body = document.createElement('div');
+        body.className = `${CLASS_BODY} alert-main`;
+
+        const title = document.createElement('div');
+        title.className = `${CLASS_TITLE} alert-title`;
+
+        const titleIcon = document.createElement('span');
+        titleIcon.className = `${CLASS_ICON} alert-icon`;
+        titleIcon.setAttribute('aria-hidden', 'true');
+        titleIcon.setAttribute('data-vs-flash-icon', ICON_MAP[kind] || 'info');
+
+        const titleText = document.createElement('strong');
+        titleText.className = CLASS_TITLE_TEXT;
+        titleText.textContent = TITLE_MAP[kind] || TITLE_MAP.info;
+
+        title.appendChild(titleIcon);
+        title.appendChild(titleText);
+
+        const message = document.createElement('p');
+        message.className = `${CLASS_MESSAGE} alert-message`;
+        message.textContent = messageText;
+
+        body.appendChild(title);
+        body.appendChild(message);
+        node.appendChild(body);
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `${CLASS_DISMISS} alert-close`;
+        button.setAttribute('aria-label', 'Fechar aviso');
+        button.innerHTML = '&times;';
+        button.addEventListener('click', () => {
+            node.remove();
+        });
+        node.appendChild(button);
+    }
+
+    function ensureDivContainer(node) {
+        if (node.tagName.toLowerCase() !== 'button') {
+            return node;
+        }
+
+        const replacement = document.createElement('div');
+        replacement.className = node.className;
+
+        Array.from(node.attributes).forEach((attribute) => {
+            if (attribute.name === 'type') {
+                return;
+            }
+
+            replacement.setAttribute(attribute.name, attribute.value);
+        });
+
+        replacement.textContent = node.textContent || '';
+        node.replaceWith(replacement);
+
+        return replacement;
     }
 
     function enhanceFlash(node) {
         if (!(node instanceof HTMLElement)) {
+            return;
+        }
+
+        if (node.getAttribute('data-vs-flash-enhanced') === '1') {
             return;
         }
 
@@ -180,10 +300,20 @@
             return;
         }
 
+        const messageText = getFlashMessage(node);
+        node = ensureDivContainer(node);
+
         clearFlashClasses(node);
         node.classList.add(CLASS_BASE);
+        node.classList.add('alert');
+        node.classList.add('alert-dismissible');
+        node.classList.add(ALERT_CLASS_MAP[kind]);
         node.classList.add(CLASS_MAP[kind]);
+        node.setAttribute('role', 'alert');
         node.setAttribute('data-vs-flash-enhanced', '1');
+
+        removeNativeControls(node);
+        rebuildFlash(node, kind, messageText);
     }
 
     function scan(root) {
