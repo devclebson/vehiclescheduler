@@ -511,12 +511,23 @@ class PluginVehicleschedulerDriverfine extends CommonDBChild
      */
     public function prepareInputForUpdate($input)
     {
-        $input = self::normalizeInput($input);
+        $fineId = (int) ($input['id'] ?? 0);
 
-        if ($input['id'] <= 0) {
+        if ($fineId <= 0) {
             Session::addMessageAfterRedirect('ID da infração inválido.', false, ERROR);
             return false;
         }
+
+        // Retrieve current database values to merge with partial updates
+        $current = [];
+        if ($this->getFromDB($fineId)) {
+            $current = $this->fields;
+        }
+
+        // Merge current values with new input values, prioritizing new values
+        $merged = array_merge($current, $input);
+
+        $input = self::normalizeInput($merged);
 
         return $this->prepareInputForAdd($input);
     }

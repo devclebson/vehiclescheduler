@@ -1,8 +1,13 @@
 <?php
 // front/driverfine.render.php
+// @noinspection PhpUndefinedClassInspection -- PluginVehicleschedulerDriverfine loaded via include
 
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access this file directly");
+}
+
+if (!function_exists('plugin_vehiclescheduler_get_front_url')) {
+    include_once __DIR__ . '/../inc/common.inc.php';
 }
 
 /**
@@ -159,6 +164,7 @@ function vs_render_driverfine_tab(PluginVehicleschedulerDriver $driver): void
     echo '                    <tbody>';
 
     foreach ($fines as $fine) {
+        $fineId = (int) ($fine['id'] ?? 0);
         $vehicleId = (int) ($fine['plugin_vehiclescheduler_vehicles_id'] ?? 0);
         $vehicleLabel = $vehicleId > 0
             ? ($vehicleLabels[$vehicleId] ?? ('Veículo #' . $vehicleId))
@@ -168,14 +174,15 @@ function vs_render_driverfine_tab(PluginVehicleschedulerDriver $driver): void
         $violationDisplay = $violationCode !== ''
             ? $violationCode . ($violationSplit !== '' ? '-' . $violationSplit : '')
             : 'Manual';
+        $fineFormUrl = plugin_vehiclescheduler_get_front_url('driverfine.form.php') . '?id=' . $fineId;
 
         echo '                    <tr>';
-        echo '                        <td>' . vs_driverfine_escape(vs_driverfine_format_date((string) ($fine['fine_date'] ?? ''))) . '</td>';
-        echo '                        <td><span class="vs-fines-code">' . vs_driverfine_escape($violationDisplay) . '</span></td>';
-        echo '                        <td>' . vs_driverfine_escape((string) ($fine['description'] ?? '')) . '</td>';
+        echo '                        <td><a href="' . vs_driverfine_escape($fineFormUrl) . '" class="vs-driverfine-link">' . vs_driverfine_escape(vs_driverfine_format_date((string) ($fine['fine_date'] ?? ''))) . '</a></td>';
+        echo '                        <td><a href="' . vs_driverfine_escape($fineFormUrl) . '" class="vs-driverfine-link"><span class="vs-fines-code">' . vs_driverfine_escape($violationDisplay) . '</span></a></td>';
+        echo '                        <td><a href="' . vs_driverfine_escape($fineFormUrl) . '" class="vs-driverfine-link">' . vs_driverfine_escape((string) ($fine['description'] ?? '')) . '</a></td>';
         echo '                        <td>' . vs_driverfine_render_severity_badge((int) ($fine['severity'] ?? 0)) . '</td>';
         echo '                        <td>' . vs_driverfine_render_status_badge((int) ($fine['status'] ?? 0)) . '</td>';
-        echo '                        <td>' . vs_driverfine_escape($vehicleLabel) . '</td>';
+        echo '                        <td><a href="' . vs_driverfine_escape($fineFormUrl) . '" class="vs-driverfine-link">' . vs_driverfine_escape($vehicleLabel) . '</a></td>';
         echo '                    </tr>';
     }
 
