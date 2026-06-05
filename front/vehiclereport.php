@@ -7,11 +7,17 @@
  * @category Plugin
  * @package  VehicleScheduler
  * @author   Plugin Development Team
- * @license  PolyForm Noncommercial License 1.0.0
+ * @license  GPLv3+
  */
 
+include ('../../../inc/includes.php');
 
 Session::checkRight('plugin_vehiclescheduler', READ);
+
+if (!PluginVehicleschedulerProfile::canViewManagement()) {
+    Html::displayRightError();
+    exit;
+}
 
 Html::header(
     PluginVehicleschedulerVehiclereport::getTypeName(Session::getPluralNumber()),

@@ -1,78 +1,50 @@
 <?php
-
 /**
- * Driver fine domain class.
+ * Plugin Vehicle Scheduler for GLPI
+ * DriverFine — Registro de infrações de trânsito
+ * LGPD: apenas dados operacionais mínimos. Sem CPF, endereço ou biometria.
  */
 
 if (!defined('GLPI_ROOT')) {
-    die("Sorry. You can't access this file directly");
+    die("Acesso direto não permitido");
 }
 
-class PluginVehicleschedulerDriverfine extends CommonDBChild
-{
-    public static $itemtype  = 'PluginVehicleschedulerDriver';
-    public static $items_id  = 'plugin_vehiclescheduler_drivers_id';
-    public static $rightname = 'config';
-    public $dohistory = true;
+class PluginVehicleschedulerDriverfine extends CommonDBChild {
 
-    public const SEVERITY_NONE       = 0;
-    public const SEVERITY_MILD       = 1;
-    public const SEVERITY_MEDIUM     = 2;
-    public const SEVERITY_SEVERE     = 3;
-    public const SEVERITY_VERYSEVERE = 4;
+    static public $itemtype  = 'PluginVehicleschedulerDriver';
+    static public $items_id  = 'plugin_vehiclescheduler_drivers_id';
+    public $dohistory        = true;
+    static $rightname        = 'plugin_vehiclescheduler';
 
-    public const STATUS_OPEN      = 1;
-    public const STATUS_PAID      = 2;
-    public const STATUS_APPEALED  = 3;
-    public const STATUS_CANCELLED = 4;
+    const SEVERITY_MILD       = 1;
+    const SEVERITY_MEDIUM     = 2;
+    const SEVERITY_SEVERE     = 3;
+    const SEVERITY_VERYSEVERE = 4;
 
-    /**
-     * Returns the translated item type name.
-     *
-     * @param int $nb Number of items.
-     *
-     * @return string
-     */
-    public static function getTypeName($nb = 0)
-    {
+    const STATUS_OPEN      = 1;
+    const STATUS_PAID      = 2;
+    const STATUS_APPEALED  = 3;
+    const STATUS_CANCELLED = 4;
+
+    static function getTypeName($nb = 0) {
         return ($nb === 1) ? 'Infração de Trânsito' : 'Infrações de Trânsito';
     }
 
-    /**
-     * Returns the tab icon.
-     *
-     * @return string
-     */
-    public static function getIcon()
-    {
+    static function getIcon() {
         return 'ti ti-ticket';
     }
 
-    /**
-     * Returns all available severities.
-     *
-     * @return array<int, string>
-     */
-    public static function getAllSeverities(): array
-    {
+    static function getAllSeverities() {
         return [
-            self::SEVERITY_NONE       => 'Sem pontuação',
-            self::SEVERITY_MILD       => 'Leve - 3 pts',
-            self::SEVERITY_MEDIUM     => 'Média - 4 pts',
-            self::SEVERITY_SEVERE     => 'Grave - 5 pts',
-            self::SEVERITY_VERYSEVERE => 'Gravíssima - 7 pts',
+            self::SEVERITY_MILD       => 'Leve — 3 pts',
+            self::SEVERITY_MEDIUM     => 'Média — 4 pts',
+            self::SEVERITY_SEVERE     => 'Grave — 5 pts',
+            self::SEVERITY_VERYSEVERE => 'Gravíssima — 7 pts',
         ];
     }
 
-    /**
-     * Returns severity to points mapping.
-     *
-     * @return array<int, int>
-     */
-    public static function getSeverityPoints(): array
-    {
+    static function getSeverityPoints() {
         return [
-            self::SEVERITY_NONE       => 0,
             self::SEVERITY_MILD       => 3,
             self::SEVERITY_MEDIUM     => 4,
             self::SEVERITY_SEVERE     => 5,
@@ -80,13 +52,7 @@ class PluginVehicleschedulerDriverfine extends CommonDBChild
         ];
     }
 
-    /**
-     * Returns all available statuses.
-     *
-     * @return array<int, string>
-     */
-    public static function getAllStatus(): array
-    {
+    static function getAllStatus() {
         return [
             self::STATUS_OPEN      => 'Em aberto',
             self::STATUS_PAID      => 'Paga',
@@ -95,567 +61,229 @@ class PluginVehicleschedulerDriverfine extends CommonDBChild
         ];
     }
 
-    /**
-     * Returns the internal severity value for a RENAINF normalized level.
-     */
-    public static function getSeverityFromRenainfLevel(string $level): int
-    {
-        switch ($level) {
-            case 'mild':
-                return self::SEVERITY_MILD;
-            case 'medium':
-                return self::SEVERITY_MEDIUM;
-            case 'severe':
-                return self::SEVERITY_SEVERE;
-            case 'verysevere':
-                return self::SEVERITY_VERYSEVERE;
-        }
-
-        return self::SEVERITY_NONE;
-    }
-
-    /**
-     * Returns the RENAINF catalog shipped with the plugin.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    public static function getRenainfCatalog(): array
-    {
-        static $catalog = null;
-
-        if ($catalog !== null) {
-            return $catalog;
-        }
-
-        $path = GLPI_ROOT . '/plugins/vehiclescheduler/public/data/renainf-infractions.json';
-
-        if (!is_file($path)) {
-            $catalog = [];
-            return $catalog;
-        }
-
-        $data = json_decode((string) file_get_contents($path), true);
-        $catalog = is_array($data) ? $data : [];
-
-        return $catalog;
-    }
-
-    /**
-     * Finds a RENAINF catalog entry by code and split.
-     *
-     * @return array<string, mixed>|null
-     */
-    public static function findRenainfViolation(string $code, string $split): ?array
-    {
-        $code = trim($code);
-        $split = trim($split);
-
-        if ($code === '') {
-            return null;
-        }
-
-        foreach (self::getRenainfCatalog() as $item) {
-            if ((string) ($item['code'] ?? '') === $code && (string) ($item['split'] ?? '') === $split) {
-                return $item;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns whether the current profile may administer fines.
-     */
-    public static function canAdminFines(): bool
-    {
-        return Session::haveRight('config', UPDATE);
-    }
-
-    /**
-     * Blocks access when the current profile is not administrative.
-     */
-    public static function requireAdminFines(): void
-    {
-        if (!self::canAdminFines()) {
-            Html::displayRightError();
-            exit;
-        }
-    }
-
-    /**
-     * Returns the tab label for the parent driver item.
-     *
-     * @param CommonGLPI $item         Parent item.
-     * @param int        $withtemplate Template flag.
-     *
-     * @return string
-     */
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
-    {
-        if (!self::canAdminFines()) {
-            return '';
-        }
-
+    // INSTÂNCIA — obrigatório, CommonGLPI::getTabNameForItem() é non-static
+    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
         if ($item instanceof PluginVehicleschedulerDriver) {
             $count = countElementsInTable(
-                (new self())->getTable(),
+                self::getTable(),
                 ['plugin_vehiclescheduler_drivers_id' => $item->getID()]
             );
-
             return self::createTabEntry('Infrações de Trânsito', $count);
         }
-
         return '';
     }
 
-    /**
-     * Displays the tab content for the parent driver item.
-     *
-     * @param CommonGLPI $item         Parent item.
-     * @param int        $tabnum       Tab number.
-     * @param int        $withtemplate Template flag.
-     *
-     * @return bool
-     */
-    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
-    {
-        if (!self::canAdminFines()) {
-            return false;
+    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+        if ($item instanceof PluginVehicleschedulerDriver) {
+            self::showFinesForDriver($item);
         }
-
-        if (!$item instanceof PluginVehicleschedulerDriver) {
-            return false;
-        }
-
-        require_once GLPI_ROOT . '/plugins/vehiclescheduler/front/driverfine.render.php';
-
-        vs_render_driverfine_tab($item);
-
         return true;
     }
 
-    /**
-     * Returns all fines linked to a driver.
-     *
-     * @param int $driverId Driver identifier.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    public static function getFinesForDriver(int $driverId): array
-    {
+    static function showFinesForDriver(PluginVehicleschedulerDriver $driver) {
         global $DB;
 
-        if ($driverId <= 0) {
-            return [];
-        }
+        $driver_id  = $driver->getID();
+        $canedit    = Session::haveRight('plugin_vehiclescheduler', UPDATE);
+        $points_map = self::getSeverityPoints();
 
-        return iterator_to_array($DB->request([
-            'FROM'  => (new self())->getTable(),
-            'WHERE' => ['plugin_vehiclescheduler_drivers_id' => $driverId],
+        $rows  = $DB->request([
+            'FROM'  => self::getTable(),
+            'WHERE' => ['plugin_vehiclescheduler_drivers_id' => $driver_id],
             'ORDER' => ['fine_date DESC'],
-        ]));
-    }
+        ]);
+        $fines = iterator_to_array($rows);
 
-    /**
-     * Returns normalized management rows for the fines list.
-     *
-     * @param int $status Status filter. Zero returns all statuses.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    public static function getManagementRows(int $status = self::STATUS_OPEN): array
-    {
-        global $DB;
-
-        $where = [];
-        if ($status > 0) {
-            $where['glpi_plugin_vehiclescheduler_driverfines.status'] = $status;
+        $total_points = 0;
+        foreach ($fines as $fine) {
+            if ($fine['status'] != self::STATUS_CANCELLED) {
+                $total_points += $points_map[$fine['severity']] ?? 0;
+            }
         }
 
-        $criteria = [
-            'SELECT'    => [
-                'glpi_plugin_vehiclescheduler_driverfines.*',
-                'glpi_plugin_vehiclescheduler_drivers.name AS driver_name',
-                'glpi_plugin_vehiclescheduler_vehicles.name AS vehicle_name',
-                'glpi_plugin_vehiclescheduler_vehicles.plate AS vehicle_plate',
-            ],
-            'FROM'      => 'glpi_plugin_vehiclescheduler_driverfines',
-            'LEFT JOIN' => [
-                'glpi_plugin_vehiclescheduler_drivers'  => [
-                    'FKEY' => [
-                        'glpi_plugin_vehiclescheduler_driverfines' => 'plugin_vehiclescheduler_drivers_id',
-                        'glpi_plugin_vehiclescheduler_drivers'     => 'id',
-                    ],
-                ],
-                'glpi_plugin_vehiclescheduler_vehicles' => [
-                    'FKEY' => [
-                        'glpi_plugin_vehiclescheduler_driverfines' => 'plugin_vehiclescheduler_vehicles_id',
-                        'glpi_plugin_vehiclescheduler_vehicles'    => 'id',
-                    ],
-                ],
-            ],
-            'ORDER'     => ['glpi_plugin_vehiclescheduler_driverfines.fine_date DESC'],
-        ];
+        $bar_color = '#28a745';
+        if ($total_points >= 20)     $bar_color = '#dc3545';
+        elseif ($total_points >= 15) $bar_color = '#fd7e14';
+        elseif ($total_points >= 10) $bar_color = '#ffc107';
+        $pct = min(100, (int) round($total_points / 40 * 100));
 
-        if ($where !== []) {
-            $criteria['WHERE'] = $where;
+        echo "<div style='background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;padding:12px 16px;margin-bottom:16px;'>";
+        echo "<strong>Saldo de Pontos:</strong> ";
+        echo "<span style='font-size:1.3em;font-weight:bold;color:{$bar_color};'>{$total_points}</span> / 40 pontos (limite de suspensão — CTB)";
+        echo "<div style='margin-top:6px;background:#dee2e6;border-radius:4px;height:10px;'>";
+        echo "<div style='background:{$bar_color};width:{$pct}%;height:10px;border-radius:4px;'></div></div>";
+        if ($total_points >= 20) {
+            echo "<p style='color:#dc3545;margin:6px 0 0;font-size:12px;'>⚠️ Pontuação elevada — recomenda-se conversa com o motorista.</p>";
+        }
+        echo "</div>";
+
+        echo "<table class='tab_cadre_fixe'>";
+        echo "<tr class='table-row'>";
+        foreach (['Data', 'Descrição', 'Severidade', 'Pontos', 'Status', 'Veículo', 'Ações'] as $h) {
+            echo "<th>{$h}</th>";
+        }
+        echo "</tr>";
+
+        if (count($fines) === 0) {
+            echo "<tr><td colspan='7' class='center'><i>Nenhuma infração registrada.</i></td></tr>";
         }
 
-        return iterator_to_array($DB->request($criteria));
-    }
-
-    /**
-     * Builds summary numbers for management rows.
-     *
-     * @param array<int, array<string, mixed>> $fines Fine rows.
-     *
-     * @return array<string, int>
-     */
-    public static function buildManagementSummary(array $fines): array
-    {
-        $pointsMap = self::getSeverityPoints();
-        $summary = [
-            'total'        => count($fines),
-            'open'         => 0,
-            'paid'         => 0,
-            'appealed'     => 0,
-            'cancelled'    => 0,
-            'activePoints' => 0,
-        ];
+        $severities = self::getAllSeverities();
+        $statuses   = self::getAllStatus();
+        $vcache     = [];
 
         foreach ($fines as $fine) {
-            $status = (int) ($fine['status'] ?? 0);
-
-            if ($status === self::STATUS_OPEN) {
-                $summary['open']++;
-            } elseif ($status === self::STATUS_PAID) {
-                $summary['paid']++;
-            } elseif ($status === self::STATUS_APPEALED) {
-                $summary['appealed']++;
-            } elseif ($status === self::STATUS_CANCELLED) {
-                $summary['cancelled']++;
+            $veh_name = '—';
+            $vid = (int)($fine['plugin_vehiclescheduler_vehicles_id'] ?? 0);
+            if ($vid > 0) {
+                if (!isset($vcache[$vid])) {
+                    $v = new PluginVehicleschedulerVehicle();
+                    $vcache[$vid] = $v->getFromDB($vid)
+                        ? htmlspecialchars($v->fields['name'] . ' (' . $v->fields['plate'] . ')')
+                        : '—';
+                }
+                $veh_name = $vcache[$vid];
             }
 
-            if ($status !== self::STATUS_CANCELLED) {
-                $summary['activePoints'] += $pointsMap[(int) ($fine['severity'] ?? 0)] ?? 0;
+            $pts       = $points_map[$fine['severity']] ?? '?';
+            $sev_label = $severities[$fine['severity']] ?? '?';
+            $sta_label = $statuses[$fine['status']]    ?? '?';
+            $row_class = ($fine['status'] == self::STATUS_PAID || $fine['status'] == self::STATUS_CANCELLED)
+                       ? 'table-row' : 'table-row';
+
+            echo "<tr class='{$row_class}'>";
+            echo "<td>" . Html::convDate($fine['fine_date']) . "</td>";
+            echo "<td>" . htmlspecialchars($fine['description']) . "</td>";
+            echo "<td>{$sev_label}</td>";
+            echo "<td><strong>{$pts}</strong></td>";
+            echo "<td>{$sta_label}</td>";
+            echo "<td>{$veh_name}</td>";
+            echo "<td>";
+            if ($canedit) {
+                $url = Plugin::getWebDir('vehiclescheduler') . '/front/driverfine.form.php?id=' . $fine['id'];
+                echo "<a href='{$url}' class='btn btn-sm btn-ghost-secondary'><i class='ti ti-pencil'></i></a>";
             }
+            echo "</td></tr>";
         }
+        echo "</table>";
 
-        return $summary;
+        if ($canedit) {
+            $form_url = Plugin::getWebDir('vehiclescheduler') . '/front/driverfine.form.php';
+            echo "<br/>";
+            echo "<div style='background:#fff;border:1px solid #dee2e6;border-radius:6px;padding:16px;'>";
+            echo "<h4 style='margin:0 0 12px;'>Registrar Nova Infração</h4>";
+            echo "<form method='post' action='{$form_url}'>";
+            echo Html::hidden('plugin_vehiclescheduler_drivers_id', ['value' => $driver_id]);
+            echo Html::hidden('_glpi_csrf_token', ['value' => Session::getNewCSRFToken()]);
+            echo "<table class='tab_cadre_fixe'>";
+
+            echo "<tr class='table-row'>";
+            echo "<td>Data <span class='red'>*</span></td><td>";
+            Html::showDateField('fine_date', ['value' => date('Y-m-d')]);
+            echo "</td><td>Severidade <span class='red'>*</span></td><td>";
+            Dropdown::showFromArray('severity', self::getAllSeverities(), ['value' => self::SEVERITY_SEVERE]);
+            echo "</td></tr>";
+
+            echo "<tr class='table-row'>";
+            echo "<td>Veículo no momento</td><td>";
+            PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => 0]);
+            echo "</td><td>Status</td><td>";
+            Dropdown::showFromArray('status', self::getAllStatus(), ['value' => self::STATUS_OPEN]);
+            echo "</td></tr>";
+
+            echo "<tr class='table-row'>";
+            echo "<td>Descrição <span class='red'>*</span></td>";
+            echo "<td colspan='3'><textarea name='description' rows='2' style='width:98%;'"
+                . " placeholder='Descreva a infração (não inclua dados pessoais como CPF)'></textarea></td></tr>";
+
+            echo "<tr class='table-row'><td colspan='4'>";
+            echo "<input type='submit' name='add' value='Adicionar Infração' class='btn btn-primary'>";
+            echo "</td></tr>";
+            echo "</table>";
+            Html::closeForm();
+            echo "</div>";
+        }
     }
 
-    public static function getSeverityModifier(int $severity): string
-    {
-        switch ($severity) {
-            case self::SEVERITY_NONE:
-                return 'neutral';
-            case self::SEVERITY_MILD:
-                return 'mild';
-            case self::SEVERITY_MEDIUM:
-                return 'medium';
-            case self::SEVERITY_SEVERE:
-                return 'severe';
-            case self::SEVERITY_VERYSEVERE:
-                return 'verysevere';
-        }
-
-        return 'neutral';
-    }
-
-    public static function getStatusModifier(int $status): string
-    {
-        switch ($status) {
-            case self::STATUS_OPEN:
-                return 'open';
-            case self::STATUS_PAID:
-                return 'closed';
-            case self::STATUS_APPEALED:
-                return 'review';
-            case self::STATUS_CANCELLED:
-                return 'neutral';
-        }
-
-        return 'neutral';
-    }
-
-    /**
-     * Builds a compact summary for the driver's infractions.
-     *
-     * @param array<int, array<string, mixed>> $fines Fine rows.
-     *
-     * @return array<string, int|string>
-     */
-    public static function buildDriverSummary(array $fines): array
-    {
-        $pointsMap   = self::getSeverityPoints();
-        $totalPoints = 0;
-        $openCount   = 0;
-
-        foreach ($fines as $fine) {
-            if ((int) ($fine['status'] ?? 0) !== self::STATUS_CANCELLED) {
-                $totalPoints += $pointsMap[(int) ($fine['severity'] ?? 0)] ?? 0;
-            }
-
-            if ((int) ($fine['status'] ?? 0) === self::STATUS_OPEN) {
-                $openCount++;
-            }
-        }
-
-        $barColor   = '#22c55e';
-        $statusText = 'Situação regular';
-
-        if ($totalPoints >= 20) {
-            $barColor   = '#dc2626';
-            $statusText = 'Atenção: pontuação elevada';
-        } elseif ($totalPoints >= 15) {
-            $barColor   = '#f59e0b';
-            $statusText = 'Alerta: próximo do limite';
-        } elseif ($totalPoints >= 10) {
-            $barColor   = '#fbbf24';
-            $statusText = 'Atenção moderada';
-        }
-
-        return [
-            'total_points' => $totalPoints,
-            'open_count'   => $openCount,
-            'total_fines'  => count($fines),
-            'bar_color'    => $barColor,
-            'status_text'  => $statusText,
-            'percentage'   => min(100, (int) round(($totalPoints / 40) * 100)),
-        ];
-    }
-
-    /**
-     * Returns vehicle labels for fine rows.
-     *
-     * @param array<int, array<string, mixed>> $fines Fine rows.
-     *
-     * @return array<int, string>
-     */
-    public static function getVehicleLabels(array $fines): array
-    {
-        $vehicleIds = [];
-
-        foreach ($fines as $fine) {
-            $vehicleId = (int) ($fine['plugin_vehiclescheduler_vehicles_id'] ?? 0);
-
-            if ($vehicleId > 0) {
-                $vehicleIds[$vehicleId] = $vehicleId;
-            }
-        }
-
-        if ($vehicleIds === []) {
-            return [];
-        }
-
-        global $DB;
-
-        $labels = [];
-
-        foreach ($DB->request([
-            'FROM'  => 'glpi_plugin_vehiclescheduler_vehicles',
-            'WHERE' => ['id' => array_values($vehicleIds)],
-        ]) as $row) {
-            $labels[(int) $row['id']] = trim(
-                (string) ($row['name'] ?? '') . ' (' . (string) ($row['plate'] ?? '') . ')'
-            );
-        }
-
-        return $labels;
-    }
-
-    /**
-     * Validates and normalizes input before creating a fine.
-     *
-     * @param array<string, mixed> $input Raw input.
-     *
-     * @return array<string, mixed>|false
-     */
-    public function prepareInputForAdd($input)
-    {
-        $input = self::normalizeInput($input);
-
-        if ($input['plugin_vehiclescheduler_drivers_id'] <= 0) {
-            Session::addMessageAfterRedirect('O motorista é obrigatório.', false, ERROR);
-            return false;
-        }
-
-        if ($input['fine_date'] === null) {
-            Session::addMessageAfterRedirect('A data da infração é obrigatória.', false, ERROR);
-            return false;
-        }
-
-        if ($input['violation_code'] === '') {
-            Session::addMessageAfterRedirect('Selecione uma infração RENAINF.', false, ERROR);
-            return false;
-        }
-
-        if ($input['description'] === '') {
+    function prepareInputForAdd($input) {
+        if (empty(trim($input['description'] ?? ''))) {
             Session::addMessageAfterRedirect('A descrição é obrigatória.', false, ERROR);
             return false;
         }
-
-        if ($input['entities_id'] <= 0) {
-            $input['entities_id'] = (int) ($_SESSION['glpiactive_entity'] ?? 0);
+        if (empty($input['fine_date'])) {
+            Session::addMessageAfterRedirect('A data da infração é obrigatória.', false, ERROR);
+            return false;
         }
-
+        if (!isset($input['status'])) {
+            $input['status'] = self::STATUS_OPEN;
+        }
+        if (!isset($input['entities_id'])) {
+            $input['entities_id'] = $_SESSION['glpiactive_entity'];
+        }
         return $input;
     }
 
-    /**
-     * Validates and normalizes input before updating a fine.
-     *
-     * @param array<string, mixed> $input Raw input.
-     *
-     * @return array<string, mixed>|false
-     */
-    public function prepareInputForUpdate($input)
-    {
-        $fineId = (int) ($input['id'] ?? 0);
+    function showForm($ID, array $options = []) {
+        $this->initForm($ID, $options);
+        $this->showFormHeader($options);
+        echo "<tr class='table-row'><td colspan='4' class='text-end' style='text-align: right;'><a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'><i class='ti ti-arrow-left'></i> Voltar</a></td></tr>";
 
-        if ($fineId <= 0) {
-            Session::addMessageAfterRedirect('ID da infração inválido.', false, ERROR);
-            return false;
+        echo "<tr class='table-row'>";
+        echo "<td>Motorista</td><td>";
+        $driver = new PluginVehicleschedulerDriver();
+        if ($driver->getFromDB($this->fields['plugin_vehiclescheduler_drivers_id'])) {
+            echo $driver->getLink();
         }
+        echo Html::hidden('plugin_vehiclescheduler_drivers_id',
+            ['value' => $this->fields['plugin_vehiclescheduler_drivers_id']]);
+        echo "</td><td>Data</td><td>";
+        Html::showDateField('fine_date', ['value' => $this->fields['fine_date']]);
+        echo "</td></tr>";
 
-        // Retrieve current database values to merge with partial updates
-        $current = [];
-        if ($this->getFromDB($fineId)) {
-            $current = $this->fields;
-        }
+        echo "<tr class='table-row'>";
+        echo "<td>Severidade</td><td>";
+        Dropdown::showFromArray('severity', self::getAllSeverities(), ['value' => $this->fields['severity']]);
+        echo "</td><td>Status</td><td>";
+        Dropdown::showFromArray('status', self::getAllStatus(), ['value' => $this->fields['status']]);
+        echo "</td></tr>";
 
-        // Merge current values with new input values, prioritizing new values
-        $merged = array_merge($current, $input);
+        echo "<tr class='table-row'>";
+        echo "<td>Veículo no momento</td><td>";
+        PluginVehicleschedulerVehicle::dropdown([
+            'name'  => 'plugin_vehiclescheduler_vehicles_id',
+            'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'] ?? 0,
+        ]);
+        echo "</td><td colspan='2'></td></tr>";
 
-        $input = self::normalizeInput($merged);
+        echo "<tr class='table-row'>";
+        echo "<td>Descrição</td>";
+        echo "<td colspan='3'><textarea name='description' rows='3' style='width:98%;'>"
+            . htmlspecialchars($this->fields['description'] ?? '') . "</textarea></td></tr>";
 
-        return $this->prepareInputForAdd($input);
+        $this->showFormButtons($options);
+        return true;
     }
 
-    /**
-     * Returns GLPI search options.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    public function rawSearchOptions()
-    {
-        return [
-            ['id' => 'common', 'name' => 'Infrações de Trânsito'],
-            ['id' => '1', 'table' => $this->getTable(), 'field' => 'id', 'name' => 'ID', 'datatype' => 'number'],
-            ['id' => '2', 'table' => $this->getTable(), 'field' => 'fine_date', 'name' => 'Data', 'datatype' => 'date'],
-            ['id' => '3', 'table' => $this->getTable(), 'field' => 'violation_code', 'name' => 'Código RENAINF', 'datatype' => 'string'],
-            ['id' => '4', 'table' => $this->getTable(), 'field' => 'description', 'name' => 'Descrição', 'datatype' => 'text'],
-            ['id' => '5', 'table' => $this->getTable(), 'field' => 'severity', 'name' => 'Severidade', 'datatype' => 'specific', 'searchtype' => ['equals']],
-            ['id' => '6', 'table' => $this->getTable(), 'field' => 'status', 'name' => 'Status', 'datatype' => 'specific', 'searchtype' => ['equals']],
-        ];
+    function rawSearchOptions() {
+        $tab   = [];
+        $tab[] = ['id' => 'common', 'name' => 'Infrações de Trânsito'];
+        $tab[] = ['id' => '1', 'table' => $this->getTable(), 'field' => 'id',
+                  'name' => 'ID', 'datatype' => 'itemlink', 'massiveaction' => false];
+        $tab[] = ['id' => '2', 'table' => self::getTable(), 'field' => 'fine_date',
+                  'name' => 'Data', 'datatype' => 'date'];
+        $tab[] = ['id' => '3', 'table' => self::getTable(), 'field' => 'description',
+                  'name' => 'Descrição', 'datatype' => 'text'];
+        $tab[] = ['id' => '4', 'table' => self::getTable(), 'field' => 'severity',
+                  'name' => 'Severidade', 'datatype' => 'specific', 'searchtype' => ['equals']];
+        $tab[] = ['id' => '5', 'table' => self::getTable(), 'field' => 'status',
+                  'name' => 'Status', 'datatype' => 'specific', 'searchtype' => ['equals']];
+        return $tab;
     }
 
-    /**
-     * Returns display values for specific fields.
-     *
-     * @param string               $field   Field name.
-     * @param mixed                $values  Values payload.
-     * @param array<string, mixed> $options Display options.
-     *
-     * @return mixed
-     */
-    public static function getSpecificValueToDisplay($field, $values, array $options = [])
-    {
-        if (!is_array($values)) {
-            $values = [$field => $values];
-        }
-
-        if ($field === 'severity') {
-            return self::getAllSeverities()[$values[$field]] ?? $values[$field];
-        }
-
-        if ($field === 'status') {
-            return self::getAllStatus()[$values[$field]] ?? $values[$field];
-        }
-
+    static function getSpecificValueToDisplay($field, $values, array $options = []) {
+        if (!is_array($values)) $values = [$field => $values];
+        if ($field === 'severity') return self::getAllSeverities()[$values[$field]] ?? $values[$field];
+        if ($field === 'status')   return self::getAllStatus()[$values[$field]]    ?? $values[$field];
         return parent::getSpecificValueToDisplay($field, $values, $options);
-    }
-
-    /**
-     * Normalizes fine input payload.
-     *
-     * @param array<string, mixed> $input Raw input.
-     *
-     * @return array<string, mixed>
-     */
-    private static function normalizeInput(array $input): array
-    {
-        $normalized = [
-            'id'                                  => PluginVehicleschedulerInput::int($input, 'id', 0, 0),
-            'plugin_vehiclescheduler_drivers_id'  => PluginVehicleschedulerInput::int($input, 'plugin_vehiclescheduler_drivers_id', 0, 0),
-            'plugin_vehiclescheduler_vehicles_id' => PluginVehicleschedulerInput::int($input, 'plugin_vehiclescheduler_vehicles_id', 0, 0),
-            'entities_id'                         => PluginVehicleschedulerInput::int(
-                $input,
-                'entities_id',
-                (int) ($_SESSION['glpiactive_entity'] ?? 0),
-                0
-            ),
-            'fine_date'                           => PluginVehicleschedulerInput::date($input, 'fine_date'),
-            'violation_code'                      => PluginVehicleschedulerInput::text($input, 'violation_code', 20, ''),
-            'violation_split'                     => PluginVehicleschedulerInput::text($input, 'violation_split', 20, ''),
-            'legal_basis'                         => PluginVehicleschedulerInput::text($input, 'legal_basis', 255, ''),
-            'offender'                            => PluginVehicleschedulerInput::text($input, 'offender', 100, ''),
-            'authority'                           => PluginVehicleschedulerInput::text($input, 'authority', 100, ''),
-            'severity'                            => PluginVehicleschedulerInput::int(
-                $input,
-                'severity',
-                self::SEVERITY_SEVERE,
-                self::SEVERITY_NONE,
-                self::SEVERITY_VERYSEVERE
-            ),
-            'status'                              => PluginVehicleschedulerInput::int(
-                $input,
-                'status',
-                self::STATUS_OPEN,
-                self::STATUS_OPEN,
-                self::STATUS_CANCELLED
-            ),
-            'description'                         => PluginVehicleschedulerInput::text($input, 'description', 65535, ''),
-        ];
-
-        $violation = self::findRenainfViolation(
-            $normalized['violation_code'],
-            $normalized['violation_split']
-        );
-
-        if ($violation !== null) {
-            $normalized['legal_basis'] = PluginVehicleschedulerInput::text(
-                ['value' => $violation['legal_basis'] ?? ''],
-                'value',
-                255,
-                ''
-            );
-            $normalized['offender'] = PluginVehicleschedulerInput::text(
-                ['value' => $violation['offender'] ?? ''],
-                'value',
-                100,
-                ''
-            );
-            $normalized['authority'] = PluginVehicleschedulerInput::text(
-                ['value' => $violation['authority'] ?? ''],
-                'value',
-                100,
-                ''
-            );
-            $normalized['severity'] = self::getSeverityFromRenainfLevel(
-                (string) ($violation['severity_level'] ?? '')
-            );
-
-            if ($normalized['description'] === '') {
-                $normalized['description'] = PluginVehicleschedulerInput::text(
-                    ['value' => $violation['description'] ?? ''],
-                    'value',
-                    65535,
-                    ''
-                );
-            }
-        }
-
-        return $normalized;
     }
 }

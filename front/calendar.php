@@ -1,401 +1,206 @@
 <?php
+/**
+ * Calendário de Eventos - Gestão de Frota
+ * Mostra: Reservas, Manutenções, Incidentes
+ */
+include('../../../inc/includes.php');
+Session::checkRight('plugin_vehiclescheduler', UPDATE);
 
-include_once __DIR__ . '/../inc/common.inc.php';
-
-Session::checkRight('plugin_vehiclescheduler_management', READ);
-
-plugin_vehiclescheduler_redirect_future_plan('CALENDAR', 'EM OMRAS !!!');
-exit;
+if (!PluginVehicleschedulerProfile::canViewManagement()) {
+    Html::displayRightError();
+    exit;
+}
 
 global $DB;
+$month = isset($_GET['month']) ? (int)$_GET['month'] : (int)date('n');
+$year  = isset($_GET['year'])  ? (int)$_GET['year']  : (int)date('Y');
 
-$rootDoc = plugin_vehiclescheduler_get_root_doc();
+$month_start = sprintf('%04d-%02d-01', $year, $month);
+$month_end   = date('Y-m-t', strtotime($month_start));
 
-$month = PluginVehicleschedulerInput::int($_GET, 'month', (int) date('n'), 1, 12);
-$year = PluginVehicleschedulerInput::int($_GET, 'year', (int) date('Y'), 2020, 2100);
-
-$monthStart = sprintf('%04d-%02d-01', $year, $month);
-$monthStartDateTime = $monthStart . ' 00:00:00';
-$monthEnd = date('Y-m-t', strtotime($monthStart));
-$monthEndDateTime = $monthEnd . ' 23:59:59';
-
-$reservations = iterator_to_array($DB->request([
+// Buscar eventos do mês
+$reservas = iterator_to_array($DB->request([
     'FROM'  => 'glpi_plugin_vehiclescheduler_schedules',
     'WHERE' => [
         'OR' => [
-            [
-                'AND' => [
-                    ['begin_date' => ['>=', $monthStartDateTime]],
-                    ['begin_date' => ['<=', $monthEndDateTime]],
-                ],
-            ],
-            [
-                'AND' => [
-                    ['end_date' => ['>=', $monthStartDateTime]],
-                    ['end_date' => ['<=', $monthEndDateTime]],
-                ],
-            ],
+            ['begin_date' => ['>=', $month_start], 'begin_date' => ['<=', $month_end . ' 23:59:59']],
+            ['end_date'   => ['>=', $month_start], 'end_date'   => ['<=', $month_end . ' 23:59:59']],
         ],
     ],
 ]));
 
-$maintenances = iterator_to_array($DB->request([
+$manutencoes = iterator_to_array($DB->request([
     'FROM'  => 'glpi_plugin_vehiclescheduler_maintenances',
-    'WHERE' => [
-        'AND' => [
-            ['scheduled_date' => ['>=', $monthStart]],
-            ['scheduled_date' => ['<=', $monthEnd]],
-        ],
-    ],
+    'WHERE' => ['scheduled_date' => ['>=', $month_start], 'scheduled_date' => ['<=', $month_end]],
 ]));
 
-$incidents = iterator_to_array($DB->request([
+$incidentes = iterator_to_array($DB->request([
     'FROM'  => 'glpi_plugin_vehiclescheduler_incidents',
     'WHERE' => [
-        'AND' => [
-            ['incident_date' => ['>=', $monthStartDateTime]],
-            ['incident_date' => ['<=', $monthEndDateTime]],
-        ],
+        'incident_date' => ['>=', $month_start . ' 00:00:00'],
+        'incident_date' => ['<=', $month_end . ' 23:59:59'],
     ],
 ]));
 
-$vehicleIds = [];
-$userIds = [];
-
-foreach ($reservations as $reservation) {
-    $vehicleIds[] = (int) ($reservation['plugin_vehiclescheduler_vehicles_id'] ?? 0);
-    $userIds[] = (int) ($reservation['users_id'] ?? 0);
-}
-
-foreach ($maintenances as $maintenance) {
-    $vehicleIds[] = (int) ($maintenance['plugin_vehiclescheduler_vehicles_id'] ?? 0);
-}
-
-foreach ($incidents as $incident) {
-    $vehicleIds[] = (int) ($incident['plugin_vehiclescheduler_vehicles_id'] ?? 0);
-}
-
-$vehicleIds = array_values(array_unique(array_filter($vehicleIds)));
-$userIds = array_values(array_unique(array_filter($userIds)));
-
-$vehicleMap = [];
-$userMap = [];
-
-if ($vehicleIds !== []) {
-    foreach (
-        $DB->request([
-            'FROM'  => 'glpi_plugin_vehiclescheduler_vehicles',
-            'WHERE' => ['id' => $vehicleIds],
-        ]) as $row
-    ) {
-        $vehicleMap[(int) $row['id']] = [
-            'name'  => (string) ($row['name'] ?? ''),
-            'plate' => (string) ($row['plate'] ?? ''),
-        ];
-    }
-}
-
-if ($userIds !== []) {
-    foreach (
-        $DB->request([
-            'FROM'  => 'glpi_users',
-            'WHERE' => ['id' => $userIds],
-        ]) as $row
-    ) {
-        $userMap[(int) $row['id']] = (string) ($row['name'] ?? '');
-    }
-}
-
-$eventsByDay = [];
-
-$scheduleStatusMeta = [
-    1 => ['label' => 'Nova', 'variant' => 'new'],
-    2 => ['label' => 'Aprovada', 'variant' => 'approved'],
-    3 => ['label' => 'Recusada', 'variant' => 'rejected'],
-    4 => ['label' => 'Cancelada', 'variant' => 'cancelled'],
-];
-
-foreach ($reservations as $reservation) {
-    $start = substr((string) ($reservation['begin_date'] ?? ''), 0, 10);
-    $end = substr((string) ($reservation['end_date'] ?? ''), 0, 10);
-    $vehicle = $vehicleMap[(int) ($reservation['plugin_vehiclescheduler_vehicles_id'] ?? 0)] ?? ['name' => 'Veiculo', 'plate' => ''];
-    $requester = $userMap[(int) ($reservation['users_id'] ?? 0)] ?? '';
-    $status = $scheduleStatusMeta[(int) ($reservation['status'] ?? 0)] ?? ['label' => '', 'variant' => 'new'];
+// Montar estrutura de eventos por dia
+$eventos = [];
+foreach ($reservas as $r) {
+    $start = substr($r['begin_date'], 0, 10);
+    $end   = substr($r['end_date'], 0, 10);
     $current = $start;
-
-    while ($current !== '' && $current <= $end && $current <= $monthEnd) {
-        if ($current >= $monthStart) {
-            $eventsByDay[$current][] = [
-                'tipo'           => 'reserva',
-                'status'         => (int) ($reservation['status'] ?? 0),
-                'status_label'   => $status['label'],
-                'status_variant' => $status['variant'],
-                'titulo'         => 'Reserva: ' . $vehicle['name'],
-                'link'           => plugin_vehiclescheduler_get_front_url('schedule.form.php') . '?id=' . (int) ($reservation['id'] ?? 0),
-                'veiculo'        => $vehicle['name'],
-                'placa'          => $vehicle['plate'],
-                'solicitante'    => $requester,
-                'destino'        => (string) ($reservation['destination'] ?? ''),
-                'horario'        => Html::convDateTime((string) ($reservation['begin_date'] ?? ''))
-                    . ' - '
-                    . Html::convDateTime((string) ($reservation['end_date'] ?? '')),
+    while ($current <= $end && $current <= $month_end) {
+        if ($current >= $month_start) {
+            if (!isset($eventos[$current])) $eventos[$current] = [];
+            $eventos[$current][] = [
+                'tipo'  => 'reserva',
+                'status'=> $r['status'],
+                'titulo'=> 'Reserva',
+                'id'    => $r['id'],
+                'link'  => 'schedule.form.php?id=' . $r['id'],
             ];
         }
-
         $current = date('Y-m-d', strtotime($current . ' +1 day'));
     }
 }
 
-foreach ($maintenances as $maintenance) {
-    $date = (string) ($maintenance['scheduled_date'] ?? '');
-
-    if ($date === '') {
-        continue;
-    }
-
-    $vehicle = $vehicleMap[(int) ($maintenance['plugin_vehiclescheduler_vehicles_id'] ?? 0)] ?? ['name' => 'Veiculo', 'plate' => ''];
-
-    $eventsByDay[$date][] = [
-        'tipo'      => 'manutencao',
-        'titulo'    => 'Manutencao: ' . $vehicle['name'],
-        'link'      => plugin_vehiclescheduler_get_front_url('maintenance.form.php') . '?id=' . (int) ($maintenance['id'] ?? 0),
-        'veiculo'   => $vehicle['name'],
-        'placa'     => $vehicle['plate'],
-        'fornecedor' => (string) ($maintenance['supplier'] ?? ''),
-        'custo'     => (float) ($maintenance['cost'] ?? 0),
-        'descricao' => (string) ($maintenance['description'] ?? ''),
+foreach ($manutencoes as $m) {
+    $data = $m['scheduled_date'];
+    if (!isset($eventos[$data])) $eventos[$data] = [];
+    $eventos[$data][] = [
+        'tipo'  => 'manutencao',
+        'status'=> $m['status'],
+        'titulo'=> 'Manutenção',
+        'id'    => $m['id'],
+        'link'  => 'maintenance.form.php?id=' . $m['id'],
     ];
 }
 
-foreach ($incidents as $incident) {
-    $date = substr((string) ($incident['incident_date'] ?? ''), 0, 10);
-
-    if ($date === '') {
-        continue;
-    }
-
-    $vehicle = $vehicleMap[(int) ($incident['plugin_vehiclescheduler_vehicles_id'] ?? 0)] ?? ['name' => 'Veiculo', 'plate' => ''];
-
-    $eventsByDay[$date][] = [
-        'tipo'      => 'incidente',
-        'titulo'    => 'Incidente: ' . $vehicle['name'],
-        'link'      => plugin_vehiclescheduler_get_front_url('incident.form.php') . '?id=' . (int) ($incident['id'] ?? 0),
-        'veiculo'   => $vehicle['name'],
-        'placa'     => $vehicle['plate'],
-        'local'     => (string) ($incident['location'] ?? ''),
-        'descricao' => (string) ($incident['description'] ?? ''),
+foreach ($incidentes as $i) {
+    $data = substr($i['incident_date'], 0, 10);
+    if (!isset($eventos[$data])) $eventos[$data] = [];
+    $eventos[$data][] = [
+        'tipo'  => 'incidente',
+        'status'=> $i['status'],
+        'titulo'=> 'Incidente',
+        'id'    => $i['id'],
+        'link'  => 'incident.form.php?id=' . $i['id'],
     ];
 }
 
-$previousMonth = $month - 1;
-$previousYear = $year;
+Html::header('Calendário de Eventos', $_SERVER['PHP_SELF'], 'tools', 'PluginVehicleschedulerMenug', 'calendar');
 
-if ($previousMonth < 1) {
-    $previousMonth = 12;
-    $previousYear--;
-}
+// Navegação de mês
+$prev_m = $month - 1; $prev_y = $year;
+if ($prev_m < 1) { $prev_m = 12; $prev_y--; }
+$next_m = $month + 1; $next_y = $year;
+if ($next_m > 12) { $next_m = 1; $next_y++; }
 
-$nextMonth = $month + 1;
-$nextYear = $year;
-
-if ($nextMonth > 12) {
-    $nextMonth = 1;
-    $nextYear++;
-}
-
-$weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
-$months = ['', 'Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-$today = date('Y-m-d');
-$firstWeekday = (int) date('w', strtotime($monthStart));
-$daysInMonth = (int) date('t', strtotime($monthStart));
-
-$stats = [
-    'total'        => count($reservations) + count($maintenances) + count($incidents),
-    'reservations' => count($reservations),
-    'maintenances' => count($maintenances),
-    'incidents'    => count($incidents),
-];
-
-Html::header('Calendario de Eventos', $_SERVER['PHP_SELF'], 'tools', 'PluginVehicleschedulerMenug', 'calendar');
-
-plugin_vehiclescheduler_load_css();
-plugin_vehiclescheduler_enhance_ui();
-
-$calendarJsFile = GLPI_ROOT . '/plugins/vehiclescheduler/public/js/calendar.js';
-$calendarJsVer = is_file($calendarJsFile) ? filemtime($calendarJsFile) : PLUGIN_VEHICLESCHEDULER_VERSION;
-$calendarJsUrl = plugin_vehiclescheduler_get_public_url('js/calendar.js') . '?v=' . $calendarJsVer;
+$dias_semana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+$meses = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 ?>
+<style>
+.cal{max-width:1600px;margin:0 auto;padding:0 12px;font-family:inherit;}
+.cal-header{background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;border-radius:14px;padding:24px 32px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;}
+.cal-header h1{margin:0;font-size:1.8rem;font-weight:700;}
+.cal-nav{display:flex;gap:10px;}
+.cal-nav button{background:#fff;color:#1e40af;border:none;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;}
+.cal-nav button:hover{background:#f1f5f9;}
+.cal-legend{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+.cal-legend-item{display:flex;align-items:center;gap:8px;font-size:.85rem;}
+.cal-legend-color{width:14px;height:14px;border-radius:3px;}
+.cal-table{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;width:100%;border-collapse:collapse;}
+.cal-table th{background:#f8fafc;padding:12px 8px;text-align:center;color:#64748b;font-weight:600;font-size:.8rem;text-transform:uppercase;border:1px solid #e2e8f0;}
+.cal-table td{padding:8px;border:1px solid #e2e8f0;vertical-align:top;min-height:100px;height:120px;position:relative;background:#fff;}
+.cal-table td.hoje{background:#fef3c7;}
+.cal-table td.outro-mes{background:#f8fafc;color:#cbd5e1;}
+.cal-day-number{font-weight:700;font-size:.9rem;color:#1e293b;margin-bottom:4px;}
+.cal-event{padding:3px 6px;margin:2px 0;font-size:.7rem;border-radius:4px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cal-event:hover{opacity:.8;}
+.evt-reserva{background:#dbeafe;color:#1e40af;border-left:3px solid #3b82f6;}
+.evt-reserva.st-2{background:#dcfce7;color:#166534;border-left-color:#22c55e;}
+.evt-manutencao{background:#fef3c7;color:#92400e;border-left:3px solid #f59e0b;}
+.evt-incidente{background:#fee2e2;color:#991b1b;border-left:3px solid #ef4444;}
+</style>
 
-<div class="vs-calendar-page">
-    <div class="vs-calendar-surface">
-        <div class="vs-calendar-card">
-            <div class="vs-calendar-header">
-                <div>
-                    <h1 class="vs-calendar-title">
-                        <i class="ti ti-calendar-event"></i>
-                        <?= htmlspecialchars($months[$month] . ' de ' . $year, ENT_QUOTES, 'UTF-8') ?>
-                    </h1>
-                    <p class="vs-calendar-subtitle">
-                        Leitura rapida do mes com reservas, manutencoes e incidentes da frota em uma unica visao.
-                    </p>
-                </div>
+<div class="cal">
 
-                <div class="vs-calendar-nav">
-                    <a href="?month=<?= (int) $previousMonth ?>&year=<?= (int) $previousYear ?>" class="vs-calendar-nav-btn">
-                        <i class="ti ti-arrow-left"></i>
-                        Anterior
-                    </a>
-                    <a href="?month=<?= (int) date('n') ?>&year=<?= (int) date('Y') ?>" class="vs-calendar-nav-btn">
-                        <i class="ti ti-calendar"></i>
-                        Hoje
-                    </a>
-                    <a href="?month=<?= (int) $nextMonth ?>&year=<?= (int) $nextYear ?>" class="vs-calendar-nav-btn">
-                        Proximo
-                        <i class="ti ti-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="vs-calendar-overview">
-                <div class="vs-calendar-overview-grid">
-                    <div class="vs-calendar-overview-card">
-                        <div class="vs-calendar-overview-value"><?= (int) $stats['total'] ?></div>
-                        <div class="vs-calendar-overview-label">Eventos no mes</div>
-                    </div>
-                    <div class="vs-calendar-overview-card">
-                        <div class="vs-calendar-overview-value"><?= (int) $stats['reservations'] ?></div>
-                        <div class="vs-calendar-overview-label">Reservas</div>
-                    </div>
-                    <div class="vs-calendar-overview-card">
-                        <div class="vs-calendar-overview-value"><?= (int) $stats['maintenances'] ?></div>
-                        <div class="vs-calendar-overview-label">Manutencoes</div>
-                    </div>
-                    <div class="vs-calendar-overview-card">
-                        <div class="vs-calendar-overview-value"><?= (int) $stats['incidents'] ?></div>
-                        <div class="vs-calendar-overview-label">Incidentes</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="vs-calendar-legend">
-                <span class="vs-calendar-legend-title">Legenda</span>
-                <div class="vs-calendar-legend-item">
-                    <span class="vs-calendar-legend-color vs-calendar-legend-color--reservation"></span>
-                    Reservas
-                </div>
-                <div class="vs-calendar-legend-item">
-                    <span class="vs-calendar-legend-color vs-calendar-legend-color--maintenance"></span>
-                    Manutencoes
-                </div>
-                <div class="vs-calendar-legend-item">
-                    <span class="vs-calendar-legend-color vs-calendar-legend-color--incident"></span>
-                    Incidentes
-                </div>
-                <div class="vs-calendar-legend-summary">
-                    <strong><?= (int) $stats['reservations'] ?></strong> reservas •
-                    <strong><?= (int) $stats['maintenances'] ?></strong> manutencoes •
-                    <strong><?= (int) $stats['incidents'] ?></strong> incidentes
-                </div>
-            </div>
-
-            <table class="vs-calendar-table">
-                <thead>
-                    <tr>
-                        <?php foreach ($weekdays as $weekday) : ?>
-                            <th><?= htmlspecialchars($weekday, ENT_QUOTES, 'UTF-8') ?></th>
-                        <?php endforeach; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $day = 1;
-
-                    for ($week = 0; $week < 6; $week++) :
-                        if ($day > $daysInMonth) {
-                            break;
-                        }
-                    ?>
-                        <tr>
-                            <?php for ($weekday = 0; $weekday < 7; $weekday++) : ?>
-                                <?php if ($week === 0 && $weekday < $firstWeekday) : ?>
-                                    <td class="vs-calendar-day--outside"></td>
-                                <?php elseif ($day > $daysInMonth) : ?>
-                                    <td class="vs-calendar-day--outside"></td>
-                                <?php else : ?>
-                                    <?php
-                                    $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
-                                    $dayEvents = $eventsByDay[$date] ?? [];
-                                    $dayClasses = $date === $today ? 'vs-calendar-day--today' : '';
-                                    ?>
-                                    <td class="<?= $dayClasses ?>">
-                                        <div class="vs-calendar-day-head">
-                                            <span class="vs-calendar-day-number"><?= (int) $day ?></span>
-                                            <?php if ($dayEvents !== []) : ?>
-                                                <span class="vs-calendar-day-count"><?= count($dayEvents) ?></span>
-                                            <?php endif; ?>
-                                        </div>
-
-                                        <div class="vs-calendar-events">
-                                            <?php foreach ($dayEvents as $event) : ?>
-                                                <?php
-                                                $eventClass = 'vs-calendar-event--' . $event['tipo'];
-
-                                                if ($event['tipo'] === 'reserva' && (int) ($event['status'] ?? 0) === 2) {
-                                                    $eventClass = 'vs-calendar-event--reservation-approved';
-                                                }
-                                                ?>
-                                                <div
-                                                    class="vs-calendar-event <?= htmlspecialchars($eventClass, ENT_QUOTES, 'UTF-8') ?>"
-                                                    data-calendar-event="<?= htmlspecialchars(json_encode($event, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>">
-                                                    <?= htmlspecialchars($event['titulo'], ENT_QUOTES, 'UTF-8') ?>
-                                                </div>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </td>
-                                    <?php $day++; ?>
-                                <?php endif; ?>
-                            <?php endfor; ?>
-                        </tr>
-                    <?php endfor; ?>
-                </tbody>
-            </table>
-
-            <div class="vs-calendar-shortcuts">
-                <a href="<?= htmlspecialchars(plugin_vehiclescheduler_get_front_url('management.php'), ENT_QUOTES, 'UTF-8') ?>" class="vs-calendar-shortcut vs-calendar-shortcut--dashboard">
-                    <i class="ti ti-layout-dashboard"></i>
-                    Dashboard
-                </a>
-                <a href="<?= htmlspecialchars(plugin_vehiclescheduler_get_front_url('schedule.php'), ENT_QUOTES, 'UTF-8') ?>" class="vs-calendar-shortcut vs-calendar-shortcut--schedule">
-                    <i class="ti ti-calendar-event"></i>
-                    Todas Reservas
-                </a>
-                <a href="<?= htmlspecialchars(plugin_vehiclescheduler_get_front_url('maintenance.php'), ENT_QUOTES, 'UTF-8') ?>" class="vs-calendar-shortcut vs-calendar-shortcut--maintenance">
-                    <i class="ti ti-tool"></i>
-                    Manutencoes
-                </a>
-                <a href="<?= htmlspecialchars(plugin_vehiclescheduler_get_front_url('incident.php'), ENT_QUOTES, 'UTF-8') ?>" class="vs-calendar-shortcut vs-calendar-shortcut--incident">
-                    <i class="ti ti-alert-triangle"></i>
-                    Incidentes
-                </a>
-            </div>
-        </div>
-    </div>
+<!-- Header -->
+<div class="cal-header">
+  <h1>📅 <?= $meses[$month] ?> de <?= $year ?></h1>
+  <div class="cal-nav">
+    <button onclick="location.href='?month=<?= $prev_m ?>&year=<?= $prev_y ?>'">← Anterior</button>
+    <button onclick="location.href='?month=<?= date('n') ?>&year=<?= date('Y') ?>'">Hoje</button>
+    <button onclick="location.href='?month=<?= $next_m ?>&year=<?= $next_y ?>'">Próximo →</button>
+  </div>
 </div>
 
-<div class="vs-calendar-modal" id="vsCalendarModal">
-    <div class="vs-calendar-modal-content">
-        <div class="vs-calendar-modal-header">
-            <h3 id="vsCalendarModalTitle">Detalhes do evento</h3>
-            <button type="button" class="vs-calendar-modal-close" data-calendar-close>×</button>
-        </div>
-        <div class="vs-calendar-modal-body" id="vsCalendarModalBody"></div>
-        <div class="vs-calendar-modal-footer">
-            <button type="button" class="vs-calendar-btn vs-calendar-btn--secondary" data-calendar-close>Fechar</button>
-            <a href="#" id="vsCalendarModalLink" class="vs-calendar-btn vs-calendar-btn--primary">Ver detalhes completos</a>
-        </div>
-    </div>
+<!-- Legenda -->
+<div class="cal-legend">
+  <strong style="color:#1e293b;">Legenda:</strong>
+  <div class="cal-legend-item"><div class="cal-legend-color" style="background:#3b82f6;"></div> Reservas</div>
+  <div class="cal-legend-item"><div class="cal-legend-color" style="background:#f59e0b;"></div> Manutenções</div>
+  <div class="cal-legend-item"><div class="cal-legend-color" style="background:#ef4444;"></div> Incidentes</div>
+  <div style="flex:1;text-align:right;color:#64748b;font-size:.85rem;">
+    <strong><?= count($reservas) ?></strong> reservas • 
+    <strong><?= count($manutencoes) ?></strong> manutenções • 
+    <strong><?= count($incidentes) ?></strong> incidentes
+  </div>
 </div>
 
-<script src="<?= htmlspecialchars($calendarJsUrl, ENT_QUOTES, 'UTF-8') ?>" defer></script>
+<!-- Calendário -->
+<table class="cal-table">
+  <tr>
+    <?php foreach ($dias_semana as $d): ?>
+      <th><?= $d ?></th>
+    <?php endforeach; ?>
+  </tr>
+  <?php
+  $primeiro_dia = (int)date('w', strtotime($month_start));
+  $dias_no_mes  = (int)date('t', strtotime($month_start));
+  $hoje = date('Y-m-d');
+  
+  $dia = 1;
+  for ($semana = 0; $semana < 6; $semana++):
+    if ($dia > $dias_no_mes) break;
+    echo "<tr>";
+    for ($dia_semana = 0; $dia_semana < 7; $dia_semana++):
+      if ($semana === 0 && $dia_semana < $primeiro_dia):
+        echo "<td class='outro-mes'></td>";
+      elseif ($dia > $dias_no_mes):
+        echo "<td class='outro-mes'></td>";
+      else:
+        $data = sprintf('%04d-%02d-%02d', $year, $month, $dia);
+        $class_hoje = ($data === $hoje) ? ' hoje' : '';
+        echo "<td class='$class_hoje'>";
+        echo "<div class='cal-day-number'>$dia</div>";
+        
+        // Exibir eventos do dia
+        if (isset($eventos[$data])):
+          foreach ($eventos[$data] as $evt):
+            $evt_class = 'evt-' . $evt['tipo'];
+            if ($evt['tipo'] === 'reserva' && $evt['status'] == 2) $evt_class .= ' st-2';
+            echo "<a href='{$evt['link']}' class='cal-event $evt_class' title='Ver detalhes'>";
+            echo htmlspecialchars($evt['titulo']);
+            echo "</a>";
+          endforeach;
+        endif;
+        
+        echo "</td>";
+        $dia++;
+      endif;
+    endfor;
+    echo "</tr>";
+  endfor;
+  ?>
+</table>
 
+<!-- Atalhos -->
+<div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
+  <a href="management.php" style="padding:12px 20px;background:#3b82f6;color:#fff;border-radius:8px;font-weight:600;text-decoration:none;font-size:.9rem;"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+  <a href="schedule.php" style="padding:12px 20px;background:#22c55e;color:#fff;border-radius:8px;font-weight:600;text-decoration:none;font-size:.9rem;"><i class="ti ti-calendar-event"></i> Ver Todas Reservas</a>
+  <a href="maintenance.php" style="padding:12px 20px;background:#f59e0b;color:#fff;border-radius:8px;font-weight:600;text-decoration:none;font-size:.9rem;"><i class="ti ti-tool"></i> Ver Manutenções</a>
+  <a href="incident.php" style="padding:12px 20px;background:#ef4444;color:#fff;border-radius:8px;font-weight:600;text-decoration:none;font-size:.9rem;"><i class="ti ti-alert-triangle"></i> Ver Incidentes</a>
+</div>
+
+</div>
 <?php Html::footer(); ?>

@@ -1,88 +1,36 @@
 <?php
-// front/incident.form.php
-
-include_once __DIR__ . '/../inc/common.inc.php';
-
-Session::checkLoginUser();
-
-function vs_incident_form_get_id(): int
-{
-    return isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
-}
-
-$incident = new PluginVehicleschedulerIncident();
-$incidentId = vs_incident_form_get_id();
-
+include('../../../inc/includes.php');
+Session::checkRight('plugin_vehiclescheduler', UPDATE);
+$item = new PluginVehicleschedulerIncident();
 if (isset($_POST['add'])) {
-    $incident->check(-1, CREATE, $_POST);
-    $newId = $incident->add($_POST);
-
-    if ($newId !== false) {
-        if (isset($_SESSION['vehiclescheduler_created_ticket_id'])) {
-            $ticketId = (int) $_SESSION['vehiclescheduler_created_ticket_id'];
-            unset($_SESSION['vehiclescheduler_created_ticket_id']);
-
-            Session::addMessageAfterRedirect(
-                'Sinistro informado! Chamado #' . $ticketId . ' criado automaticamente.',
-                false,
-                INFO
-            );
+    $item->check(-1, CREATE, $_POST);
+    if ($nid = $item->add($_POST)) {
+        if (!PluginVehicleschedulerProfile::canViewManagement()) {
+            Session::addMessageAfterRedirect('Incidente reportado com sucesso!', false, INFO);
+            Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/requester_list.php');
         }
-
-        Html::redirect(plugin_vehiclescheduler_get_front_url('incident.form.php') . '?id=' . (int) $newId);
+        if ($_SESSION['glpibackcreated']) Html::redirect($item->getLinkURL());
     }
-
     Html::back();
-}
-
-if (isset($_POST['update'])) {
-    $postId = isset($_POST['id']) ? (int) $_POST['id'] : 0;
-    $incident->check($postId, UPDATE);
-    $incident->update($_POST);
+} elseif (isset($_POST['update'])) {
+    $item->check($_POST['id'], UPDATE); $item->update($_POST);
+    if (!PluginVehicleschedulerProfile::canViewManagement()) {
+        Session::addMessageAfterRedirect('Incidente atualizado.', false, INFO);
+        Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/requester_list.php');
+    }
     Html::back();
-}
-
-if (isset($_POST['purge'])) {
-    $postId = isset($_POST['id']) ? (int) $_POST['id'] : 0;
-    $incident->check($postId, PURGE);
-    $incident->delete($_POST, 1);
-
-    Html::redirect(plugin_vehiclescheduler_get_front_url('incident.php'));
-}
-
-if ($incidentId > 0) {
-    $incident->check($incidentId, READ);
+} elseif (isset($_POST['delete'])) {
+    $item->check($_POST['id'], DELETE); $item->delete($_POST);
+    if (!PluginVehicleschedulerProfile::canViewManagement()) {
+        Session::addMessageAfterRedirect('Incidente cancelado.', false, INFO);
+        Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/requester_list.php');
+    }
+    $item->redirectToList();
+} elseif (isset($_POST['purge'])) {
+    $item->check($_POST['id'], PURGE); $item->delete($_POST, 1); $item->redirectToList();
 } else {
-    $incident->check(-1, CREATE);
+    $item->checkGlobal(READ);
+    Html::header(PluginVehicleschedulerIncident::getTypeName(1), $_SERVER['PHP_SELF'], 'plugins', 'pluginvehicleschedulerincident', 'incident');
+    $item->display(['id' => isset($_GET['id']) ? (int)$_GET['id'] : 0]);
+    Html::footer();
 }
-
-$menuClass = PluginVehicleschedulerProfile::canViewManagement()
-    ? PluginVehicleschedulerMenu::class
-    : '';
-$section = PluginVehicleschedulerProfile::canViewManagement()
-    ? 'management'
-    : '';
-
-Html::header(
-    'Informar Sinistro',
-    $_SERVER['PHP_SELF'],
-    PluginVehicleschedulerProfile::canViewManagement() ? 'tools' : 'helpdesk',
-    $menuClass,
-    $section
-);
-
-plugin_vehiclescheduler_load_css();
-plugin_vehiclescheduler_enhance_ui();
-
-if (PluginVehicleschedulerProfile::canViewManagement()) {
-    plugin_vehiclescheduler_render_back_to_management();
-}
-
-plugin_vehiclescheduler_load_script('js/form-feedback.js');
-plugin_vehiclescheduler_load_script('js/incident-form.js');
-
-$incident->display([
-    'id' => $incidentId,
-]);
-
-Html::footer();

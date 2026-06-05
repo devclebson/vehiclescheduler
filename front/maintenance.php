@@ -1,10 +1,26 @@
 <?php
+include('../../../inc/includes.php');
+Session::checkRight('plugin_vehiclescheduler', READ);
 
-include_once __DIR__ . '/../inc/common.inc.php';
+if (!PluginVehicleschedulerProfile::canViewManagement()) {
+    Html::displayRightError();
+    exit;
+}
 
-Session::checkRight('plugin_vehiclescheduler_management', READ);
+Html::header(
+    'Manutenções',
+    $_SERVER['PHP_SELF'],
+    'tools',
+    'PluginVehicleschedulerMenug',
+    'maintenances'
+);
 
-plugin_vehiclescheduler_flash_warning('Manutenções em breve: este módulo ainda não está disponível.');
+echo "<div class='d-flex justify-content-between align-items-center mb-3'>";
+echo "<div class='d-flex align-items-center gap-2'><a href='management.php' class='btn btn-sm btn-outline-secondary'><i class='ti ti-arrow-left'></i></a><h2 class='m-0'>Gestão de Manutenções</h2></div>";
+if (Session::haveRight('plugin_vehiclescheduler', CREATE)) {
+    echo "<a href='maintenance.form.php' class='btn btn-primary'><i class='ti ti-plus'></i> Agendar Manutenção</a>";
+}
+echo "</div>";
 
-Html::redirect(plugin_vehiclescheduler_get_front_url('management.php'));
-exit;
+Search::show('PluginVehicleschedulerMaintenance');
+Html::footer();

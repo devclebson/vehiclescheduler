@@ -1,73 +1,117 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Vinicius Lopes
-# This file is distributed under the same license as the Vehicle Scheduler plugin.
-# Vinicius Lopes <generalvini@gmail.com>, YEAR.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: Vehicle Scheduler 1.0.0\n"
-"Report-Msgid-Bugs-To: generalvini@gmail.com\n"
-"POT-Creation-Date: 2026-04-14 00:00+0000\n"
-"PO-Revision-Date: 2026-04-14 00:00+0000\n"
-"Last-Translator: Vinicius Lopes <generalvini@gmail.com>\n"
-"Language-Team: pt_BR\n"
+"Project-Id-Version: Vehicle Scheduler 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-05 16:00-0300\n"
+"PO-Revision-Date: 2026-06-05 16:00-0300\n"
+"Last-Translator: Clebson <clebson@scc.com.br>\n"
+"Language-Team: Portuguese (Brazil)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Domain: vehiclescheduler\n"
 
-msgid "Vehicle Scheduler"
-msgstr "Agendador de Veículos"
+msgid "Active Drivers"
+msgstr "Motoristas Ativos"
 
-msgid "Fleet Management"
-msgstr "Gestão de Frota"
+msgid "Active Vehicles"
+msgstr "Veículos Ativos"
 
-msgid "Fleet Reservation"
-msgstr "Reserva de Frota"
+msgid "Analyzing"
+msgstr "Em Análise"
 
-msgid "Dashboard"
-msgstr "Dashboard"
+msgid "Approved"
+msgstr "Aprovada"
 
-msgid "Calendar"
-msgstr "Calendário"
+msgid "Approved Reservations"
+msgstr "Reservas Aprovadas"
 
-msgid "Management"
-msgstr "Gestão"
+msgid "Approved Value"
+msgstr "Valor Aprovado"
 
-msgid "Administration"
-msgstr "Administração"
+msgid "Approved Value (R$)"
+msgstr "Valor Aprovado (R$)"
 
-msgid "Reports"
-msgstr "Relatórios"
+msgid "Available Vehicles"
+msgstr "Veículos Disponíveis"
 
-msgid "Settings"
-msgstr "Configurações"
+msgid "CNH Cat."
+msgstr "Cat. CNH"
 
-msgid "Vehicle"
-msgstr "Veículo"
+msgid "CNH Expiry Alerts (next 90 days)"
+msgstr "Alertas de Vencimento de CNH (próx. 90 dias)"
 
-msgid "Vehicles"
-msgstr "Veículos"
+msgid "Calendar View"
+msgstr "Visualização de Calendário"
+
+msgid "Cancelled"
+msgstr "Cancelada"
+
+msgid "Claim #"
+msgstr "Sinistro nº"
+
+msgid "Claim Number"
+msgstr "Número do Sinistro"
+
+msgid "Closed"
+msgstr "Fechado"
+
+msgid "Closing Date"
+msgstr "Data de Fechamento"
+
+msgid "Completion Date"
+msgstr "Data de Conclusão"
+
+msgid "Contact at Insurer"
+msgstr "Contato na Seguradora"
+
+msgid "Corrective"
+msgstr "Corretiva"
+
+msgid "Cost (R$)"
+msgstr "Custo (R$)"
+
+msgid "Create one"
+msgstr "Criar novo"
+
+msgid "Date"
+msgstr "Data"
+
+msgid "Dates"
+msgstr "Datas"
+
+msgid "Description"
+msgstr "Descrição"
+
+msgid "Destination"
+msgstr "Destino"
+
+msgid "Done"
+msgstr "Concluído"
 
 msgid "Driver"
 msgstr "Motorista"
 
-msgid "Drivers"
-msgstr "Motoristas"
+msgid "Est. Value"
+msgstr "Valor Est."
 
-msgid "Schedule"
-msgstr "Reserva"
+msgid "Estimated Value (R$)"
+msgstr "Valor Estimado (R$)"
 
-msgid "Schedules"
-msgstr "Reservas"
+msgid "Expiry"
+msgstr "Vencimento"
 
-msgid "Reservation"
-msgstr "Reserva"
+msgid "Fleet Dashboard"
+msgstr "Dashboard da Frota"
 
-msgid "Reservations"
-msgstr "Reservas"
+msgid "Fleet Portal"
+msgstr "Portal da Frota"
+
+msgid "Fleet Reservation"
+msgstr "Reserva de Frota"
+
+msgid "In Progress"
+msgstr "Em Andamento"
 
 msgid "Incident"
 msgstr "Incidente"
@@ -75,374 +119,210 @@ msgstr "Incidente"
 msgid "Incidents"
 msgstr "Incidentes"
 
-msgid "Maintenance"
-msgstr "Manutenção"
-
-msgid "Maintenances"
-msgstr "Manutenções"
-
 msgid "Insurance Claim"
 msgstr "Sinistro"
 
 msgid "Insurance Claims"
 msgstr "Sinistros"
 
-msgid "Fine"
-msgstr "Multa"
+msgid "Insurance Claims in Progress"
+msgstr "Sinistros em Andamento"
+
+msgid "Insurance Company"
+msgstr "Seguradora"
+
+msgid "Insurance claim reference number"
+msgstr "Número de referência do sinistro"
+
+msgid "Insurer"
+msgstr "Seguradora"
+
+msgid "Maintenance"
+msgstr "Manutenção"
+
+msgid "Maintenances"
+msgstr "Manutenções"
+
+msgid "Manager Dashboard"
+msgstr "Dashboard do Gestor"
+
+msgid "Mileage (km)"
+msgstr "Quilometragem (km)"
+
+msgid "My Incident Reports"
+msgstr "Meus Incidentes Reportados"
+
+msgid "My Reservations"
+msgstr "Minhas Reservas"
+
+msgid "New"
+msgstr "Nova"
+
+msgid "New Reservation"
+msgstr "Nova Reserva"
+
+msgid "Next"
+msgstr "Próximo"
+
+msgid "No CNH expiring soon"
+msgstr "Nenhuma CNH vencendo em breve"
+
+msgid "No incidents reported."
+msgstr "Nenhum incidente reportado."
+
+msgid "No maintenances pending"
+msgstr "Nenhuma manutenção pendente"
+
+msgid "No open claims"
+msgstr "Nenhum sinistro aberto"
+
+msgid "No open incidents"
+msgstr "Nenhum incidente aberto"
+
+msgid "No pending reservations"
+msgstr "Nenhuma reserva pendente"
+
+msgid "No vehicles available"
+msgstr "Nenhum veículo disponível"
+
+msgid "None"
+msgstr "Nenhum"
+
+msgid "Open"
+msgstr "Aberto"
+
+msgid "Open Claims"
+msgstr "Sinistros Abertos"
+
+msgid "Open Fines"
+msgstr "Multas em Aberto"
+
+msgid "Open Incidents"
+msgstr "Incidentes Abertos"
+
+msgid "Open Insurance Claim"
+msgstr "Abrir Sinistro"
+
+msgid "Opened"
+msgstr "Aberto"
+
+msgid "Opening Date"
+msgstr "Data de Abertura"
+
+msgid "Origin Incident"
+msgstr "Incidente de Origem"
+
+msgid "Overdue"
+msgstr "Em Atraso"
+
+msgid "Pending Approval"
+msgstr "Pendente de Aprovação"
+
+msgid "Period"
+msgstr "Período"
+
+msgid "Preventive"
+msgstr "Preventiva"
+
+msgid "Previous"
+msgstr "Anterior"
+
+msgid "Register Driver"
+msgstr "Cadastrar Motorista"
+
+msgid "Rejected"
+msgstr "Recusada"
+
+msgid "Report Incident"
+msgstr "Reportar Incidente"
+
+msgid "Request Reservation"
+msgstr "Solicitar Reserva"
+
+msgid "Requester') . \"</th><th>\" . __('Vehicle"
+msgstr "Solicitante') . \"</th><th>\" . __('Veículo"
+
+msgid "Reservations"
+msgstr "Reservas"
+
+msgid "Reservations Pending Approval"
+msgstr "Reservas Pendentes de Aprovação"
+
+msgid "Schedule Maintenance"
+msgstr "Agendar Manutenção"
+
+msgid "Scheduled"
+msgstr "Agendado"
+
+msgid "Scheduled Date"
+msgstr "Data Agendada"
+
+msgid "Scheduled Maintenances"
+msgstr "Manutenções Agendadas"
+
+msgid "Select a vehicle and period to make your reservation. Manage your trips efficiently."
+msgstr "Selecione um veículo e período para fazer sua reserva. Gerencie suas viagens com eficiência."
+
+msgid "Supplier/Workshop"
+msgstr "Fornecedor/Oficina"
+
+msgid "Title"
+msgstr "Título"
+
+msgid "Title is required."
+msgstr "Título é obrigatório."
+
+msgid "Today"
+msgstr "Hoje"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Under Analysis"
+msgstr "Em Análise"
+
+msgid "Upcoming Maintenances"
+msgstr "Próximas Manutenções"
+
+msgid "Vehicle"
+msgstr "Veículo"
+
+msgid "Vehicle is required."
+msgstr "Veículo é obrigatório."
+
+msgid "View all"
+msgstr "Ver tudo"
+
+msgid "Welcome, %s. Manage your reservations and report incidents."
+msgstr "Bem-vindo, %s. Gerencie suas reservas e reporte incidentes."
+
+msgid "You have no reservations yet."
+msgstr "Você ainda não possui reservas."
+
+msgid "seats"
+msgstr "lugares"
+
+msgid "Vehicle Scheduler"
+msgstr "Reserva de Veículos"
+
+msgid "Vehicles"
+msgstr "Veículos"
+
+msgid "Drivers"
+msgstr "Motoristas"
+
+msgid "Schedules"
+msgstr "Reservas"
 
 msgid "Fines"
 msgstr "Multas"
 
-msgid "Plate"
-msgstr "Placa"
+msgid "Dashboard"
+msgstr "Dashboard"
 
-msgid "Brand"
-msgstr "Marca"
+msgid "Calendar"
+msgstr "Calendário"
 
-msgid "Model"
-msgstr "Modelo"
+msgid "Fleet Management"
+msgstr "Gestão de Frota"
 
-msgid "Year"
-msgstr "Ano"
-
-msgid "Color"
-msgstr "Cor"
-
-msgid "Category"
-msgstr "Categoria"
-
-msgid "Fuel"
-msgstr "Combustível"
-
-msgid "Seats"
-msgstr "Assentos"
-
-msgid "Mileage"
-msgstr "Quilometragem"
-
-msgid "Status"
-msgstr "Status"
-
-msgid "Available"
-msgstr "Disponível"
-
-msgid "Unavailable"
-msgstr "Indisponível"
-
-msgid "In maintenance"
-msgstr "Em manutenção"
-
-msgid "Vehicle Scheduling"
-msgstr "Agendamento de Veículos"
-
-msgid "Reservation Request"
-msgstr "Solicitação de Reserva"
-
-msgid "Reservation %s - %s"
-msgstr "Reserva %s - %s"
-
-msgid "Requester"
-msgstr "Solicitante"
-
-msgid "Request date"
-msgstr "Data da solicitação"
-
-msgid "Start date"
-msgstr "Data inicial"
-
-msgid "End date"
-msgstr "Data final"
-
-msgid "Start time"
-msgstr "Hora de saída"
-
-msgid "End time"
-msgstr "Hora de retorno"
-
-msgid "Departure"
-msgstr "Saída"
-
-msgid "Return"
-msgstr "Retorno"
-
-msgid "Origin"
-msgstr "Origem"
-
-msgid "Destination"
-msgstr "Destino"
-
-msgid "Purpose"
-msgstr "Finalidade"
-
-msgid "Description"
-msgstr "Descrição"
-
-msgid "Description/Purpose"
-msgstr "Descrição/Finalidade"
-
-msgid "Describe the purpose of this reservation"
-msgstr "Descreva a finalidade desta reserva"
-
-msgid "Number of passengers"
-msgstr "Número de passageiros"
-
-msgid "Passengers"
-msgstr "Passageiros"
-
-msgid "Assigned driver"
-msgstr "Motorista atribuído"
-
-msgid "Assigned vehicle"
-msgstr "Veículo atribuído"
-
-msgid "Contact Phone"
-msgstr "Telefone de contato"
-
-msgid "Department/Sector"
-msgstr "Departamento/Setor"
-
-msgid "Additional Comments"
-msgstr "Comentários adicionais"
-
-msgid "Additional observations"
-msgstr "Observações adicionais"
-
-msgid "Related Ticket"
-msgstr "Chamado relacionado"
-
-msgid "Vehicle Report"
-msgstr "Relato de Veículo"
-
-msgid "Vehicle Reports"
-msgstr "Relatos de Veículo"
-
-msgid "Report Type"
-msgstr "Tipo de relato"
-
-msgid "Report Date"
-msgstr "Data do relato"
-
-msgid "Reporter"
-msgstr "Responsável pelo relato"
-
-msgid "Maintenance Needed"
-msgstr "Necessita manutenção"
-
-msgid "Problem/Issue"
-msgstr "Problema/Ocorrência"
-
-msgid "Accident"
-msgstr "Acidente"
-
-msgid "Observation"
-msgstr "Observação"
-
-msgid "Describe the issue, observation or situation in detail"
-msgstr "Descreva o problema, observação ou situação em detalhe"
-
-msgid "New"
-msgstr "Novo"
-
-msgid "Pending"
-msgstr "Pendente"
-
-msgid "Approved"
-msgstr "Aprovado"
-
-msgid "Rejected"
-msgstr "Rejeitado"
-
-msgid "Cancelled"
-msgstr "Cancelado"
-
-msgid "Completed"
-msgstr "Concluído"
-
-msgid "Active"
-msgstr "Ativo"
-
-msgid "Closed"
-msgstr "Fechado"
-
-msgid "Open"
-msgstr "Abrir"
-
-msgid "View"
-msgstr "Visualizar"
-
-msgid "Add"
-msgstr "Adicionar"
-
-msgid "Create"
-msgstr "Criar"
-
-msgid "Edit"
-msgstr "Editar"
-
-msgid "Update"
-msgstr "Atualizar"
-
-msgid "Save"
-msgstr "Salvar"
-
-msgid "Delete"
-msgstr "Excluir"
-
-msgid "Approve"
-msgstr "Aprovar"
-
-msgid "Reject"
-msgstr "Recusar"
-
-msgid "Cancel"
-msgstr "Cancelar"
-
-msgid "Close"
-msgstr "Fechar"
-
-msgid "Filter"
-msgstr "Filtrar"
-
-msgid "Search"
-msgstr "Pesquisar"
-
-msgid "Clear filters"
-msgstr "Limpar filtros"
-
-msgid "Approved reservations"
-msgstr "Reservas aprovadas"
-
-msgid "Pending requests"
-msgstr "Solicitações pendentes"
-
-msgid "Rejected requests"
-msgstr "Solicitações rejeitadas"
-
-msgid "Reservations by status"
-msgstr "Reservas por status"
-
-msgid "Operational overview"
-msgstr "Visão operacional"
-
-msgid "Management overview"
-msgstr "Visão gerencial"
-
-msgid "Executive overview"
-msgstr "Visão executiva"
-
-msgid "Department is required"
-msgstr "Departamento é obrigatório"
-
-msgid "Contact phone is required"
-msgstr "Telefone de contato é obrigatório"
-
-msgid "Description/Purpose is required"
-msgstr "Descrição/Finalidade é obrigatória"
-
-msgid "Description is required"
-msgstr "Descrição é obrigatória"
-
-msgid "Vehicle is required"
-msgstr "Veículo é obrigatório"
-
-msgid "Start date is required"
-msgstr "Data inicial é obrigatória"
-
-msgid "End date is required"
-msgstr "Data final é obrigatória"
-
-msgid "Destination is required"
-msgstr "Destino é obrigatório"
-
-msgid "Driver is required"
-msgstr "Motorista é obrigatório"
-
-msgid "Invalid period"
-msgstr "Período inválido"
-
-msgid "The selected vehicle is not available for this period"
-msgstr "O veículo selecionado não está disponível para este período"
-
-msgid "The selected driver is not available for this period"
-msgstr "O motorista selecionado não está disponível para este período"
-
-msgid "Item added successfully"
-msgstr "Item adicionado com sucesso"
-
-msgid "Item updated successfully"
-msgstr "Item atualizado com sucesso"
-
-msgid "Item deleted successfully"
-msgstr "Item excluído com sucesso"
-
-msgid "Reservation approved successfully"
-msgstr "Reserva aprovada com sucesso"
-
-msgid "Reservation rejected successfully"
-msgstr "Reserva recusada com sucesso"
-
-msgid "Unable to save data"
-msgstr "Não foi possível salvar os dados"
-
-msgid "An unexpected error occurred"
-msgstr "Ocorreu um erro inesperado"
-
-msgid "Vehicle Reservation: %s - %s"
-msgstr "Reserva de Veículo: %s - %s"
-
-msgid "Vehicle Reservation Details:\\n\\nVehicle: %s\\nRequester: %s\\nStart: %s\\nEnd: %s\\nDestination: %s\\nPassengers: %d\\nPurpose: %s"
-msgstr "Detalhes da Reserva de Veículo:\\n\\nVeículo: %s\\nSolicitante: %s\\nInício: %s\\nFim: %s\\nDestino: %s\\nPassageiros: %d\\nFinalidade: %s"
-
-msgid "Portuguese"
-msgstr "Português"
-
-msgid "English"
-msgstr "Inglês"
-
-msgid "Spanish"
-msgstr "Espanhol"
-
-msgid "French"
-msgstr "Francês"
-
-msgid "You are not allowed to access plugin settings."
-msgstr "Você não tem permissão para acessar as configurações do plugin."
-
-msgid "You are not allowed to change plugin settings."
-msgstr "Você não tem permissão para alterar as configurações do plugin."
-
-msgid "Settings saved successfully."
-msgstr "Configurações salvas com sucesso."
-
-msgid "Unable to save plugin settings."
-msgstr "Não foi possível salvar as configurações do plugin."
-
-msgid "Plugin language saved successfully."
-msgstr "Idioma do plugin salvo com sucesso."
-
-msgid "Unable to save plugin language."
-msgstr "Não foi possível salvar o idioma do plugin."
-
-msgid "Plugin settings"
-msgstr "Configurações do plugin"
-
-msgid "Operational settings for SisViaturas behavior."
-msgstr "Configurações operacionais para ajustar o comportamento do SisViaturas."
-
-msgid "Checklist"
-msgstr "Checklist"
-
-msgid "Automatic departure checklist"
-msgstr "Checklist de saída automático"
-
-msgid "Open the first checklist after reservation approval."
-msgstr "Abre o primeiro checklist após a aprovação da reserva."
-
-msgid "Language"
-msgstr "Idioma"
-
-msgid "Plugin language"
-msgstr "Idioma do plugin"
-
-msgid "Choose the language used by SisViaturas screens."
-msgstr "Escolha o idioma usado nas telas do SisViaturas."

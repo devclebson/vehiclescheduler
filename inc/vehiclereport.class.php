@@ -1,203 +1,176 @@
 <?php
 /**
- * Plugin Vehicle Scheduler for GLPI.
- * Vehicle reports for fleet operations.
+ * Plugin Vehicle Scheduler for GLPI
+ * VehicleReport — Relatórios sobre veículos
  */
 
 if (!defined('GLPI_ROOT')) {
-    die("Acesso direto nÃ£o permitido");
+    die("Acesso direto não permitido");
 }
 
-class PluginVehicleschedulerVehiclereport extends CommonDBTM
-{
+class PluginVehicleschedulerVehiclereport extends CommonDBTM {
+
     public $dohistory = true;
+    static $rightname = 'plugin_vehiclescheduler';
 
-    public static $rightname = 'plugin_vehiclescheduler';
+    const TYPE_MAINTENANCE = 1;
+    const TYPE_PROBLEM     = 2;
+    const TYPE_ACCIDENT    = 3;
+    const TYPE_OBSERVATION = 4;
 
-    public const TYPE_MAINTENANCE = 1;
-    public const TYPE_PROBLEM = 2;
-    public const TYPE_ACCIDENT = 3;
-    public const TYPE_OBSERVATION = 4;
-
-    public static function getTypeName($nb = 0)
-    {
-        return ($nb === 1) ? 'RelatÃ³rio de VeÃ­culo' : 'RelatÃ³rios de VeÃ­culos';
+    static function getTypeName($nb = 0) {
+        return ($nb === 1) ? 'Relatório de Veículo' : 'Relatórios de Veículos';
     }
 
-    public static function getMenuName()
-    {
-        return 'RelatÃ³rios de VeÃ­culos';
+    static function getMenuName() {
+        return 'Relatórios de Veículos';
     }
 
-    public static function getIcon()
-    {
+    static function getIcon() {
         return 'ti ti-file-report';
     }
 
-    public static function getAllTypes()
-    {
+    static function getAllTypes() {
         return [
-            self::TYPE_MAINTENANCE => 'Necessita ManutenÃ§Ã£o',
+            self::TYPE_MAINTENANCE => 'Necessita Manutenção',
             self::TYPE_PROBLEM     => 'Problema / Defeito',
             self::TYPE_ACCIDENT    => 'Acidente',
-            self::TYPE_OBSERVATION => 'ObservaÃ§Ã£o Geral',
+            self::TYPE_OBSERVATION => 'Observação Geral',
         ];
     }
 
-    public static function getMenuContent()
-    {
+    static function getMenuContent() {
         if (!Session::haveRight('plugin_vehiclescheduler', READ)) {
             return false;
         }
-
         $menu = [];
-        $menu['title'] = 'RelatÃ³rios de VeÃ­culos';
-        $menu['page'] = '/plugins/vehiclescheduler/front/vehiclereport.php';
-        $menu['icon'] = self::getIcon();
+        $menu['title'] = 'Relatórios de Veículos';
+        $menu['page']  = '/plugins/vehiclescheduler/front/vehiclereport.php';
+        $menu['icon']  = self::getIcon();
         $menu['links']['search'] = '/plugins/vehiclescheduler/front/vehiclereport.php';
-
         if (Session::haveRight('plugin_vehiclescheduler', CREATE)) {
             $menu['links']['add'] = '/plugins/vehiclescheduler/front/vehiclereport.form.php';
         }
-
         $menu['options']['vehiclereport'] = [
-            'title'          => 'RelatÃ³rios de VeÃ­culos',
+            'title'          => 'Relatórios de Veículos',
             'page'           => '/plugins/vehiclescheduler/front/vehiclereport.php',
             'icon'           => self::getIcon(),
             'links'          => [
                 'search' => '/plugins/vehiclescheduler/front/vehiclereport.php',
                 'add'    => '/plugins/vehiclescheduler/front/vehiclereport.form.php',
             ],
-            'lists_itemtype' => self::class,
+            'lists_itemtype' => 'PluginVehicleschedulerVehiclereport',
         ];
-
         return $menu;
     }
 
-    public function defineTabs($options = [])
-    {
+    function defineTabs($options = []) {
         $ong = [];
         $this->addDefaultFormTab($ong);
         $this->addStandardTab('Log', $ong, $options);
-
         return $ong;
     }
 
-    public function showForm($ID, array $options = [])
-    {
+    function showForm($ID, array $options = []) {
         $this->initForm($ID, $options);
         $this->showFormHeader($options);
+        echo "<tr class='table-row'><td colspan='4' class='text-end' style='text-align: right;'><a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'><i class='ti ti-arrow-left'></i> Voltar</a></td></tr>";
 
-        echo "<tr><td colspan='4'>";
-        require_once GLPI_ROOT . '/plugins/vehiclescheduler/front/vehiclereport.render.php';
-        vs_render_vehiclereport_form($this);
+        echo "<tr class='table-row'><td colspan='4' class='center'>"
+            . "<h3>Relatório de Veículo</h3></td></tr>";
+
+        echo "<tr class='table-row'>";
+        echo "<td>Veículo <span class='red'>*</span></td><td>";
+        PluginVehicleschedulerVehicle::dropdown([
+            'name'   => 'plugin_vehiclescheduler_vehicles_id',
+            'value'  => $this->fields['plugin_vehiclescheduler_vehicles_id'],
+            'entity' => $this->fields['entities_id'],
+        ]);
+        echo "</td>";
+        echo "<td>Tipo de Relatório <span class='red'>*</span></td><td>";
+        Dropdown::showFromArray('report_type', self::getAllTypes(), [
+            'value' => $this->fields['report_type'] ?: self::TYPE_OBSERVATION,
+        ]);
         echo "</td></tr>";
 
-        $this->showFormButtons($options);
+        echo "<tr class='table-row'>";
+        echo "<td>Reportado por</td><td>";
+        User::dropdown(['name' => 'users_id', 'value' => $this->fields['users_id'], 'right' => 'all']);
+        echo "</td>";
+        echo "<td>Departamento/Setor</td>";
+        echo "<td>" . Html::input('department', ['value' => $this->fields['department'], 'size' => 40]) . "</td>";
+        echo "</tr>";
 
+        echo "<tr class='table-row'>";
+        echo "<td>Telefone para Contato</td>";
+        echo "<td>" . Html::input('contact_phone', ['value' => $this->fields['contact_phone'], 'size' => 20]) . "</td>";
+        echo "<td>Data do Relatório</td><td>";
+        Html::showDateTimeField('report_date', [
+            'value' => $this->fields['report_date'] ?: date('Y-m-d H:i:s'),
+        ]);
+        echo "</td></tr>";
+
+        echo "<tr class='table-row'>";
+        echo "<td>Descrição <span class='red'>*</span></td>";
+        echo "<td colspan='3'><textarea name='description' rows='6' style='width:98%;'"
+            . " placeholder='Descreva o problema, observação ou situação em detalhes'>"
+            . htmlspecialchars($this->fields['description'] ?? '')
+            . "</textarea></td></tr>";
+
+        echo "<tr class='table-row'>";
+        echo "<td>Comentários Adicionais</td>";
+        echo "<td colspan='3'><textarea name='comment' rows='3' style='width:98%;'>"
+            . htmlspecialchars($this->fields['comment'] ?? '') . "</textarea></td></tr>";
+
+        $this->showFormButtons($options);
         return true;
     }
 
-    public function prepareInputForAdd($input)
-    {
-        $input = $this->normalizeReportInput($input);
-
-        if ($input['plugin_vehiclescheduler_vehicles_id'] <= 0) {
-            Session::addMessageAfterRedirect('O veÃ­culo Ã© obrigatÃ³rio.', false, ERROR);
+    function prepareInputForAdd($input) {
+        if (empty($input['plugin_vehiclescheduler_vehicles_id'])) {
+            Session::addMessageAfterRedirect('O veículo é obrigatório.', false, ERROR);
             return false;
         }
-
-        if ($input['description'] === '') {
-            Session::addMessageAfterRedirect('A descriÃ§Ã£o Ã© obrigatÃ³ria.', false, ERROR);
+        if (empty(trim($input['description'] ?? ''))) {
+            Session::addMessageAfterRedirect('A descrição é obrigatória.', false, ERROR);
             return false;
         }
-
-        if ($input['users_id'] <= 0) {
-            $input['users_id'] = (int) Session::getLoginUserID();
+        if (!isset($input['users_id']) || $input['users_id'] == 0) {
+            $input['users_id'] = Session::getLoginUserID();
         }
-
-        if ($input['entities_id'] <= 0) {
-            $input['entities_id'] = (int) ($_SESSION['glpiactive_entity'] ?? 0);
+        if (!isset($input['entities_id'])) {
+            $input['entities_id'] = $_SESSION['glpiactive_entity'];
         }
-
         return $input;
     }
 
-    public function prepareInputForUpdate($input)
-    {
-        $input = $this->normalizeReportInput($input);
-
-        if ($input['id'] <= 0) {
-            Session::addMessageAfterRedirect('ID do relatÃ³rio invÃ¡lido.', false, ERROR);
-            return false;
-        }
-
-        return $this->prepareInputForAdd($input);
-    }
-
-    public function rawSearchOptions()
-    {
-        $tab = [];
-        $tab[] = ['id' => 'common', 'name' => 'RelatÃ³rios de VeÃ­culos'];
-        $tab[] = ['id' => '1', 'table' => $this->getTable(), 'field' => 'id', 'name' => 'ID', 'datatype' => 'itemlink', 'massiveaction' => false];
-        $tab[] = ['id' => '2', 'table' => 'glpi_plugin_vehiclescheduler_vehicles', 'field' => 'name', 'name' => 'VeÃ­culo', 'datatype' => 'dropdown'];
-        $tab[] = ['id' => '3', 'table' => $this->getTable(), 'field' => 'report_type', 'name' => 'Tipo', 'datatype' => 'specific'];
-        $tab[] = ['id' => '4', 'table' => 'glpi_users', 'field' => 'name', 'name' => 'Reportado por', 'datatype' => 'dropdown'];
-        $tab[] = ['id' => '5', 'table' => $this->getTable(), 'field' => 'department', 'name' => 'Departamento/Setor', 'datatype' => 'string'];
-        $tab[] = ['id' => '6', 'table' => $this->getTable(), 'field' => 'contact_phone', 'name' => 'Telefone', 'datatype' => 'string'];
-        $tab[] = ['id' => '7', 'table' => $this->getTable(), 'field' => 'report_date', 'name' => 'Data do RelatÃ³rio', 'datatype' => 'datetime'];
-        $tab[] = ['id' => '8', 'table' => $this->getTable(), 'field' => 'description', 'name' => 'DescriÃ§Ã£o', 'datatype' => 'text'];
-
+    function rawSearchOptions() {
+        $tab   = [];
+        $tab[] = ['id' => 'common', 'name' => 'Relatórios de Veículos'];
+        $tab[] = ['id' => '1', 'table' => $this->getTable(), 'field' => 'id',
+                  'name' => 'ID', 'datatype' => 'itemlink', 'massiveaction' => false];
+        $tab[] = ['id' => '2', 'table' => 'glpi_plugin_vehiclescheduler_vehicles', 'field' => 'name',
+                  'name' => 'Veículo', 'datatype' => 'dropdown'];
+        $tab[] = ['id' => '3', 'table' => $this->getTable(), 'field' => 'report_type',
+                  'name' => 'Tipo', 'datatype' => 'specific'];
+        $tab[] = ['id' => '4', 'table' => 'glpi_users', 'field' => 'name',
+                  'name' => 'Reportado por', 'datatype' => 'dropdown'];
+        $tab[] = ['id' => '5', 'table' => $this->getTable(), 'field' => 'department',
+                  'name' => 'Departamento/Setor', 'datatype' => 'string'];
+        $tab[] = ['id' => '6', 'table' => $this->getTable(), 'field' => 'contact_phone',
+                  'name' => 'Telefone', 'datatype' => 'string'];
+        $tab[] = ['id' => '7', 'table' => $this->getTable(), 'field' => 'report_date',
+                  'name' => 'Data do Relatório', 'datatype' => 'datetime'];
+        $tab[] = ['id' => '8', 'table' => $this->getTable(), 'field' => 'description',
+                  'name' => 'Descrição', 'datatype' => 'text'];
         return $tab;
     }
 
-    public static function getSpecificValueToDisplay($field, $values, array $options = [])
-    {
-        if (!is_array($values)) {
-            $values = [$field => $values];
-        }
-
+    static function getSpecificValueToDisplay($field, $values, array $options = []) {
+        if (!is_array($values)) $values = [$field => $values];
         if ($field === 'report_type') {
             return self::getAllTypes()[$values[$field]] ?? $values[$field];
         }
-
         return parent::getSpecificValueToDisplay($field, $values, $options);
-    }
-
-    private function normalizeReportInput(array $input): array
-    {
-        return [
-            'id' => PluginVehicleschedulerInput::int($input, 'id', 0, 0),
-            'entities_id' => PluginVehicleschedulerInput::int(
-                $input,
-                'entities_id',
-                (int) ($_SESSION['glpiactive_entity'] ?? 0),
-                0
-            ),
-            'plugin_vehiclescheduler_vehicles_id' => PluginVehicleschedulerInput::int(
-                $input,
-                'plugin_vehiclescheduler_vehicles_id',
-                0,
-                0
-            ),
-            'report_type' => PluginVehicleschedulerInput::int(
-                $input,
-                'report_type',
-                self::TYPE_OBSERVATION,
-                self::TYPE_MAINTENANCE,
-                self::TYPE_OBSERVATION
-            ),
-            'users_id' => PluginVehicleschedulerInput::int(
-                $input,
-                'users_id',
-                (int) Session::getLoginUserID(),
-                0
-            ),
-            'department' => PluginVehicleschedulerInput::string($input, 'department', 255, ''),
-            'contact_phone' => PluginVehicleschedulerInput::string($input, 'contact_phone', 50, ''),
-            'report_date' => PluginVehicleschedulerInput::datetime($input, 'report_date', date('Y-m-d H:i:s')),
-            'description' => PluginVehicleschedulerInput::text($input, 'description', 65535, ''),
-            'comment' => PluginVehicleschedulerInput::text($input, 'comment', 65535, ''),
-        ];
     }
 }

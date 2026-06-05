@@ -1,468 +1,267 @@
 <?php
-
-include_once(__DIR__ . '/../inc/common.inc.php');
-
+/**
+ * Plugin Vehicle Scheduler for GLPI
+ * Manager Dashboard — full fleet overview
+ */
+include('../../../inc/includes.php');
 Session::checkRight('plugin_vehiclescheduler', READ);
+
+if (!PluginVehicleschedulerProfile::canViewManagement()) {
+    Html::displayRightError();
+    exit;
+}
 
 Html::header(
     __('Fleet Dashboard', 'vehiclescheduler'),
     $_SERVER['PHP_SELF'],
-    'plugins',
-    'pluginvehicleschedulerschedule',
-    'schedule'
+    'tools',
+    'PluginVehicleschedulerMenug',
+    'dashboard'
 );
 
-plugin_vehiclescheduler_load_css();
-plugin_vehiclescheduler_enhance_ui();
-
-/**
- * Count rows using GLPI structured criteria.
- */
-function vs_dashboard_count(string $table, array $where = []): int
-{
+// ── Helper: query count ────────────────────────────────────────────────────
+function vs_count(string $table, array $where = []): int {
     global $DB;
-
-    $criteria = [
-        'FROM'  => $table,
-        'COUNT' => 'cpt',
-    ];
-
-    if ($where !== []) {
-        $criteria['WHERE'] = $where;
-    }
-
+    $criteria = ['FROM' => $table, 'COUNT' => 'cpt'];
+    if ($where) $criteria['WHERE'] = $where;
     $row = $DB->request($criteria)->current();
-
-    return (int) ($row['cpt'] ?? 0);
+    return (int)($row['cpt'] ?? 0);
 }
 
-/**
- * Escape helper for dashboard output.
- */
-function vs_dashboard_escape($value): string
-{
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-}
-
-function vs_dashboard_render_driver_expiry_badge(array $status): string
-{
-    $badge = PluginVehicleschedulerDriver::getCNHExpiryBadgeData($status);
-
-    return '<span class="vs-driver-expiry-badge '
-        . vs_dashboard_escape((string) $badge['class'])
-        . '">'
-        . vs_dashboard_escape((string) $badge['label'])
-        . '</span>';
-}
-
-/**
- * Vehicle label cache for dashboard widgets.
- */
-function vs_dashboard_vehicle_name(int $id): string
-{
-    global $DB;
-
-    static $cache = [];
-
-    if ($id <= 0) {
-        return '&mdash;';
-    }
-
-    if (!array_key_exists($id, $cache)) {
-        $row = $DB->request([
-            'FROM'  => 'glpi_plugin_vehiclescheduler_vehicles',
-            'WHERE' => ['id' => $id],
-        ])->current();
-
-        if ($row) {
-            $cache[$id] = "<span class='vs-dashboard-vehicle'>"
-                . '<span>' . vs_dashboard_escape($row['name'] ?? '') . '</span>'
-                . "<small class='vs-dashboard-vehicle-plate'>("
-                . vs_dashboard_escape($row['plate'] ?? '')
-                . ')</small>'
-                . '</span>';
-        } else {
-            $cache[$id] = '#' . $id;
-        }
-    }
-
-    return $cache[$id];
-}
-
-/**
- * Dashboard section header renderer.
- */
-function vs_dashboard_section(string $icon, string $title, string $link = '', string $linkLabel = ''): void
-{
-    echo "<div class='vs-dashboard-card-header'>";
-    echo "   <span class='vs-dashboard-card-title'><i class='ti " . vs_dashboard_escape($icon) . "'></i>"
-        . vs_dashboard_escape($title)
-        . '</span>';
-
-    if ($link !== '') {
-        echo "   <a href='" . vs_dashboard_escape($link)
-            . "' class='vs-dashboard-btn vs-dashboard-btn--secondary vs-dashboard-card-link'>"
-            . vs_dashboard_escape($linkLabel)
-            . '</a>';
-    }
-
-    echo '</div>';
-}
-
-global $DB;
-
+// ── KPI data ───────────────────────────────────────────────────────────────
 $kpi = [
-    'vehicles_active'     => vs_dashboard_count('glpi_plugin_vehiclescheduler_vehicles', ['is_active' => 1]),
-    'vehicles_total'      => vs_dashboard_count('glpi_plugin_vehiclescheduler_vehicles'),
-    'drivers_active'      => vs_dashboard_count('glpi_plugin_vehiclescheduler_drivers', ['is_active' => 1]),
-    'schedules_new'       => vs_dashboard_count('glpi_plugin_vehiclescheduler_schedules', ['status' => 1]),
-    'schedules_approved'  => vs_dashboard_count('glpi_plugin_vehiclescheduler_schedules', ['status' => 2]),
-    'incidents_open'      => vs_dashboard_count('glpi_plugin_vehiclescheduler_incidents', ['status' => 1]),
-    'incidents_analyzing' => vs_dashboard_count('glpi_plugin_vehiclescheduler_incidents', ['status' => 2]),
-    'maint_scheduled'     => vs_dashboard_count('glpi_plugin_vehiclescheduler_maintenances', ['status' => 1]),
-    'maint_in_progress'   => vs_dashboard_count('glpi_plugin_vehiclescheduler_maintenances', ['status' => 2]),
-    'insurance_open'      => vs_dashboard_count('glpi_plugin_vehiclescheduler_insuranceclaims', ['status' => [1, 2]]),
-    'fines_open'          => vs_dashboard_count('glpi_plugin_vehiclescheduler_driverfines', ['status' => 1]),
+    'vehicles_active'     => vs_count('glpi_plugin_vehiclescheduler_vehicles', ['is_active' => 1]),
+    'vehicles_total'      => vs_count('glpi_plugin_vehiclescheduler_vehicles'),
+    'drivers_active'      => vs_count('glpi_plugin_vehiclescheduler_drivers', ['is_active' => 1]),
+    'schedules_new'       => vs_count('glpi_plugin_vehiclescheduler_schedules', ['status' => 1]),
+    'schedules_approved'  => vs_count('glpi_plugin_vehiclescheduler_schedules', ['status' => 2]),
+    'incidents_open'      => vs_count('glpi_plugin_vehiclescheduler_incidents', ['status' => 1]),
+    'incidents_analyzing' => vs_count('glpi_plugin_vehiclescheduler_incidents', ['status' => 2]),
+    'maint_scheduled'     => vs_count('glpi_plugin_vehiclescheduler_maintenances', ['status' => 1]),
+    'maint_in_progress'   => vs_count('glpi_plugin_vehiclescheduler_maintenances', ['status' => 2]),
+    'insurance_open'      => vs_count('glpi_plugin_vehiclescheduler_insuranceclaims', ['status' => [1, 2]]),
+    'fines_open'          => vs_count('glpi_plugin_vehiclescheduler_driverfines', ['status' => 1]),
 ];
 
-$cnhWarning = iterator_to_array($DB->request([
-    'FROM'  => 'glpi_plugin_vehiclescheduler_drivers',
-    'WHERE' => [
-        'is_active'  => 1,
-        'cnh_expiry' => ['<=', date('Y-m-d', strtotime('+90 days'))],
-    ],
-    'ORDER' => ['cnh_expiry ASC'],
-    'LIMIT' => 5,
+// CNH expiring in 90 days
+global $DB;
+$cnh_warning = iterator_to_array($DB->request([
+    'FROM'    => 'glpi_plugin_vehiclescheduler_drivers',
+    'WHERE'   => ['is_active' => 1, 'cnh_expiry' => ['<=', date('Y-m-d', strtotime('+90 days'))], 'cnh_expiry' => ['>=', date('Y-m-d')]],
+    'ORDER'   => ['cnh_expiry ASC'],
+    'LIMIT'   => 5,
 ]));
 
-$cnhWarning = array_values(array_filter(
-    $cnhWarning,
-    static function (array $driver): bool {
-        $expiry = (string) ($driver['cnh_expiry'] ?? '');
-
-        return $expiry !== '' && $expiry >= date('Y-m-d');
-    }
-));
-
-$pendingSchedules = iterator_to_array($DB->request([
-    'FROM'  => 'glpi_plugin_vehiclescheduler_schedules',
-    'WHERE' => ['status' => 1],
-    'ORDER' => ['date_creation DESC'],
-    'LIMIT' => 8,
+// Recent schedules pending approval
+$pending_schedules = iterator_to_array($DB->request([
+    'FROM'    => 'glpi_plugin_vehiclescheduler_schedules',
+    'WHERE'   => ['status' => 1],
+    'ORDER'   => ['date_creation DESC'],
+    'LIMIT'   => 8,
 ]));
 
-$openIncidents = iterator_to_array($DB->request([
+// Recent open incidents
+$open_incidents = iterator_to_array($DB->request([
     'FROM'  => 'glpi_plugin_vehiclescheduler_incidents',
     'WHERE' => ['status' => [1, 2]],
     'ORDER' => ['incident_date DESC'],
     'LIMIT' => 6,
 ]));
 
-$upcomingMaintenances = iterator_to_array($DB->request([
+// Upcoming/overdue maintenances
+$upcoming_maint = iterator_to_array($DB->request([
     'FROM'  => 'glpi_plugin_vehiclescheduler_maintenances',
     'WHERE' => ['status' => [1, 2]],
     'ORDER' => ['scheduled_date ASC'],
     'LIMIT' => 6,
 ]));
 
-$openClaims = iterator_to_array($DB->request([
-    'FROM'  => 'glpi_plugin_vehiclescheduler_insuranceclaims',
-    'WHERE' => ['status' => [1, 2]],
-    'ORDER' => ['opening_date DESC'],
-    'LIMIT' => 6,
-]));
-
-$rootDoc = plugin_vehiclescheduler_get_root_doc();
-
-$urls = [
-    'schedule_form'       => plugin_vehiclescheduler_get_front_url('schedule.form.php'),
-    'schedule'            => plugin_vehiclescheduler_get_front_url('schedule.php'),
-    'calendar'            => plugin_vehiclescheduler_get_front_url('calendar.php'),
-    'incident_form'       => plugin_vehiclescheduler_get_front_url('incident.form.php'),
-    'incident'            => plugin_vehiclescheduler_get_front_url('incident.php'),
-    'maintenance_form'    => plugin_vehiclescheduler_get_front_url('maintenance.form.php'),
-    'maintenance'         => plugin_vehiclescheduler_get_front_url('maintenance.php'),
-    'insurance_form'      => plugin_vehiclescheduler_get_front_url('insuranceclaim.form.php'),
-    'insurance'           => plugin_vehiclescheduler_get_front_url('insuranceclaim.php'),
-    'driver'              => plugin_vehiclescheduler_get_front_url('driver.php'),
-    'driver_form'         => plugin_vehiclescheduler_get_front_url('driver.form.php'),
-];
-
-$incidentTypes = PluginVehicleschedulerIncident::getAllTypes();
-$maintenanceTypes = PluginVehicleschedulerMaintenance::getAllTypes();
-$claimStatuses = PluginVehicleschedulerInsuranceclaim::getAllStatus();
+// Vehicle name cache
+$vcache = [];
+function vs_vehicle_name(int $id): string {
+    global $DB, $vcache;
+    if (!$id) return '—';
+    if (!isset($vcache[$id])) {
+        $row = $DB->request(['FROM' => 'glpi_plugin_vehiclescheduler_vehicles', 'WHERE' => ['id' => $id]])->current();
+        $vcache[$id] = $row ? $row['name'] . ' <small style="color:#888">(' . $row['plate'] . ')</small>' : "#{$id}";
+    }
+    return $vcache[$id];
+}
 ?>
+<style>
+/* NOC Dark Mode Theme */
+:fullscreen { background-color: #0f172a; }
+:fullscreen #header, :fullscreen #footer, :fullscreen #page-wrapper > header, :fullscreen .glpi-header, :fullscreen .glpi-menu, :fullscreen .breadcrumb, :fullscreen #c_menu { display: none !important; }
+:fullscreen .noc-wrapper { padding: 30px; height: 100vh; overflow-y: auto; box-sizing: border-box; }
+.noc-wrapper { background: #0f172a; color: #e2e8f0; font-family: inherit; padding: 20px; border-radius: 12px; margin-top: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.noc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #1e293b; padding-bottom: 16px; }
+.noc-header h1 { margin: 0; font-size: 1.8rem; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 10px; }
+.noc-btn { background: #334155; color: #f8fafc; border: 1px solid #475569; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+.noc-btn:hover { background: #475569; }
+.noc-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.noc-kpi { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 20px; text-align: center; }
+.noc-kpi .val { font-size: 2.6rem; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+.noc-kpi .lbl { font-size: 0.8rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.noc-red .val { color: #ef4444; } .noc-amber .val { color: #f59e0b; } .noc-blue .val { color: #3b82f6; } .noc-green .val { color: #10b981; } .noc-purple .val { color: #8b5cf6; }
+.noc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.noc-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; overflow: hidden; }
+.noc-card-header { padding: 16px 20px; background: #0f172a; border-bottom: 1px solid #334155; font-weight: 700; font-size: 1rem; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
+.noc-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.noc-table th { background: #1e293b; padding: 12px 16px; text-align: left; color: #94a3b8; font-weight: 600; text-transform: uppercase; border-bottom: 1px solid #334155; }
+.noc-table td { padding: 14px 16px; border-bottom: 1px solid #334155; color: #cbd5e1; }
+.noc-table tr:last-child td { border-bottom: none; }
+.noc-empty { padding: 40px; text-align: center; color: #475569; font-size: 1rem; font-style: italic; }
+.noc-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+.bg-critical { background: #7f1d1d; color: #fca5a5; } .bg-warning { background: #78350f; color: #fcd34d; } .bg-info { background: #1e3a8a; color: #bfdbfe; }
+@media(max-width: 1100px) { .noc-grid-2 { grid-template-columns: 1fr; } }
+</style>
 
-<div class="vs-dashboard-page">
-    <div class="vs-dashboard-actions">
-        <a href="<?= vs_dashboard_escape($urls['schedule_form']) ?>" class="vs-dashboard-btn vs-dashboard-btn--primary">
-            <i class="ti ti-calendar-plus"></i>
-            <?= vs_dashboard_escape(__('New Reservation', 'vehiclescheduler')) ?>
-        </a>
-        <a href="<?= vs_dashboard_escape($urls['calendar']) ?>" class="vs-dashboard-btn vs-dashboard-btn--info">
-            <i class="ti ti-calendar-month"></i>
-            <?= vs_dashboard_escape(__('Open Calendar', 'vehiclescheduler')) ?>
-        </a>
-        <a href="<?= vs_dashboard_escape($urls['incident_form']) ?>" class="vs-dashboard-btn vs-dashboard-btn--warning">
-            <i class="ti ti-alert-triangle"></i>
-            <?= vs_dashboard_escape(__('Report Incident', 'vehiclescheduler')) ?>
-        </a>
-        <a href="<?= vs_dashboard_escape($urls['maintenance_form']) ?>" class="vs-dashboard-btn vs-dashboard-btn--secondary">
-            <i class="ti ti-tool"></i>
-            <?= vs_dashboard_escape(__('Schedule Maintenance', 'vehiclescheduler')) ?>
-        </a>
-        <a href="<?= vs_dashboard_escape($urls['insurance_form']) ?>" class="vs-dashboard-btn vs-dashboard-btn--secondary">
-            <i class="ti ti-shield"></i>
-            <?= vs_dashboard_escape(__('Open Insurance Claim', 'vehiclescheduler')) ?>
-        </a>
+<div class="noc-wrapper" id="noc-dashboard">
+  <div class="noc-header">
+    <h1><i class="ti ti-activity" style="color:#10b981;"></i> NOC Analytics - Monitoramento de Frota</h1>
+    <div>
+      <span style="color:#94a3b8; font-size:0.85rem; margin-right:15px; font-family:monospace;" id="noc-clock"></span>
+      <button class="noc-btn" onclick="toggleFullscreen()"><i class="ti ti-maximize"></i> Tela Cheia</button>
+    </div>
+  </div>
+
+  <!-- KPIs Topo -->
+  <div class="noc-kpi-grid">
+    <div class="noc-kpi noc-amber">
+      <div class="val"><?= $kpi['schedules_new'] ?></div>
+      <div class="lbl">Reservas Pendentes</div>
+    </div>
+    <div class="noc-kpi noc-red">
+      <div class="val"><?= $kpi['incidents_open'] ?></div>
+      <div class="lbl">Incidentes Abertos</div>
+    </div>
+    <div class="noc-kpi noc-purple">
+      <div class="val"><?= $kpi['maint_scheduled'] ?></div>
+      <div class="lbl">Manutenções Agendadas</div>
+    </div>
+    <div class="noc-kpi noc-blue">
+      <div class="val"><?= $kpi['vehicles_active'] ?></div>
+      <div class="lbl">Veículos Operacionais</div>
+    </div>
+  </div>
+
+  <!-- Grid Principal -->
+  <div class="noc-grid-2">
+    <!-- Reservas Pendentes -->
+    <div class="noc-card">
+      <div class="noc-card-header"><i class="ti ti-clock-pause" style="color:#f59e0b;"></i> Aguardando Aprovação</div>
+      <?php if (empty($pending_schedules)): ?>
+        <div class="noc-empty">Nenhuma reserva pendente</div>
+      <?php else: ?>
+        <table class="noc-table">
+          <tr><th>Solicitante</th><th>Veículo</th><th>Período</th></tr>
+          <?php foreach ($pending_schedules as $s): ?>
+            <tr>
+              <td><strong style="color:#f8fafc;"><?= getUserName($s['users_id']) ?></strong></td>
+              <td><?= strip_tags(vs_vehicle_name($s['plugin_vehiclescheduler_vehicles_id'])) ?></td>
+              <td><?= Html::convDate(substr($s['begin_date'],0,10)) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </table>
+      <?php endif; ?>
     </div>
 
-    <div class="vs-dashboard-kpi-grid">
-        <?php
-        $kpis = [
-            ['blue', 'ti-car', $kpi['vehicles_active'], __('Active Vehicles', 'vehiclescheduler'), $kpi['vehicles_total'] . ' total'],
-            ['green', 'ti-steering-wheel', $kpi['drivers_active'], __('Active Drivers', 'vehiclescheduler'), ''],
-            ['amber', 'ti-clock', $kpi['schedules_new'], __('Pending Approval', 'vehiclescheduler'), __('Reservations', 'vehiclescheduler')],
-            ['green', 'ti-calendar-check', $kpi['schedules_approved'], __('Approved Reservations', 'vehiclescheduler'), ''],
-            ['red', 'ti-alert-triangle', $kpi['incidents_open'], __('Open Incidents', 'vehiclescheduler'), $kpi['incidents_analyzing'] . ' analyzing'],
-            ['purple', 'ti-tool', $kpi['maint_scheduled'], __('Scheduled Maintenances', 'vehiclescheduler'), $kpi['maint_in_progress'] . ' in progress'],
-            ['amber', 'ti-shield', $kpi['insurance_open'], __('Open Claims', 'vehiclescheduler'), ''],
-            ['red', 'ti-ticket', $kpi['fines_open'], __('Open Fines', 'vehiclescheduler'), ''],
-        ];
+    <!-- Incidentes Abertos -->
+    <div class="noc-card">
+      <div class="noc-card-header"><i class="ti ti-alert-triangle" style="color:#ef4444;"></i> Incidentes Abertos</div>
+      <?php if (empty($open_incidents)): ?>
+        <div class="noc-empty">Nenhum incidente crítico</div>
+      <?php else: ?>
+        <table class="noc-table">
+          <tr><th>Data</th><th>Veículo</th><th>Status</th></tr>
+          <?php foreach ($open_incidents as $inc): 
+            $st = $inc['status'] == 1 ? 'bg-critical' : 'bg-warning';
+            $lbl = $inc['status'] == 1 ? 'ABERTO' : 'EM ANÁLISE';
+          ?>
+            <tr>
+              <td><?= Html::convDate(substr($inc['incident_date'],0,10)) ?></td>
+              <td><strong style="color:#f8fafc;"><?= strip_tags(vs_vehicle_name($inc['plugin_vehiclescheduler_vehicles_id'])) ?></strong></td>
+              <td><span class="noc-badge <?= $st ?>"><?= $lbl ?></span></td>
+            </tr>
+          <?php endforeach; ?>
+        </table>
+      <?php endif; ?>
+    </div>
+  </div>
 
-        foreach ($kpis as [$color, $icon, $value, $label, $sub]) :
-        ?>
-            <div class="vs-dashboard-kpi vs-dashboard-kpi--<?= vs_dashboard_escape($color) ?>">
-                <div class="vs-dashboard-kpi-value"><?= (int) $value ?></div>
-                <div class="vs-dashboard-kpi-label">
-                    <i class="ti <?= vs_dashboard_escape($icon) ?>"></i>
-                    <?= vs_dashboard_escape($label) ?>
-                </div>
-                <?php if ($sub !== '') : ?>
-                    <div class="vs-dashboard-kpi-sub"><?= vs_dashboard_escape($sub) ?></div>
-                <?php endif; ?>
-            </div>
-        <?php endforeach; ?>
+  <div class="noc-grid-2">
+    <!-- Manutenções -->
+    <div class="noc-card">
+      <div class="noc-card-header"><i class="ti ti-tool" style="color:#8b5cf6;"></i> Manutenções Próximas / Atrasadas</div>
+      <?php if (empty($upcoming_maint)): ?>
+        <div class="noc-empty">Nenhuma manutenção pendente</div>
+      <?php else: ?>
+        <table class="noc-table">
+          <tr><th>Veículo</th><th>Agendamento</th><th>Status</th></tr>
+          <?php foreach ($upcoming_maint as $m): 
+            $overdue = !empty($m['scheduled_date']) && $m['scheduled_date'] < date('Y-m-d') && $m['status'] == 1;
+            $st = $overdue ? 'bg-critical' : 'bg-info';
+            $lbl = $overdue ? 'ATRASADA' : 'AGENDADA';
+            if ($m['status'] == 2) { $st = 'bg-warning'; $lbl = 'EM ANDAMENTO'; }
+          ?>
+            <tr>
+              <td><strong style="color:#f8fafc;"><?= strip_tags(vs_vehicle_name($m['plugin_vehiclescheduler_vehicles_id'])) ?></strong></td>
+              <td><?= Html::convDate($m['scheduled_date']) ?></td>
+              <td><span class="noc-badge <?= $st ?>"><?= $lbl ?></span></td>
+            </tr>
+          <?php endforeach; ?>
+        </table>
+      <?php endif; ?>
     </div>
 
-    <div class="vs-dashboard-grid-2">
-        <div class="vs-dashboard-card">
-            <?php vs_dashboard_section('ti-calendar-event', __('Reservations Pending Approval', 'vehiclescheduler'), $urls['schedule'], __('View all', 'vehiclescheduler')); ?>
-            <div class="vs-dashboard-card-body">
-                <?php if ($pendingSchedules === []) : ?>
-                    <div class="vs-dashboard-empty"><?= vs_dashboard_escape(__('No pending reservations', 'vehiclescheduler')) ?></div>
-                <?php else : ?>
-                    <table class="vs-dashboard-table">
-                        <thead>
-                            <tr>
-                                <th><?= vs_dashboard_escape(__('Requester')) ?></th>
-                                <th><?= vs_dashboard_escape(__('Vehicle', 'vehiclescheduler')) ?></th>
-                                <th><?= vs_dashboard_escape(__('Dates', 'vehiclescheduler')) ?></th>
-                                <th><?= vs_dashboard_escape(__('Status')) ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($pendingSchedules as $schedule) : ?>
-                                <tr>
-                                    <td>
-                                        <a href="<?= vs_dashboard_escape($urls['schedule_form'] . '?id=' . (int) ($schedule['id'] ?? 0)) ?>">
-                                            <?= vs_dashboard_escape(getUserName((int) ($schedule['users_id'] ?? 0))) ?>
-                                        </a>
-                                    </td>
-                                    <td><?= vs_dashboard_vehicle_name((int) ($schedule['plugin_vehiclescheduler_vehicles_id'] ?? 0)) ?></td>
-                                    <td class="vs-dashboard-nowrap">
-                                        <?= Html::convDate(substr((string) ($schedule['begin_date'] ?? ''), 0, 10)) ?>
-                                        →
-                                        <?= Html::convDate(substr((string) ($schedule['end_date'] ?? ''), 0, 10)) ?>
-                                    </td>
-                                    <td><span class="vs-dashboard-badge vs-dashboard-badge--new"><?= vs_dashboard_escape(__('New', 'vehiclescheduler')) ?></span></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <div class="vs-dashboard-card">
-            <?php vs_dashboard_section('ti-id-badge', __('CNH Expiry Alerts (next 90 days)', 'vehiclescheduler'), $urls['driver'], __('View all', 'vehiclescheduler')); ?>
-            <div class="vs-dashboard-card-body">
-                <?php if ($cnhWarning === []) : ?>
-                    <div class="vs-dashboard-empty"><?= vs_dashboard_escape(__('No CNH expiring soon', 'vehiclescheduler')) ?></div>
-                <?php else : ?>
-                    <table class="vs-dashboard-table">
-                        <thead>
-                            <tr>
-                                <th><?= vs_dashboard_escape(__('Driver', 'vehiclescheduler')) ?></th>
-                                <th>CNH Cat.</th>
-                                <th><?= vs_dashboard_escape(__('Expiry', 'vehiclescheduler')) ?></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($cnhWarning as $driver) : ?>
-                                <?php
-                                $expiryStatus = PluginVehicleschedulerDriver::getCNHExpiryStatus((string) ($driver['cnh_expiry'] ?? ''));
-                                $badge = vs_dashboard_render_driver_expiry_badge($expiryStatus);
-                                ?>
-                                <tr>
-                                    <td>
-                                        <a href="<?= vs_dashboard_escape($urls['driver_form'] . '?id=' . (int) ($driver['id'] ?? 0)) ?>">
-                                            <?= vs_dashboard_escape((string) ($driver['name'] ?? '')) ?>
-                                        </a>
-                                    </td>
-                                    <td><?= vs_dashboard_escape((string) ($driver['cnh_category'] ?? '')) ?></td>
-                                    <td><?= Html::convDate((string) ($driver['cnh_expiry'] ?? '')) ?></td>
-                                    <td><?= $badge ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php endif; ?>
-            </div>
-        </div>
+    <!-- CNHs -->
+    <div class="noc-card">
+      <div class="noc-card-header"><i class="ti ti-id-badge" style="color:#fcd34d;"></i> Alertas de CNH (< 90 dias)</div>
+      <?php if (empty($cnh_warning)): ?>
+        <div class="noc-empty">Nenhum vencimento próximo</div>
+      <?php else: ?>
+        <table class="noc-table">
+          <tr><th>Motorista</th><th>Vencimento</th></tr>
+          <?php foreach ($cnh_warning as $d): 
+            $days = (int)((strtotime($d['cnh_expiry']) - time()) / 86400);
+            $st = $days <= 30 ? 'bg-critical' : 'bg-warning';
+          ?>
+            <tr>
+              <td><strong style="color:#f8fafc;"><?= htmlspecialchars($d['name']) ?></strong></td>
+              <td><?= Html::convDate($d['cnh_expiry']) ?> <span class="noc-badge <?= $st ?>" style="margin-left:10px;"><?= $days ?> dias</span></td>
+            </tr>
+          <?php endforeach; ?>
+        </table>
+      <?php endif; ?>
     </div>
-
-    <div class="vs-dashboard-grid-2">
-        <div class="vs-dashboard-card">
-            <?php vs_dashboard_section('ti-alert-triangle', __('Open Incidents', 'vehiclescheduler'), $urls['incident'], __('View all', 'vehiclescheduler')); ?>
-            <div class="vs-dashboard-card-body">
-                <?php if ($openIncidents === []) : ?>
-                    <div class="vs-dashboard-empty"><?= vs_dashboard_escape(__('No open incidents', 'vehiclescheduler')) ?></div>
-                <?php else : ?>
-                    <table class="vs-dashboard-table">
-                        <thead>
-                            <tr>
-                                <th><?= vs_dashboard_escape(__('Date', 'vehiclescheduler')) ?></th>
-                                <th><?= vs_dashboard_escape(__('Type', 'vehiclescheduler')) ?></th>
-                                <th><?= vs_dashboard_escape(__('Vehicle', 'vehiclescheduler')) ?></th>
-                                <th><?= vs_dashboard_escape(__('Status')) ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($openIncidents as $incident) : ?>
-                                <?php
-                                $statusClass = (int) ($incident['status'] ?? 0) === 1
-                                    ? 'vs-dashboard-badge--open'
-                                    : 'vs-dashboard-badge--analyzing';
-                                $statusLabel = (int) ($incident['status'] ?? 0) === 1
-                                    ? __('Open', 'vehiclescheduler')
-                                    : __('Analyzing', 'vehiclescheduler');
-                                ?>
-                                <tr>
-                                    <td><?= Html::convDate(substr((string) ($incident['incident_date'] ?? ''), 0, 10)) ?></td>
-                                    <td>
-                                        <a href="<?= vs_dashboard_escape($urls['incident_form'] . '?id=' . (int) ($incident['id'] ?? 0)) ?>">
-                                            <?= vs_dashboard_escape($incidentTypes[(int) ($incident['incident_type'] ?? 0)] ?? '?') ?>
-                                        </a>
-                                    </td>
-                                    <td><?= vs_dashboard_vehicle_name((int) ($incident['plugin_vehiclescheduler_vehicles_id'] ?? 0)) ?></td>
-                                    <td><span class="vs-dashboard-badge <?= vs_dashboard_escape($statusClass) ?>"><?= vs_dashboard_escape($statusLabel) ?></span></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <div class="vs-dashboard-card">
-            <?php vs_dashboard_section('ti-tool', __('Upcoming Maintenances', 'vehiclescheduler'), $urls['maintenance'], __('View all', 'vehiclescheduler')); ?>
-            <div class="vs-dashboard-card-body">
-                <?php if ($upcomingMaintenances === []) : ?>
-                    <div class="vs-dashboard-empty"><?= vs_dashboard_escape(__('No maintenances pending', 'vehiclescheduler')) ?></div>
-                <?php else : ?>
-                    <table class="vs-dashboard-table">
-                        <thead>
-                            <tr>
-                                <th><?= vs_dashboard_escape(__('Vehicle', 'vehiclescheduler')) ?></th>
-                                <th><?= vs_dashboard_escape(__('Type', 'vehiclescheduler')) ?></th>
-                                <th><?= vs_dashboard_escape(__('Scheduled', 'vehiclescheduler')) ?></th>
-                                <th><?= vs_dashboard_escape(__('Status')) ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($upcomingMaintenances as $maintenance) : ?>
-                                <?php
-                                $overdue = !empty($maintenance['scheduled_date'])
-                                    && (string) $maintenance['scheduled_date'] < date('Y-m-d')
-                                    && (int) ($maintenance['status'] ?? 0) === 1;
-                                $statusClass = (int) ($maintenance['status'] ?? 0) === 1
-                                    ? 'vs-dashboard-badge--scheduled'
-                                    : 'vs-dashboard-badge--progress';
-                                $statusLabel = (int) ($maintenance['status'] ?? 0) === 1
-                                    ? __('Scheduled', 'vehiclescheduler')
-                                    : __('In Progress', 'vehiclescheduler');
-
-                                if ($overdue) {
-                                    $statusClass = 'vs-dashboard-badge--open';
-                                    $statusLabel = __('Overdue', 'vehiclescheduler');
-                                }
-                                ?>
-                                <tr>
-                                    <td><?= vs_dashboard_vehicle_name((int) ($maintenance['plugin_vehiclescheduler_vehicles_id'] ?? 0)) ?></td>
-                                    <td>
-                                        <a href="<?= vs_dashboard_escape($urls['maintenance_form'] . '?id=' . (int) ($maintenance['id'] ?? 0)) ?>">
-                                            <?= vs_dashboard_escape($maintenanceTypes[(int) ($maintenance['type'] ?? 0)] ?? '?') ?>
-                                        </a>
-                                    </td>
-                                    <td><?= Html::convDate((string) ($maintenance['scheduled_date'] ?? '')) ?></td>
-                                    <td><span class="vs-dashboard-badge <?= vs_dashboard_escape($statusClass) ?>"><?= vs_dashboard_escape($statusLabel) ?></span></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <div class="vs-dashboard-card vs-dashboard-card--spaced">
-        <?php vs_dashboard_section('ti-shield-check', __('Insurance Claims in Progress', 'vehiclescheduler'), $urls['insurance'], __('View all', 'vehiclescheduler')); ?>
-        <div class="vs-dashboard-card-body">
-            <?php if ($openClaims === []) : ?>
-                <div class="vs-dashboard-empty"><?= vs_dashboard_escape(__('No open claims', 'vehiclescheduler')) ?></div>
-            <?php else : ?>
-                <table class="vs-dashboard-table">
-                    <thead>
-                        <tr>
-                            <th>Claim #</th>
-                            <th><?= vs_dashboard_escape(__('Vehicle', 'vehiclescheduler')) ?></th>
-                            <th>Insurer</th>
-                            <th><?= vs_dashboard_escape(__('Opened', 'vehiclescheduler')) ?></th>
-                            <th>Est. Value</th>
-                            <th><?= vs_dashboard_escape(__('Status')) ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($openClaims as $claim) : ?>
-                            <?php
-                            $statusClass = (int) ($claim['status'] ?? 0) === 1
-                                ? 'vs-dashboard-badge--open'
-                                : 'vs-dashboard-badge--analyzing';
-                            ?>
-                            <tr>
-                                <td>
-                                    <a href="<?= vs_dashboard_escape($urls['insurance_form'] . '?id=' . (int) ($claim['id'] ?? 0)) ?>">
-                                        <?= vs_dashboard_escape((string) ($claim['claim_number'] ?? ('#' . (int) ($claim['id'] ?? 0)))) ?>
-                                    </a>
-                                </td>
-                                <td><?= vs_dashboard_vehicle_name((int) ($claim['plugin_vehiclescheduler_vehicles_id'] ?? 0)) ?></td>
-                                <td><?= vs_dashboard_escape((string) ($claim['insurance_company'] ?? '')) ?></td>
-                                <td><?= Html::convDate((string) ($claim['opening_date'] ?? '')) ?></td>
-                                <td>R$ <?= number_format((float) ($claim['estimated_value'] ?? 0), 2, ',', '.') ?></td>
-                                <td>
-                                    <span class="vs-dashboard-badge <?= vs_dashboard_escape($statusClass) ?>">
-                                        <?= vs_dashboard_escape($claimStatuses[(int) ($claim['status'] ?? 0)] ?? '?') ?>
-                                    </span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
-        </div>
-    </div>
+  </div>
 </div>
 
+<script>
+// Auto Refresh (60 segundos)
+setTimeout(() => { window.location.reload(); }, 60000);
+
+// Relógio em tempo real
+function updateClock() {
+  const d = new Date();
+  document.getElementById('noc-clock').innerText = "Atualizado: " + d.toLocaleTimeString();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Lógica de Tela Cheia
+function toggleFullscreen() {
+  let elem = document.documentElement;
+  if (!document.fullscreenElement) {
+    elem.requestFullscreen().catch(err => {
+      console.log(`Erro ao tentar tela cheia: ${err.message}`);
+      alert("O seu navegador bloqueou a tela cheia. Aperte F11.");
+    });
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+}
+</script>
 <?php Html::footer(); ?>
