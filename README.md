@@ -1,7 +1,7 @@
 # 🚗 GLPI Vehicle Scheduler (Gestão de Frotas)
 
 **Versão:** 4.0.0  
-**Compatibilidade:** GLPI 10.x  
+**Compatibilidade:** GLPI 11.x  
 **Idioma:** 100% PT-BR Nativo (com suporte a i18n Gettext)
 
 O **Vehicle Scheduler** é um plugin completo e altamente customizado para transformar o seu GLPI em um verdadeiro sistema de **Gestão de Frotas (Fleet Management)** de nível Enterprise. Ele substitui os controles em planilhas por fluxos de trabalho inteligentes, painéis modernos e monitoramento proativo.
