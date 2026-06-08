@@ -24,7 +24,7 @@ Este documento contém o levantamento completo de todas as interfaces (telas, da
 - **Recursos**:
   - Painel lateral com lista de veículos ativos e status de disponibilidade hoje (Disponível em verde, Em viagem em vermelho).
   - Grade mensal do calendário exibindo chaves coloridas dos veículos reservados por dia.
-  - Modal interativo ao clicar nos dias para visualização de detalhes ou aprovação rápida.
+  - Modal interativo ao clicar nas chaves de agendamentos para visualização de detalhes (modo somente leitura).
 - **Público**: Gestores (ocultado para usuários comuns).
 
 ### 1.4. Meus Agendamentos (`/front/pages/requester_list.php` — Aba: 📋 Meus Agendamentos)
@@ -68,7 +68,6 @@ Estas telas utilizam o mecanismo nativo do GLPI para renderizar tabelas de busca
 | **Manutenções (Maintenances)**| `maintenance.php` | `maintenance.form.php` | Exclusivo Gestores (Leitura/Escrita) |
 | **Sinistros (InsuranceClaims)**| `insuranceclaim.php` | `insuranceclaim.form.php`| Exclusivo Gestores (Leitura/Escrita) |
 | **Multas (DriverFines)** | *(Visualizado no Dash de Multas)*| `driverfine.form.php` | Exclusivo Gestores (Leitura/Escrita) |
-| **Relatórios (VehicleReports)**| `vehiclereport.php` | `vehiclereport.form.php` | Exclusivo Gestores (Leitura/Escrita) |
 
 ---
 

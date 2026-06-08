@@ -35,7 +35,7 @@ $reservations = iterator_to_array($DB->request([
     'ORDER' => ['date_creation DESC'],
 ]));
 
-$statuses = ['', 'Nova', 'Aprovada', 'Recusada', 'Cancelada'];
+$statuses = PluginVehicleschedulerSchedule::getAllStatus();
 ?>
 
 <div class="vs-app-view" style="max-width:1200px;margin:30px auto;padding:0 20px;">
@@ -53,7 +53,15 @@ $statuses = ['', 'Nova', 'Aprovada', 'Recusada', 'Cancelada'];
             </div>
         <?php else: ?>
             <?php foreach ($reservations as $r):
-                $badge_class = ['', 'vs-badge-blue', 'vs-badge-green', 'vs-badge-red', 'vs-badge-gray'][$r['status']] ?? 'vs-badge-blue';
+                $status_badges = [
+                    PluginVehicleschedulerSchedule::STATUS_NEW       => 'vs-badge-blue',
+                    PluginVehicleschedulerSchedule::STATUS_APPROVED  => 'vs-badge-green',
+                    PluginVehicleschedulerSchedule::STATUS_REJECTED  => 'vs-badge-red',
+                    PluginVehicleschedulerSchedule::STATUS_CANCELLED => 'vs-badge-gray',
+                    PluginVehicleschedulerSchedule::STATUS_ONGOING   => 'vs-badge-yellow',
+                    PluginVehicleschedulerSchedule::STATUS_RETURNED  => 'vs-badge-green',
+                ];
+                $badge_class = $status_badges[$r['status']] ?? 'vs-badge-blue';
                 
                 // Buscar nome do veículo
                 $veh_name = 'Veículo não informado';

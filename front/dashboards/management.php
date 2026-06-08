@@ -300,7 +300,7 @@ if (!$is_tab) {
     <div>
       
       <!-- Approvals Card -->
-      <div class="vs-card mb-4" style="margin-bottom: 24px; border-left: 4px solid #f59e0b;">
+      <div class="vs-card mb-4" style="margin-bottom: 24px; border-radius: 16px; border: 1px solid #e5e7eb; border-left: 4px solid #f59e0b;">
         <div class="vs-card-header" style="margin-bottom: 18px; padding-bottom: 12px;">
           <h3><i class="ti ti-clock" style="color: #f59e0b;"></i> Solicitações Aguardando Aprovação</h3>
           <a href="<?= Plugin::getWebDir('vehiclescheduler') ?>/front/schedule.php" style="font-size: 0.82rem; color:#3b82f6; text-decoration:none; font-weight:700;">Ver todos &rarr;</a>
@@ -376,7 +376,7 @@ if (!$is_tab) {
       </div>
 
       <!-- Maintenances Card -->
-      <div class="vs-card" style="border-left: 4px solid #0ea5e9;">
+      <div class="vs-card" style="border-radius: 16px; border: 1px solid #e5e7eb; border-left: 4px solid #0ea5e9;">
         <div class="vs-card-header" style="margin-bottom: 18px; padding-bottom: 12px;">
           <h3><i class="ti ti-tool" style="color: #0ea5e9;"></i> Cronograma de Próximas Manutenções</h3>
           <a href="<?= Plugin::getWebDir('vehiclescheduler') ?>/front/maintenance.php" style="font-size: 0.82rem; color:#3b82f6; text-decoration:none; font-weight:700;">Ver todas &rarr;</a>
@@ -443,7 +443,7 @@ if (!$is_tab) {
     <div>
       
       <!-- Fleet Utilization Status Card -->
-      <div class="vs-card mb-4" style="margin-bottom: 24px; border-left: 4px solid #3b82f6;">
+      <div class="vs-card mb-4" style="margin-bottom: 24px; border-radius: 16px; border: 1px solid #e5e7eb; border-left: 4px solid #3b82f6;">
         <div class="vs-card-header" style="margin-bottom: 18px; padding-bottom: 12px;">
           <h3><i class="ti ti-chart-bar" style="color: #3b82f6;"></i> Uso da Frota (Hoje)</h3>
         </div>
@@ -485,7 +485,7 @@ if (!$is_tab) {
       </div>
 
       <!-- CNH Expiry Alerts Card -->
-      <div class="vs-card" style="border-left: 4px solid #ef4444;">
+      <div class="vs-card" style="border-radius: 16px; border: 1px solid #e5e7eb; border-left: 4px solid #ef4444;">
         <div class="vs-card-header" style="margin-bottom: 18px; padding-bottom: 12px;">
           <h3><i class="ti ti-id" style="color: #ef4444;"></i> Alertas CNH (Próximas a Vencer)</h3>
           <a href="<?= Plugin::getWebDir('vehiclescheduler') ?>/front/driver.php" style="font-size: 0.82rem; color:#3b82f6; text-decoration:none; font-weight:700;">Ver todos &rarr;</a>

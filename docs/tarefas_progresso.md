@@ -44,3 +44,12 @@ Este arquivo registra e acompanha a execução do Plano de Implementação de in
   - [x] Implementar `createTicketFromFine` abrindo chamado no nome do motorista infrator
   - [x] Exibir link do chamado relacionado no formulário de multas
   - [x] Sincronizar status de multas via acompanhamentos do chamado
+
+- [x] **Componente 7: Ajustes de Interface, Sincronização de Status e Limpeza**
+  - [x] Tornar o formulário de incidentes existentes somente leitura para usuários comuns (`incident.class.php` / `incident.form.php`)
+  - [x] Exibir status dinâmico e anexos com links no visualizador de incidentes
+  - [x] Sincronizar status e mapeamento de badges de agendamentos na tela de requisições (`requester.php` / `requester_list.php`)
+  - [x] Remover o card "Perfil do Condutor" no Portal (`portal.php`)
+  - [x] Tornar a aba "Agendamento" (calendário) somente leitura e remover botão de "Nova Reserva" (`booking.php`)
+  - [x] Excluir todos os arquivos e pastas obsoletas (`vehiclereport`, classe `Theme`, `app-style.css`, etc.)
+

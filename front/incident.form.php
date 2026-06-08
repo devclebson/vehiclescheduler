@@ -29,19 +29,23 @@ if (isset($_POST['add'])) {
     $item->add($_POST);
     Session::addMessageAfterRedirect('Incidente reportado com sucesso!', false, INFO);
     Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
-} elseif (isset($_POST['update'])) {
-    $item->check($_POST['id'], UPDATE);
-    $item->update($_POST);
-    Session::addMessageAfterRedirect('Incidente atualizado.', false, INFO);
-    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
-} elseif (isset($_POST['delete'])) {
-    $item->check($_POST['id'], DELETE);
-    $item->delete($_POST);
-    Session::addMessageAfterRedirect('Incidente cancelado.', false, INFO);
-    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
-} elseif (isset($_POST['purge'])) {
-    $item->check($_POST['id'], PURGE);
-    $item->delete($_POST, 1);
+} elseif (isset($_POST['update']) || isset($_POST['delete']) || isset($_POST['purge'])) {
+    if (!PluginVehicleschedulerProfile::canViewManagement()) {
+        Html::displayRightError();
+        exit;
+    }
+    if (isset($_POST['update'])) {
+        $item->check($_POST['id'], UPDATE);
+        $item->update($_POST);
+        Session::addMessageAfterRedirect('Incidente atualizado.', false, INFO);
+    } elseif (isset($_POST['delete'])) {
+        $item->check($_POST['id'], DELETE);
+        $item->delete($_POST);
+        Session::addMessageAfterRedirect('Incidente cancelado.', false, INFO);
+    } elseif (isset($_POST['purge'])) {
+        $item->check($_POST['id'], PURGE);
+        $item->delete($_POST, 1);
+    }
     Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 } else {
     $item->checkGlobal(READ);

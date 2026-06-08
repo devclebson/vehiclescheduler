@@ -727,20 +727,7 @@ foreach ($reservations as $r) {
 
   </div><!-- .vbk-grid -->
 
-  <!-- Floating Add Action Button -->
-  <a id="vbk-floating-add-btn" href="<?= Plugin::getWebDir('vehiclescheduler') ?>/front/schedule.form.php" style="position:fixed;bottom:30px;right:30px;background:#3b82f6 !important;color:#ffffff !important;padding:15px 24px;border-radius:50px;font-weight:700;box-shadow:0 6px 20px rgba(59,130,246,.3);cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:8px;font-size:1rem;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);z-index:99;">
-    <i class="ti ti-calendar-plus" style="font-size:1.25rem; color:#ffffff !important;"></i> <span id="vbk-floating-add-btn-txt" style="color:#ffffff !important;">Nova Reserva</span>
-  </a>
-
 </div><!-- .vs-app-view -->
-
-<!-- Hidden POST form for manager and quick actions -->
-<form id="quick-action-form" method="post" action="" style="display:none;">
-  <input type="hidden" name="_glpi_csrf_token" value="<?= Session::getNewCSRFToken() ?>">
-  <input type="hidden" id="post-res-id" name="id" value="">
-  <input type="hidden" id="post-quick-action" name="quick_action" value="">
-  <input type="hidden" id="post-comment" name="comment" value="">
-</form>
 
 <!-- Modal for Reservation Details -->
 <div id="res-modal" class="vbk-modal" style="display:none;">
@@ -786,38 +773,8 @@ foreach ($reservations as $r) {
         <div class="vbk-detail-label">Status:</div>
         <div class="vbk-detail-value"><span id="lbl-status" class="vs-badge"></span></div>
       </div>
-      
-      <!-- Actions Section -->
-      <div id="modal-actions-section" style="margin-top:20px; padding:15px; border-radius:12px; background:#f8fafc; border:1px solid #e2e8f0;">
-        
-        <!-- Manager Decision block -->
-        <div id="manager-decision-block" style="display:none;">
-          <div style="font-weight:700; font-size:0.85rem; margin-bottom:10px; color:#475569;">Decisão do Gestor:</div>
-          <div style="display:flex; gap:10px;" id="decision-buttons">
-            <button type="button" onclick="window.approveReservation()" class="vs-btn vs-btn-primary" style="flex:1; font-size:0.85rem; padding:8px 12px; background:#22c55e !important; border:none; color:#ffffff !important;"><i class="ti ti-check"></i> Aprovar</button>
-            <button type="button" onclick="window.showRefusalReasonInput()" class="vs-btn vs-btn-danger" style="flex:1; font-size:0.85rem; padding:8px 12px; background:#ef4444 !important; border:none; color:#ffffff !important;"><i class="ti ti-x"></i> Recusar</button>
-          </div>
-          
-          <!-- Refusal Reason Input Form -->
-          <div id="refusal-reason-form" style="display:none; margin-top:10px;">
-            <label class="vbk-detail-label" style="display:block; margin-bottom:6px; font-size:0.8rem; width:100%;">Motivo da Recusa <span style="color:#ef4444;">*</span></label>
-            <textarea id="refusal-comment" class="form-control" rows="2" style="width:100%; border-radius:8px; border:1px solid #cbd5e1; padding:8px; font-size:0.85rem; margin-bottom:10px;" placeholder="Informe o motivo da recusa..."></textarea>
-            <div style="display:flex; gap:10px; justify-content:flex-end;">
-              <button type="button" onclick="window.hideRefusalReasonInput()" class="vs-btn vs-btn-light" style="font-size:0.8rem; padding:6px 12px;">Voltar</button>
-              <button type="button" onclick="window.submitRefusal()" class="vs-btn vs-btn-danger" style="font-size:0.8rem; padding:6px 12px; background:#ef4444 !important; border:none; color:#ffffff !important;">Confirmar Recusa</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Cancel Booking Button for owner or manager -->
-        <div id="cancel-booking-block" style="display:none; text-align:center;">
-          <button type="button" onclick="window.cancelReservation()" class="vs-btn vs-btn-danger" style="width:100%; font-size:0.85rem; padding:8px 12px; background:#ef4444 !important; border:none; color:#ffffff !important;"><i class="ti ti-trash"></i> Cancelar Agendamento</button>
-        </div>
-
-      </div>
     </div>
     <div class="vbk-modal-footer">
-      <a id="btn-edit-res" href="" class="vs-btn vs-btn-light" style="font-size:0.85rem; padding:8px 16px;"><i class="ti ti-pencil"></i> Detalhes / Alterar</a>
       <button class="vs-btn vs-btn-secondary" onclick="window.closeResModal()" style="font-size:0.85rem; padding:8px 16px;">Fechar</button>
     </div>
   </div>
@@ -830,40 +787,6 @@ window.allVehicles = <?= json_encode($vehicles) ?>;
 window.baseWebDir = "<?= Plugin::getWebDir('vehiclescheduler') ?>";
 window.isManager = <?= PluginVehicleschedulerProfile::canViewManagement() ? 'true' : 'false' ?>;
 window.currentUserId = <?= Session::getLoginUserID() ?>;
-
-// Global modal handlers
-window.approveReservation = function() {
-    document.getElementById('post-quick-action').value = 'approve';
-    document.getElementById('quick-action-form').submit();
-};
-
-window.showRefusalReasonInput = function() {
-    document.getElementById('decision-buttons').style.display = 'none';
-    document.getElementById('refusal-reason-form').style.display = 'block';
-};
-
-window.hideRefusalReasonInput = function() {
-    document.getElementById('decision-buttons').style.display = 'flex';
-    document.getElementById('refusal-reason-form').style.display = 'none';
-};
-
-window.submitRefusal = function() {
-    const comment = document.getElementById('refusal-comment').value.trim();
-    if (!comment) {
-        alert('Por favor, digite o motivo da recusa.');
-        return;
-    }
-    document.getElementById('post-quick-action').value = 'refuse';
-    document.getElementById('post-comment').value = comment;
-    document.getElementById('quick-action-form').submit();
-};
-
-window.cancelReservation = function() {
-    if (confirm('Deseja realmente cancelar este agendamento?')) {
-        document.getElementById('post-quick-action').value = 'cancel';
-        document.getElementById('quick-action-form').submit();
-    }
-};
 
 window.closeResModal = function() {
     document.getElementById('res-modal').style.display = 'none';
@@ -917,13 +840,11 @@ window.closeResModal = function() {
                     this.classList.remove('selected-day');
                     activeDate = null;
                     updateVehicleStatusAndSorting(null);
-                    updateFloatingButton();
                 } else {
                     days.forEach(d => d.classList.remove('selected-day'));
                     this.classList.add('selected-day');
                     activeDate = clickedDate;
                     updateVehicleStatusAndSorting(clickedDate);
-                    updateFloatingButton();
                 }
             };
         });
@@ -963,7 +884,6 @@ window.closeResModal = function() {
                     activeVehicleId = null;
                     
                     updateVehicleStatusAndSorting(null);
-                    updateFloatingButton();
                     initEvents();
                 }
             })
@@ -1003,8 +923,6 @@ window.closeResModal = function() {
 
         if (filteredVehicleLbl) filteredVehicleLbl.textContent = vehicleName;
         if (filterBanner) filterBanner.style.display = 'flex';
-
-        updateFloatingButton();
     }
 
     function clearFilter() {
@@ -1016,8 +934,6 @@ window.closeResModal = function() {
         vehicleCards.forEach(c => c.classList.remove('selected'));
         events.forEach(e => e.style.display = 'block');
         if (filterBanner) filterBanner.style.display = 'none';
-
-        updateFloatingButton();
     }
 
     function updateVehicleStatusAndSorting(dateStr) {
@@ -1082,69 +998,6 @@ window.closeResModal = function() {
         cards.forEach(card => listContainer.appendChild(card));
     }
 
-    function updateFloatingButton() {
-        const addBtn = document.getElementById('vbk-floating-add-btn');
-        const addBtnTxt = document.getElementById('vbk-floating-add-btn-txt');
-        if (!addBtn) return;
-
-        let url = `${window.baseWebDir}/front/schedule.form.php`;
-        let params = [];
-
-        if (activeVehicleId) {
-            params.push(`plugin_vehiclescheduler_vehicles_id=${activeVehicleId}`);
-        }
-        if (activeDate) {
-            params.push(`begin_date=${activeDate}%2008:00:00`);
-            params.push(`end_date=${activeDate}%2018:00:00`);
-        }
-
-        if (params.length > 0) {
-            url += '?' + params.join('&');
-        }
-
-        addBtn.href = url;
-
-        let isOccupied = false;
-        let vehicleName = '';
-        if (activeVehicleId) {
-            const v = window.allVehicles.find(x => x.id == activeVehicleId);
-            vehicleName = v ? v.name : '';
-            if (activeDate) {
-                isOccupied = window.monthlyReservations.some(res => {
-                    return res.vehicle_id == activeVehicleId && activeDate >= res.begin_date && activeDate <= res.end_date;
-                });
-            }
-        }
-
-        addBtn.style.pointerEvents = 'auto';
-        addBtn.style.opacity = '1';
-
-        if (activeDate && activeVehicleId) {
-            const parts = activeDate.split('-');
-            const formattedDate = `${parts[2]}/${parts[1]}`;
-            if (isOccupied) {
-                if (addBtnTxt) addBtnTxt.textContent = `Veículo Ocupado em ${formattedDate}`;
-                addBtn.style.background = '#64748b';
-                addBtn.style.pointerEvents = 'none';
-                addBtn.style.opacity = '0.7';
-            } else {
-                if (addBtnTxt) addBtnTxt.textContent = `Reservar ${vehicleName} em ${formattedDate}`;
-                addBtn.style.background = '#3b82f6';
-            }
-        } else if (activeDate) {
-            const parts = activeDate.split('-');
-            const formattedDate = `${parts[2]}/${parts[1]}`;
-            if (addBtnTxt) addBtnTxt.textContent = `Reservar em ${formattedDate}`;
-            addBtn.style.background = '#3b82f6';
-        } else if (activeVehicleId) {
-            if (addBtnTxt) addBtnTxt.textContent = `Reservar ${vehicleName}`;
-            addBtn.style.background = '#3b82f6';
-        } else {
-            if (addBtnTxt) addBtnTxt.textContent = 'Nova Reserva';
-            addBtn.style.background = '#3b82f6';
-        }
-    }
-
     function openResModal(res) {
         document.getElementById('lbl-title').textContent = res.name;
         document.getElementById('lbl-vehicle').textContent = res.vehicle_name;
@@ -1166,31 +1019,6 @@ window.closeResModal = function() {
             statusSpan.className += 'vs-badge-red';
         } else {
             statusSpan.className += 'vs-badge-gray';
-        }
-
-        document.getElementById('post-res-id').value = res.id;
-        
-        const editBtn = document.getElementById('btn-edit-res');
-        editBtn.href = `${window.baseWebDir}/front/schedule.form.php?id=${res.id}`;
-
-        document.getElementById('decision-buttons').style.display = 'flex';
-        document.getElementById('refusal-reason-form').style.display = 'none';
-        document.getElementById('refusal-comment').value = '';
-
-        const decisionBlock = document.getElementById('manager-decision-block');
-        const cancelBlock = document.getElementById('cancel-booking-block');
-
-        if (res.status == 1 && window.isManager) {
-            decisionBlock.style.display = 'block';
-        } else {
-            decisionBlock.style.display = 'none';
-        }
-
-        const isOwner = (res.users_id == window.currentUserId);
-        if ((res.status == 1 || res.status == 2) && (window.isManager || isOwner)) {
-            cancelBlock.style.display = 'block';
-        } else {
-            cancelBlock.style.display = 'none';
         }
 
         document.getElementById('res-modal').style.display = 'flex';

@@ -371,15 +371,6 @@ function vs_vehicle_label(int $id): string {
         <p class="vs-action-card-desc">Registre panes, sinistros ou avarias ocorridas no veículo.</p>
       </div>
     </a>
-    <?php if (PluginVehicleschedulerProfile::canViewManagement()): ?>
-    <a href="<?= Plugin::getWebDir('vehiclescheduler') ?>/front/driver.form.php" class="vs-action-card vs-card-motorista">
-      <div class="vs-action-card-icon"><i class="ti ti-steering-wheel"></i></div>
-      <div class="vs-action-card-content">
-        <h3 class="vs-action-card-title">Perfil do Condutor</h3>
-        <p class="vs-action-card-desc">Cadastre ou atualize seus dados de CNH para dirigir.</p>
-      </div>
-    </a>
-    <?php endif; ?>
   </div>
 
   <!-- Content Grid: My Reservations / My Incidents -->

@@ -78,7 +78,6 @@ function plugin_init_vehiclescheduler() {
         Plugin::registerClass('PluginVehicleschedulerMaintenance',    ['notificationtemplates_types' => true]);
         Plugin::registerClass('PluginVehicleschedulerInsuranceclaim', ['notificationtemplates_types' => true]);
         Plugin::registerClass('PluginVehicleschedulerProfile',        ['addtabon' => 'Profile']);
-        Plugin::registerClass('PluginVehicleschedulerTheme');
         
         // Removido página de configuração (temas)
     }

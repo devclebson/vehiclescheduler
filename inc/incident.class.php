@@ -79,6 +79,7 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
     }
 
     function showForm($ID, array $options = []) {
+        global $DB;
         $this->initForm($ID, $options);
         
         // Ativar multipart para upload de arquivos
@@ -102,7 +103,6 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
             }
             
             // Buscar reserva ativa nesse exato momento para preencher o veículo automaticamente
-            global $DB;
             $now = date('Y-m-d H:i:s');
             $res_iterator = $DB->request([
                 'FROM'  => 'glpi_plugin_vehiclescheduler_schedules',
@@ -147,6 +147,8 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
         }
 
         $is_manager = PluginVehicleschedulerProfile::canViewManagement();
+        $is_readonly = ($ID > 0 && !$is_manager);
+        $disabled_attr = $is_readonly ? "disabled='disabled'" : "";
 
         // Card 1: Relatório de Incidente
         echo "<div class='card shadow-sm border-0 mb-4'>
@@ -172,63 +174,144 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
 
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Departamento/Setor</label>
-                            <input type='text' name='department' value='".htmlspecialchars($this->fields['department'] ?: $default_dept)."' class='form-control'>
+                            <input type='text' name='department' value='".htmlspecialchars($this->fields['department'] ?: $default_dept)."' class='form-control' $disabled_attr>
                         </div>";
 
         // Row 2: Vehicle / Driver
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Veículo Envolvido <span class='text-danger'>*</span></label>";
-        echo "              <div>";
-        PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'] ?: $default_vehicle_id]);
-        echo "              </div>
-                        </div>";
+        if ($is_readonly) {
+            $veh_name = 'Veículo não informado';
+            $veh_id = $this->fields['plugin_vehiclescheduler_vehicles_id'] ?: $default_vehicle_id;
+            if (!empty($veh_id)) {
+                $veh = $DB->request(['FROM' => 'glpi_plugin_vehiclescheduler_vehicles', 'WHERE' => ['id' => $veh_id]])->current();
+                if ($veh) $veh_name = htmlspecialchars($veh['name'] . ' (' . $veh['plate'] . ')');
+            }
+            echo "          <div class='form-control bg-light'>$veh_name</div>";
+        } else {
+            echo "              <div>";
+            PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'] ?: $default_vehicle_id]);
+            echo "              </div>";
+        }
+        echo "          </div>";
 
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Motorista no Momento</label>";
-        echo "              <div>";
-        PluginVehicleschedulerDriver::dropdown(['name' => 'plugin_vehiclescheduler_drivers_id', 'value' => $this->fields['plugin_vehiclescheduler_drivers_id'] ?: $default_driver_id]);
-        echo "              </div>
-                        </div>";
+        if ($is_readonly) {
+            $drv_name = 'Motorista não informado';
+            $drv_id = $this->fields['plugin_vehiclescheduler_drivers_id'] ?: $default_driver_id;
+            if (!empty($drv_id)) {
+                $drv = $DB->request(['FROM' => 'glpi_plugin_vehiclescheduler_drivers', 'WHERE' => ['id' => $drv_id]])->current();
+                if ($drv) $drv_name = htmlspecialchars($drv['name']);
+            }
+            echo "          <div class='form-control bg-light'>$drv_name</div>";
+        } else {
+            echo "              <div>";
+            PluginVehicleschedulerDriver::dropdown(['name' => 'plugin_vehiclescheduler_drivers_id', 'value' => $this->fields['plugin_vehiclescheduler_drivers_id'] ?: $default_driver_id]);
+            echo "              </div>";
+        }
+        echo "          </div>";
 
-        // Row 3: Type / Date
-        echo "          <div class='col-md-6'>
+        // Row 3: Type / Date / Status (for common users viewing an existing incident)
+        $col_width = ($ID > 0 && !$is_manager) ? 'col-md-4' : 'col-md-6';
+        echo "          <div class='$col_width'>
                             <label class='form-label text-muted fw-bold'>Tipo de Incidente <span class='text-danger'>*</span></label>";
-        echo "              <div>";
-        Dropdown::showFromArray('incident_type', self::getAllTypes(), ['value' => $this->fields['incident_type'] ?? self::TYPE_OTHER]);
-        echo "              </div>
-                        </div>";
+        if ($is_readonly) {
+            $type_label = self::getAllTypes()[$this->fields['incident_type'] ?? self::TYPE_OTHER] ?? 'Outros';
+            echo "          <div class='form-control bg-light'>$type_label</div>";
+        } else {
+            echo "              <div>";
+            Dropdown::showFromArray('incident_type', self::getAllTypes(), ['value' => $this->fields['incident_type'] ?? self::TYPE_OTHER]);
+            echo "              </div>";
+        }
+        echo "          </div>";
 
-        echo "          <div class='col-md-6'>
-                            <label class='form-label text-muted fw-bold'>Data e Hora <span class='text-danger'>*</span></label>
-                            <div>";
-        Html::showDateTimeField('incident_date', ['value' => $this->fields['incident_date'] ?? date('Y-m-d H:i:s')]);
-        echo "              </div>
-                        </div>";
+        echo "          <div class='$col_width'>
+                            <label class='form-label text-muted fw-bold'>Data e Hora <span class='text-danger'>*</span></label>";
+        if ($is_readonly) {
+            $inc_date = Html::convDateTime($this->fields['incident_date'] ?? date('Y-m-d H:i:s'));
+            echo "          <div class='form-control bg-light'>$inc_date</div>";
+        } else {
+            echo "              <div>";
+            Html::showDateTimeField('incident_date', ['value' => $this->fields['incident_date'] ?? date('Y-m-d H:i:s')]);
+            echo "              </div>";
+        }
+        echo "          </div>";
+
+        if ($ID > 0 && !$is_manager) {
+            echo "          <div class='col-md-4'>
+                                <label class='form-label text-muted fw-bold'>Status do Incidente</label>";
+            $status_label = self::getAllStatus()[$this->fields['status'] ?? self::STATUS_OPEN] ?? 'Aberto';
+            $status_colors = [
+                self::STATUS_OPEN => 'vs-badge-blue',
+                self::STATUS_ANALYZING => 'vs-badge-yellow',
+                self::STATUS_RESOLVED => 'vs-badge-green',
+                self::STATUS_CLOSED => 'vs-badge-gray'
+            ];
+            $status_class = $status_colors[$this->fields['status'] ?? self::STATUS_OPEN] ?? 'vs-badge-blue';
+            echo "              <div class='form-control bg-light'><span class='vs-badge $status_class'>$status_label</span></div>";
+            echo "          </div>";
+        }
 
         // Row 4: Location / Contact Phone
         echo "          <div class='col-md-8'>
                             <label class='form-label text-muted fw-bold'>Localização/Endereço</label>
-                            <input type='text' name='location' value='".htmlspecialchars($this->fields['location'] ?? '')."' placeholder='Onde aconteceu?' class='form-control'>
+                            <input type='text' name='location' value='".htmlspecialchars($this->fields['location'] ?? '')."' placeholder='Onde aconteceu?' class='form-control' $disabled_attr>
                         </div>";
 
         echo "          <div class='col-md-4'>
                             <label class='form-label text-muted fw-bold'>Telefone de Contato</label>
-                            <input type='text' name='contact_phone' value='".htmlspecialchars($this->fields['contact_phone'] ?: $default_phone)."' class='form-control'>
+                            <input type='text' name='contact_phone' value='".htmlspecialchars($this->fields['contact_phone'] ?: $default_phone)."' class='form-control' $disabled_attr>
                         </div>";
 
         // Description (Full width)
         echo "          <div class='col-12'>
                             <label class='form-label text-muted fw-bold'>Descrição do Ocorrido <span class='text-danger'>*</span></label>
-                            <textarea name='description' rows='5' class='form-control' placeholder='Descreva detalhadamente o que ocorreu'>".htmlspecialchars($this->fields['description'] ?? '')."</textarea>
+                            <textarea name='description' rows='5' class='form-control' placeholder='Descreva detalhadamente o que ocorreu' $disabled_attr>".htmlspecialchars($this->fields['description'] ?? '')."</textarea>
                         </div>";
 
         // Fotos / Anexos
         echo "          <div class='col-12'>
-                            <label class='form-label text-muted fw-bold'>Fotos / Anexos do Ocorrido</label>
-                            <div>";
-        Html::file(['name' => 'filename']);
-        echo "              </div>
-                        </div>";
+                            <label class='form-label text-muted fw-bold'>Fotos / Anexos do Ocorrido</label>";
+        if ($is_readonly) {
+            $attachments = $DB->request([
+                'SELECT' => ['d.id', 'd.name', 'd.filename'],
+                'FROM'   => 'glpi_documents_items AS di',
+                'INNER JOIN' => [
+                    'glpi_documents AS d' => [
+                        'FKEY' => [
+                            'di' => 'documents_id',
+                            'd'  => 'id'
+                        ]
+                    ]
+                ],
+                'WHERE' => [
+                    'di.itemtype' => self::class,
+                    'di.items_id' => $ID
+                ]
+            ]);
+            
+            if (count($attachments) > 0) {
+                echo "<div class='list-group mt-2'>";
+                foreach ($attachments as $att) {
+                    $doc_obj = new Document();
+                    if ($doc_obj->getFromDB($att['id'])) {
+                        echo "<div class='list-group-item d-flex justify-content-between align-items-center bg-light' style='padding: 8px 12px; border: 1px solid var(--vs-border); border-radius: 4px; margin-bottom: 4px;'>";
+                        echo "<span><i class='ti ti-file-text me-2'></i>" . htmlspecialchars($att['name'] ?: $att['filename']) . "</span>";
+                        echo $doc_obj->getLink();
+                        echo "</div>";
+                    }
+                }
+                echo "</div>";
+            } else {
+                echo "<div class='form-control bg-light text-muted'>Nenhum arquivo anexado</div>";
+            }
+        } else {
+            echo "              <div>";
+            Html::file(['name' => 'filename']);
+            echo "              </div>";
+        }
+        echo "          </div>";
 
         echo "      </div>
                 </div>
@@ -287,18 +370,24 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
                       </div>";
             }
 
-            // Quick-action buttons
-            $vid = $this->fields['plugin_vehiclescheduler_vehicles_id'];
-            echo "<div class='d-flex gap-2 mb-4'>
-                    <a href='/plugins/vehiclescheduler/front/maintenance.form.php?plugin_vehiclescheduler_vehicles_id=$vid&plugin_vehiclescheduler_incidents_id=$ID&type=2' class='btn btn-outline-danger'><i class='ti ti-tool'></i> Criar Manutenção Corretiva</a>
-                    <a href='/plugins/vehiclescheduler/front/insuranceclaim.form.php?plugin_vehiclescheduler_vehicles_id=$vid&plugin_vehiclescheduler_incidents_id=$ID' class='btn btn-outline-primary'><i class='ti ti-shield'></i> Abrir Sinistro</a>
-                  </div>";
+            if ($is_manager) {
+                // Quick-action buttons
+                $vid = $this->fields['plugin_vehiclescheduler_vehicles_id'];
+                echo "<div class='d-flex gap-2 mb-4'>
+                        <a href='/plugins/vehiclescheduler/front/maintenance.form.php?plugin_vehiclescheduler_vehicles_id=$vid&plugin_vehiclescheduler_incidents_id=$ID&type=2' class='btn btn-outline-danger'><i class='ti ti-tool'></i> Criar Manutenção Corretiva</a>
+                        <a href='/plugins/vehiclescheduler/front/insuranceclaim.form.php?plugin_vehiclescheduler_vehicles_id=$vid&plugin_vehiclescheduler_incidents_id=$ID' class='btn btn-outline-primary'><i class='ti ti-shield'></i> Abrir Sinistro</a>
+                      </div>";
+            }
         }
 
         echo "</div>"; // Container End
         echo "</td></tr>";
 
-        $this->showFormButtons($options);
+        if (!$is_readonly) {
+            $this->showFormButtons($options);
+        } else {
+            Html::closeForm();
+        }
         return true;
     }
 
