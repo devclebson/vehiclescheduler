@@ -12,32 +12,28 @@ $driver = new PluginVehicleschedulerDriver();
 
 if (isset($_POST['add'])) {
     $driver->check(-1, CREATE, $_POST);
-    if ($newID = $driver->add($_POST)) {
-        if ($_SESSION['glpibackcreated']) {
-            Html::redirect($driver->getLinkURL());
-        }
-    }
-    Html::back();
+    $driver->add($_POST);
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } elseif (isset($_POST['update'])) {
     $driver->check($_POST['id'], UPDATE);
     $driver->update($_POST);
-    Html::back();
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } elseif (isset($_POST['delete'])) {
     $driver->check($_POST['id'], DELETE);
     $driver->delete($_POST);
-    $driver->redirectToList();
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } elseif (isset($_POST['restore'])) {
     $driver->check($_POST['id'], DELETE);
     $driver->restore($_POST);
-    $driver->redirectToList();
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } elseif (isset($_POST['purge'])) {
     $driver->check($_POST['id'], PURGE);
     $driver->delete($_POST, 1);
-    $driver->redirectToList();
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } else {
     $driver->checkGlobal(READ);

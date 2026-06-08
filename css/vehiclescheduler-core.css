@@ -1,0 +1,177 @@
+/* Vehicle Scheduler Core UI */
+:root {
+  --vs-primary: #3b82f6;
+  --vs-primary-hover: #2563eb;
+  --vs-secondary: #64748b;
+  --vs-secondary-hover: #475569;
+  --vs-warning: #f59e0b;
+  --vs-warning-hover: #d97706;
+  --vs-danger: #ef4444;
+  --vs-danger-hover: #dc2626;
+  --vs-bg: #f8fafc;
+  --vs-card-bg: rgba(255, 255, 255, 0.85);
+  --vs-border: #e2e8f0;
+  --vs-text: #1e293b;
+  --vs-text-light: #64748b;
+}
+
+/* Base */
+body.vs-app-view {
+  background: var(--vs-bg);
+  color: var(--vs-text);
+  font-family: inherit;
+}
+
+/* Navbar */
+.vs-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--vs-card-bg);
+  backdrop-filter: blur(10px);
+  padding: 12px 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+.vs-nav-left, .vs-nav-right, .vs-nav-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.vs-nav-center {
+  flex: 1;
+  justify-content: center;
+}
+
+.vs-nav-link {
+  color: var(--vs-text-light);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vs-nav-link:hover, .vs-nav-link.active {
+  background: var(--vs-bg);
+  color: var(--vs-primary);
+}
+
+/* Buttons */
+.vs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.vs-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(59, 130, 246, 0.2);
+}
+
+.vs-btn-primary { background: var(--vs-primary); color: #fff !important; }
+.vs-btn-primary:hover { background: var(--vs-primary-hover); }
+
+.vs-btn-secondary { background: var(--vs-secondary); color: #fff !important; }
+.vs-btn-secondary:hover { background: var(--vs-secondary-hover); }
+
+.vs-btn-warning { background: var(--vs-warning); color: #fff !important; }
+.vs-btn-warning:hover { background: var(--vs-warning-hover); }
+
+.vs-btn-danger { background: var(--vs-danger); color: #fff !important; }
+.vs-btn-danger:hover { background: var(--vs-danger-hover); }
+
+.vs-btn-light { background: #fff; color: var(--vs-text) !important; border: 1px solid var(--vs-border); }
+.vs-btn-light:hover { background: #f1f5f9; }
+
+/* Cards */
+.vs-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03), 0 2px 6px -1px rgba(0,0,0,0.01);
+  padding: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.vs-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -6px rgba(0,0,0,0.06), 0 4px 10px -2px rgba(0,0,0,0.02);
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.vs-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--vs-border);
+}
+
+.vs-card-header h2, .vs-card-header h3 {
+  margin: 0;
+  font-weight: 700;
+  color: var(--vs-text);
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Badges */
+.vs-badge {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.vs-badge-green { background: #dcfce7; color: #166534; }
+.vs-badge-blue { background: #dbeafe; color: #1e40af; }
+.vs-badge-yellow { background: #fef3c7; color: #92400e; }
+.vs-badge-red { background: #fee2e2; color: #991b1b; }
+.vs-badge-gray { background: #f1f5f9; color: #475569; }
+
+/* Tables */
+.vs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.vs-table th {
+  background: var(--vs-bg);
+  padding: 14px 18px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--vs-text-light);
+  border-bottom: 2px solid var(--vs-border);
+}
+.vs-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--vs-border);
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+.vs-table tr:last-child td { border-bottom: none; }
+.vs-table tr:hover { background: rgba(59, 130, 246, 0.02); }

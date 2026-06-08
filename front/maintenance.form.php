@@ -4,14 +4,20 @@ Session::checkRight('plugin_vehiclescheduler', UPDATE);
 $item = new PluginVehicleschedulerMaintenance();
 if (isset($_POST['add'])) {
     $item->check(-1, CREATE, $_POST);
-    if ($nid = $item->add($_POST)) { if ($_SESSION['glpibackcreated']) Html::redirect($item->getLinkURL()); }
-    Html::back();
+    $item->add($_POST);
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 } elseif (isset($_POST['update'])) {
-    $item->check($_POST['id'], UPDATE); $item->update($_POST); Html::back();
+    $item->check($_POST['id'], UPDATE);
+    $item->update($_POST);
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 } elseif (isset($_POST['delete'])) {
-    $item->check($_POST['id'], DELETE); $item->delete($_POST); $item->redirectToList();
+    $item->check($_POST['id'], DELETE);
+    $item->delete($_POST);
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 } elseif (isset($_POST['purge'])) {
-    $item->check($_POST['id'], PURGE); $item->delete($_POST, 1); $item->redirectToList();
+    $item->check($_POST['id'], PURGE);
+    $item->delete($_POST, 1);
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 } else {
     $item->checkGlobal(READ);
     // Pre-fill from GET (from incident quick-action)

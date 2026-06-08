@@ -52,8 +52,7 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
             $menu['links']['add'] = '/plugins/vehiclescheduler/front/schedule.form.php';
         }
         // Extra quick links
-        $menu['links']['<i class="ti ti-layout-dashboard"></i>'] = '/plugins/vehiclescheduler/front/dashboard.php';
-        $menu['links']['<i class="ti ti-home"></i>']             = '/plugins/vehiclescheduler/front/portal.php';
+        $menu['links']['<i class="ti ti-home"></i>']             = '/plugins/vehiclescheduler/front/dashboards/portal.php';
         $menu['options']['schedule'] = [
             'title'          => 'Agendamentos',
             'page'           => '/plugins/vehiclescheduler/front/schedule.php',
@@ -77,96 +76,153 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
 
     function showForm($ID, array $options = []) {
         $this->initForm($ID, $options);
+        $this->showFormHeader($options);
         
-        echo "<form method='post' action='" . $this->getFormURL() . "' enctype='multipart/form-data'>";
-        echo "<div class='container-fluid mb-4'><div class='card'>";
-        echo "<div class='card-header d-flex justify-content-between align-items-center'><h3 class='card-title'>Solicitação de Reserva</h3> <a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'><i class='ti ti-arrow-left'></i> Voltar</a></div>";
-        echo "<div class='card-body'>";
+        echo "<tr style='display:none;'><td></td></tr>";
+        echo "<tr><td colspan='4' style='padding:0; border:none; background:transparent;'>";
+        
+        echo "<div class='container-fluid px-3 py-4'>";
+        
+        // Back Button
+        echo "<div class='d-flex justify-content-end mb-3'>
+                <a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'>
+                    <i class='ti ti-arrow-left'></i> Voltar
+                </a>
+              </div>";
 
         $is_manager = PluginVehicleschedulerProfile::canViewManagement();
 
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>Solicitante <span class='red'>*</span></label>";
+        // Card 1: Detalhes da Solicitação
+        echo "<div class='card shadow-sm border-0 mb-4'>
+                <div class='card-header bg-white border-bottom-0 pt-4 pb-2'>
+                    <h5 class='mb-0 text-primary fw-bold'><i class='ti ti-calendar-event'></i> Solicitação de Reserva</h5>
+                </div>
+                <div class='card-body'>
+                    <div class='row g-4'>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Solicitante <span class='text-danger'>*</span></label>";
         if ($is_manager) {
+            echo "          <div>";
             User::dropdown(['name' => 'users_id', 'value' => $this->fields['users_id'] ?: Session::getLoginUserID(), 'right' => 'all']);
+            echo "          </div>";
         } else {
             $u_id = $this->fields['users_id'] ?: Session::getLoginUserID();
-            echo "<input type='hidden' name='users_id' value='$u_id'>";
-            echo "<div class='form-control bg-light'>" . getUserName($u_id) . "</div>";
+            echo "          <input type='hidden' name='users_id' value='$u_id'>";
+            echo "          <div class='form-control bg-light'>" . getUserName($u_id) . "</div>";
         }
-        echo "</div>";
-        echo "<div class='col-md-6'><label class='form-label'>Departamento/Setor <span class='red'>*</span></label>";
-        echo Html::input('department', ['value' => $this->fields['department'] ?? '', 'class' => 'form-control']);
-        echo "</div></div>";
+        echo "          </div>";
 
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>Telefone para Contato <span class='red'>*</span></label>";
-        echo Html::input('contact_phone', ['value' => $this->fields['contact_phone'], 'class' => 'form-control']);
-        echo "</div>";
-        echo "<div class='col-md-6'><label class='form-label'>Veículo <span class='red'>*</span></label>";
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Departamento/Setor <span class='text-danger'>*</span></label>
+                            <input type='text' name='department' value='".htmlspecialchars($this->fields['department'] ?? '')."' class='form-control'>
+                        </div>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Telefone para Contato <span class='text-danger'>*</span></label>
+                            <input type='text' name='contact_phone' value='".htmlspecialchars($this->fields['contact_phone'] ?? '')."' class='form-control'>
+                        </div>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Veículo Solicitado <span class='text-danger'>*</span></label>";
+        echo "              <div>";
         PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'], 'entity' => $this->fields['entities_id']]);
-        echo "</div></div>";
+        echo "              </div>";
+        echo "          </div>";
 
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>Data/Hora de Saída <span class='red'>*</span></label>";
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Data/Hora de Saída <span class='text-danger'>*</span></label>
+                            <div>";
         Html::showDateTimeField('begin_date', ['value' => $this->fields['begin_date']]);
-        echo "</div>";
-        echo "<div class='col-md-6'><label class='form-label'>Data/Hora de Retorno <span class='red'>*</span></label>";
+        echo "              </div>
+                        </div>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Data/Hora de Retorno <span class='text-danger'>*</span></label>
+                            <div>";
         Html::showDateTimeField('end_date', ['value' => $this->fields['end_date']]);
-        echo "</div></div>";
+        echo "              </div>
+                        </div>";
 
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>Destino <span class='red'>*</span></label>";
-        echo Html::input('destination', ['value' => $this->fields['destination'], 'class' => 'form-control']);
-        echo "</div>";
-        echo "<div class='col-md-6'><label class='form-label'>Nº de Passageiros</label>";
-        echo Html::input('passengers', ['value' => $this->fields['passengers'] ?: 1, 'type' => 'number', 'min' => 1, 'class' => 'form-control']);
-        echo "</div></div>";
+        echo "          <div class='col-md-8'>
+                            <label class='form-label text-muted fw-bold'>Destino <span class='text-danger'>*</span></label>
+                            <input type='text' name='destination' value='".htmlspecialchars($this->fields['destination'] ?? '')."' class='form-control'>
+                        </div>";
+        
+        echo "          <div class='col-md-4'>
+                            <label class='form-label text-muted fw-bold'>Nº de Passageiros</label>
+                            <input type='number' name='passengers' value='".($this->fields['passengers'] ?: 1)."' min='1' class='form-control'>
+                        </div>";
 
-        if ($is_manager) {
-            echo "<div class='row mb-3'>";
-            echo "<div class='col-md-12'><label class='form-label'>Motorista Designado <small class='text-muted'>(opcional — atribuir após aprovação)</small></label>";
-            PluginVehicleschedulerDriver::dropdown(['name' => 'plugin_vehiclescheduler_drivers_id', 'value' => $this->fields['plugin_vehiclescheduler_drivers_id'] ?? 0]);
-            echo "</div></div>";
+        echo "          <div class='col-12'>
+                            <label class='form-label text-muted fw-bold'>Descrição / Finalidade <span class='text-danger'>*</span></label>
+                            <textarea name='purpose' rows='3' class='form-control' placeholder='Descreva a finalidade desta reserva'>".htmlspecialchars($this->fields['purpose'] ?? '')."</textarea>
+                        </div>";
+
+        echo "      </div>
+                </div>
+              </div>";
+
+        // Card 2: Gestão
+        if ($is_manager || (!empty($this->fields['plugin_vehiclescheduler_drivers_id']) && $this->fields['plugin_vehiclescheduler_drivers_id'] > 0)) {
+            echo "<div class='card shadow-sm border-0 mb-4'>
+                    <div class='card-header bg-white border-bottom-0 pt-4 pb-2'>
+                        <h5 class='mb-0 text-primary fw-bold'><i class='ti ti-steering-wheel'></i> Gestão da Reserva</h5>
+                    </div>
+                    <div class='card-body'>
+                        <div class='row g-4'>";
+            
+            if ($is_manager) {
+                echo "      <div class='col-md-6'>
+                                <label class='form-label text-muted fw-bold'>Motorista Designado</label>
+                                <div>";
+                PluginVehicleschedulerDriver::dropdown(['name' => 'plugin_vehiclescheduler_drivers_id', 'value' => $this->fields['plugin_vehiclescheduler_drivers_id'] ?? 0]);
+                echo "          </div>
+                            </div>";
+                
+                if ($ID > 0 && Session::haveRight('plugin_vehiclescheduler', UPDATE)) {
+                    echo "  <div class='col-md-6'>
+                                <label class='form-label text-muted fw-bold'>Status</label>
+                                <div>";
+                    Dropdown::showFromArray('status', self::getAllStatus(), ['value' => $this->fields['status']]);
+                    echo "          </div>
+                            </div>";
+                }
+            } else {
+                echo "      <div class='col-md-6'>
+                                <label class='form-label text-muted fw-bold'>Motorista Designado</label>
+                                <div class='form-control bg-light'>".Dropdown::getDropdownName('glpi_plugin_vehiclescheduler_drivers', $this->fields['plugin_vehiclescheduler_drivers_id'])."</div>
+                            </div>";
+            }
+
+            echo "          <div class='col-12'>
+                                <label class='form-label text-muted fw-bold'>Comentários Adicionais</label>
+                                <textarea name='comment' rows='2' class='form-control' placeholder='Anotações do gestor'>".htmlspecialchars($this->fields['comment'] ?? '')."</textarea>
+                            </div>";
+
+            echo "      </div>
+                    </div>
+                  </div>";
         }
 
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-12'><label class='form-label'>Descrição / Finalidade <span class='red'>*</span></label>";
-        echo "<textarea name='purpose' class='form-control' rows='4' placeholder='Descreva a finalidade desta reserva'>" . htmlspecialchars($this->fields['purpose'] ?? '') . "</textarea>";
-        echo "</div></div>";
-
-        if ($ID > 0 && Session::haveRight('plugin_vehiclescheduler', UPDATE) && $is_manager) {
-            echo "<div class='row mb-3'>";
-            echo "<div class='col-md-6'><label class='form-label'>Status</label>";
-            Dropdown::showFromArray('status', self::getAllStatus(), ['value' => $this->fields['status']]);
-            echo "</div></div>";
-        }
-
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-12'><label class='form-label'>Comentários Adicionais</label>";
-        echo "<textarea name='comment' class='form-control' rows='3' placeholder='Observações adicionais'>" . htmlspecialchars($this->fields['comment'] ?? '') . "</textarea>";
-        echo "</div></div>";
-
+        // Ticket Relation
         if (!empty($this->fields['tickets_id']) && $this->fields['tickets_id'] > 0) {
-            echo "<div class='row mb-3'><div class='col-md-12'><label class='form-label'>Chamado Relacionado:</label> ";
+            echo "<div class='alert alert-info d-flex align-items-center mb-4 border-0 shadow-sm'>
+                    <i class='ti ti-ticket me-2 fs-4'></i>
+                    <div>";
+            echo "      <strong>Chamado Relacionado:</strong> ";
             $ticket = new Ticket();
             if ($ticket->getFromDB($this->fields['tickets_id'])) {
                 echo $ticket->getLink();
             }
-            echo "</div></div>";
+            echo "  </div>
+                  </div>";
         }
 
-        echo "</div>"; // card-body
-        echo "<div class='card-footer text-end'>";
-        if ($ID > 0) {
-            echo "<button type='submit' name='update' class='btn btn-primary'>" . __('Save') . "</button>";
-        } else {
-            echo "<button type='submit' name='add' class='btn btn-success'>" . __('Add') . "</button>";
-        }
-        echo "<input type='hidden' name='id' value='$ID'>";
-        echo Html::hidden('_glpi_csrf_token', ['value' => Session::getNewCSRFToken()]);
-        echo "</div></div></div></form>";
-
+        echo "</div>"; // Container End
+        echo "</td></tr>";
+        
+        $this->showFormButtons($options);
         return true;
     }
 
@@ -310,6 +366,8 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
                   'name' => 'Motorista', 'datatype' => 'dropdown'];
         $tab[] = ['id' => '16', 'table' => $this->getTable(), 'field' => 'comment',
                   'name' => 'Observações', 'datatype' => 'text'];
+        $tab[] = ['id' => '17', 'table' => $this->getTable(), 'field' => 'id',
+                  'name' => 'ID', 'datatype' => 'integer'];
         return $tab;
     }
 

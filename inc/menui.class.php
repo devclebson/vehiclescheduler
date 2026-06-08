@@ -21,7 +21,7 @@ class PluginVehicleschedulerMenui extends CommonDBTM {
         
         $menu = [
             'title' => 'Reserva de Frota',
-            'page'  => $CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/requester.php',
+            'page'  => $CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php',
             'icon'  => 'ti ti-car',
         ];
         

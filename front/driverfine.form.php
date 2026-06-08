@@ -13,12 +13,12 @@ $fine = new PluginVehicleschedulerDriverfine();
 if (isset($_POST['add'])) {
     $fine->check(-1, CREATE, $_POST);
     $fine->add($_POST);
-    Html::back();
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } elseif (isset($_POST['update'])) {
     $fine->check($_POST['id'], UPDATE);
     $fine->update($_POST);
-    Html::back();
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } elseif (isset($_POST['delete'])) {
     $fine->check($_POST['id'], DELETE);

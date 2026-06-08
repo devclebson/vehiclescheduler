@@ -138,76 +138,108 @@ class PluginVehicleschedulerDriver extends CommonDBTM {
     function showForm($ID, array $options = []) {
         $this->initForm($ID, $options);
         $this->showFormHeader($options);
-        echo "<tr class='table-row'><td colspan='4' class='text-end' style='text-align: right;'><a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'><i class='ti ti-arrow-left'></i> Voltar</a></td></tr>";
+        
+        echo "<tr style='display:none;'><td></td></tr>";
+        echo "<tr><td colspan='4' style='padding:0; border:none; background:transparent;'>";
+        
+        echo "<div class='container-fluid px-3 py-4'>";
+        
+        // Back Button
+        echo "<div class='d-flex justify-content-end mb-3'>
+                <a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'>
+                    <i class='ti ti-arrow-left'></i> Voltar
+                </a>
+              </div>";
 
         // Aviso LGPD
-        echo "<tr><td colspan='4'>";
-        echo "<div style='background:#fff3cd;border:1px solid #ffc107;border-radius:4px;"
-            . "padding:8px 14px;font-size:12px;color:#856404;'>";
-        echo "<strong>🔒 Aviso de Privacidade (LGPD):</strong> ";
-        echo "Coletamos apenas os dados mínimos necessários para a gestão da frota "
-            . "(LGPD Art. 6-III). Nenhum dado pessoal sensível (CPF, RG, nº CNH, biometria) "
-            . "é armazenado. Base legal: execução de contrato e legítimo interesse operacional.";
-        echo "</div></td></tr>";
+        echo "<div class='alert alert-warning d-flex align-items-center mb-4' style='background:#fff3cd; color:#856404; border-color:#ffc107;'>
+                <i class='ti ti-lock me-2 fs-4'></i>
+                <div>
+                    <strong>Aviso de Privacidade (LGPD):</strong> Coletamos apenas os dados mínimos necessários para a gestão da frota (LGPD Art. 6-III). Nenhum dado pessoal sensível é armazenado. Base legal: execução de contrato e legítimo interesse operacional.
+                </div>
+              </div>";
 
-        // Linha 1: Nome / Matrícula
-        echo "<tr class='table-row'>";
-        echo "<td>Nome Completo <span class='red'>*</span></td>";
-        echo "<td>" . Html::input('name', ['value' => $this->fields['name'], 'size' => 40]) . "</td>";
-        echo "<td>Matrícula Interna</td>";
-        echo "<td>" . Html::input('registration', [
-            'value'       => $this->fields['registration'],
-            'size'        => 20,
-            'placeholder' => 'ex: EMP-0042',
-        ]) . "</td>";
-        echo "</tr>";
-
-        // Linha 2: Categoria CNH / Vencimento CNH
-        echo "<tr class='table-row'>";
-        echo "<td>Categoria CNH <span class='red'>*</span></td>";
-        echo "<td>";
-        Dropdown::showFromArray('cnh_category', self::getCNHCategories(), [
-            'value' => $this->fields['cnh_category'] ?: self::CNH_CAT_B,
-        ]);
-        echo "</td>";
-        echo "<td>Vencimento da CNH <span class='red'>*</span></td>";
-        echo "<td>";
-        Html::showDateField('cnh_expiry', ['value' => $this->fields['cnh_expiry']]);
+        // CNH Badge
+        $cnh_badge_html = "";
         if ($ID > 0 && !empty($this->fields['cnh_expiry'])) {
             $s = self::getCNHExpiryStatus($this->fields['cnh_expiry']);
-            echo " &nbsp; " . self::renderExpiryBadge($s);
+            $cnh_badge_html = "<div class='ms-auto'>" . self::renderExpiryBadge($s) . "</div>";
         }
-        echo "</td>";
-        echo "</tr>";
 
-        // Linha 3: Departamento / Telefone
-        echo "<tr class='table-row'>";
-        echo "<td>Departamento/Setor</td>";
-        echo "<td>" . Html::input('department', ['value' => $this->fields['department'], 'size' => 40]) . "</td>";
-        echo "<td>Telefone para Contato</td>";
-        echo "<td>" . Html::input('contact_phone', ['value' => $this->fields['contact_phone'], 'size' => 20]) . "</td>";
-        echo "</tr>";
+        // Card: Perfil Motorista
+        echo "<div class='card shadow-sm border-0 mb-4'>
+                <div class='card-header bg-white border-bottom-0 pt-4 pb-2 d-flex align-items-center'>
+                    <h5 class='mb-0 text-primary fw-bold'><i class='ti ti-id'></i> Perfil do Motorista</h5>
+                    {$cnh_badge_html}
+                </div>
+                <div class='card-body'>
+                    <div class='row g-4'>";
+        
+        // Row 1
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Nome Completo <span class='text-danger'>*</span></label>
+                            <input type='text' name='name' value='".htmlspecialchars($this->fields['name'] ?? '')."' class='form-control form-control-lg'>
+                        </div>";
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Matrícula Interna</label>
+                            <input type='text' name='registration' value='".htmlspecialchars($this->fields['registration'] ?? '')."' placeholder='ex: EMP-0042' class='form-control form-control-lg'>
+                        </div>";
+        
+        // Row 2
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Departamento/Setor</label>
+                            <input type='text' name='department' value='".htmlspecialchars($this->fields['department'] ?? '')."' class='form-control'>
+                        </div>";
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Telefone para Contato</label>
+                            <input type='text' name='contact_phone' value='".htmlspecialchars($this->fields['contact_phone'] ?? '')."' class='form-control'>
+                        </div>";
 
-        // Linha 4: Ativo / Observações
-        echo "<tr class='table-row'>";
-        echo "<td>Ativo</td>";
-        echo "<td>";
-        Dropdown::showYesNo('is_active', $this->fields['is_active'] ?? 1);
-        echo "</td>";
-        echo "<td>Observações</td>";
-        echo "<td><textarea name='comment' rows='3' style='width:98%;'>"
-            . htmlspecialchars($this->fields['comment'] ?? '') . "</textarea></td>";
-        echo "</tr>";
+        // Row 3
+        echo "          <div class='col-md-4'>
+                            <label class='form-label text-muted fw-bold'>Categoria CNH <span class='text-danger'>*</span></label>
+                            <select name='cnh_category' class='form-select'>";
+                            foreach (self::getCNHCategories() as $cat_key => $cat_val) {
+                                $sel = ($this->fields['cnh_category'] == $cat_key) ? 'selected' : '';
+                                echo "<option value='{$cat_key}' {$sel}>{$cat_val}</option>";
+                            }
+        echo "              </select>
+                        </div>";
+        echo "          <div class='col-md-4'>
+                            <label class='form-label text-muted fw-bold'>Vencimento da CNH <span class='text-danger'>*</span></label>
+                            <input type='date' name='cnh_expiry' value='".htmlspecialchars($this->fields['cnh_expiry'] ?? '')."' class='form-control'>
+                        </div>";
+        echo "          <div class='col-md-4'>
+                            <label class='form-label text-muted fw-bold'>Ativo</label>
+                            <select name='is_active' class='form-select'>
+                                <option value='1' ".($this->fields['is_active'] == 1 ? 'selected' : '').">Sim</option>
+                                <option value='0' ".($this->fields['is_active'] == 0 ? 'selected' : '').">Não</option>
+                            </select>
+                        </div>";
+        
+        echo "      </div>
+                </div>
+              </div>";
 
-        // Rodapé LGPD (somente no cadastro)
+        // Card 2: Observações
+        echo "<div class='card shadow-sm border-0 mb-4'>
+                <div class='card-header bg-white border-bottom-0 pt-4 pb-2'>
+                    <h5 class='mb-0 text-primary fw-bold'><i class='ti ti-align-left'></i> Observações</h5>
+                </div>
+                <div class='card-body'>
+                    <textarea name='comment' rows='3' class='form-control'>".htmlspecialchars($this->fields['comment'] ?? '')."</textarea>
+                </div>
+              </div>";
+
         if ($ID <= 0) {
-            echo "<tr class='table-row'><td colspan='4'>";
-            echo "<small style='color:#666;'>📋 Retenção de dados: os registros são mantidos "
-                . "pelo período do vínculo funcional acrescido do mínimo legal aplicável. "
-                . "O titular tem direito a acesso, correção e exclusão mediante solicitação.</small>";
-            echo "</td></tr>";
+            echo "<div class='text-muted small mt-2'>
+                    <i class='ti ti-info-circle'></i> Retenção de dados: os registros são mantidos pelo período do vínculo funcional acrescido do mínimo legal aplicável. O titular tem direito a acesso, correção e exclusão mediante solicitação.
+                  </div>";
         }
 
+        echo "</div>"; // Container End
+        echo "</td></tr>";
+        
         $this->showFormButtons($options);
         return true;
     }
@@ -281,6 +313,10 @@ class PluginVehicleschedulerDriver extends CommonDBTM {
         $tab[] = [
             'id' => '7', 'table' => $this->getTable(), 'field' => 'is_active',
             'name' => 'Ativo', 'datatype' => 'bool',
+        ];
+        $tab[] = [
+            'id' => '8', 'table' => $this->getTable(), 'field' => 'id',
+            'name' => 'ID', 'datatype' => 'integer',
         ];
         return $tab;
     }

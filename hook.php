@@ -233,10 +233,10 @@ function plugin_vehiclescheduler_redefine_menus($menus) {
         
         // Adiciona como um menu principal na barra superior
         $menus['vehiclescheduler'] = [
-            'default' => '/plugins/vehiclescheduler/front/requester.php',
+            'default' => '/plugins/vehiclescheduler/front/index.php',
             'title'   => __('Reserva de Frota', 'vehiclescheduler'),
             'icon'    => 'ti ti-car',
-            'page'    => '/plugins/vehiclescheduler/front/requester.php',
+            'page'    => '/plugins/vehiclescheduler/front/index.php',
         ];
     }
     

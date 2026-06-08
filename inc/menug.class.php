@@ -21,18 +21,13 @@ class PluginVehicleschedulerMenug extends CommonDBTM {
         
         $menu = [
             'title' => 'Gestão de Frota',
-            'page'  => $CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/management.php',
+            'page'  => $CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php',
             'icon'  => 'ti ti-building-warehouse',
             'options' => [
                 'dashboard' => [
                     'title' => 'Dashboard',
-                    'page'  => $CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/management.php',
+                    'page'  => $CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php',
                     'icon'  => 'ti ti-layout-dashboard',
-                ],
-                'calendar' => [
-                    'title' => 'Calendário',
-                    'page'  => $CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/calendar.php',
-                    'icon'  => 'ti ti-calendar',
                 ],
                 'reservations' => [
                     'title' => 'Reservas',
@@ -66,7 +61,7 @@ class PluginVehicleschedulerMenug extends CommonDBTM {
                 ],
                 'fines' => [
                     'title' => 'Multas',
-                    'page'  => $CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/fines.php',
+                    'page'  => $CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/dashboards/fines.php',
                     'icon'  => 'ti ti-ticket',
                 ],
             ],

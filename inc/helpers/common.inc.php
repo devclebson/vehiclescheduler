@@ -20,10 +20,16 @@ function plugin_vehiclescheduler_load_css() {
     echo "<script>document.body.classList.add('vs-app-body');</script>";
 }
 
+// Include UI helpers globally so vs_render_navbar is always available
+include_once(__DIR__ . '/ui-helpers.php');
+
 /**
  * Apply glassmorphism classes to existing GLPI elements
  */
 function plugin_vehiclescheduler_enhance_ui() {
+    global $CFG_GLPI;
+
+
     echo "<script>
     document.addEventListener('DOMContentLoaded', function() {
         // Transformar cards do GLPI em glassmorphism

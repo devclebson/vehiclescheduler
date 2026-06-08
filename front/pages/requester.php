@@ -2,7 +2,7 @@
 /**
  * Portal do Requerente - 3 ações principais
  */
-include('../../../inc/includes.php');
+include('../../../../inc/includes.php');
 
 // Verificar permissão de acesso ao portal
 if (!PluginVehicleschedulerProfile::canAccessRequester()) {
@@ -11,7 +11,7 @@ if (!PluginVehicleschedulerProfile::canAccessRequester()) {
 }
 
 // Carregar CSS glassmorphism
-include_once(__DIR__ . '/../inc/common.inc.php');
+include_once(__DIR__ . '/../../inc/helpers/common.inc.php');
 
 if (Session::getCurrentInterface() == "helpdesk") {
     Html::helpHeader(__('Bem-vindo à Reserva de Frota', 'vehiclescheduler'));
@@ -19,52 +19,35 @@ if (Session::getCurrentInterface() == "helpdesk") {
     Html::header('Reserva de Frota', $_SERVER['PHP_SELF'], 'helpdesk', 'PluginVehicleschedulerMenui');
 }
 
-plugin_vehiclescheduler_load_css();
-plugin_vehiclescheduler_enhance_ui();
+if (Session::getCurrentInterface() != "helpdesk") {
+    vs_render_navbar('requester');
+}
+
 ?>
-<style>
-.req-portal{max-width:1200px;margin:30px auto;padding:0 20px;}
-.req-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px 20px;text-align:center;cursor:pointer;transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,0.05);}
-.req-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.1);border-color:#cbd5e1;}
-.req-card-icon{width:64px;height:64px;margin:0 auto 16px;background:linear-gradient(135deg,#f8fafc 20%,#e2e8f0);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
-.req-card-title{font-size:1.15rem;font-weight:700;color:#1e293b;margin-bottom:8px;}
-.req-card-desc{font-size:.85rem;color:#475569;line-height:1.4;}
-.req-recent{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,0.05);}
-.req-recent h3{margin:0 0 20px;font-size:1.15rem;color:#1e293b;font-weight:700;}
-.req-item{display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid #f1f5f9;border-radius:8px;margin-bottom:12px;background:#fafafa;}
-.req-item-left{display:flex;align-items:center;gap:16px;}
-.req-badge{padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:700;}
-.badge-new{background:#dbeafe;color:#1d4ed8;}
-.badge-approved{background:#dcfce7;color:#166534;}
-.badge-rejected{background:#fee2e2;color:#991b1b;}
-.badge-cancelled{background:#f1f5f9;color:#475569;}
-</style>
 
-<div class="req-portal">
+<div class="vs-app-view" style="max-width: 1200px; margin: 30px auto; padding: 0 20px;">
 
-<!-- Hero Glassmorphism -->
-<div class="vs-hero-glass">
-  <h1>🚗 Bem-vindo à Reserva de Frota</h1>
-  <p>Escolha uma das opções abaixo para gerenciar suas solicitações</p>
+<!-- Hero -->
+<div style="background: linear-gradient(135deg, var(--vs-primary) 0%, #1e40af 100%); color: #fff; padding: 30px; border-radius: 16px; margin-bottom: 30px; text-align: center;">
+  <h1 style="margin: 0; font-size: 2rem; font-weight: 700;">🚗 Bem-vindo à Reserva de Frota</h1>
+  <p style="margin: 10px 0 0; opacity: 0.9; font-size: 1.1rem;">Escolha uma das opções abaixo para gerenciar suas solicitações</p>
+</div>
+
 <!-- 2 Cartões de Ação -->
-<div class="row g-4 mb-4 justify-content-center">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
   
   <!-- 1. Reservar Veículo -->
-  <div class="col-md-5">
-    <div class="req-card h-100" onclick="location.href='schedule.form.php'">
-      <div class="req-card-icon">🚙</div>
-      <div class="req-card-title">Reservar Veículo</div>
-      <div class="req-card-desc">Solicite a reserva de um veículo para sua viagem ou compromisso</div>
-    </div>
+  <div class="vs-card" style="text-align:center; cursor:pointer;" onclick="location.href='../schedule.form.php'">
+    <div style="width:64px;height:64px;margin:0 auto 16px;background:var(--vs-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;">🚙</div>
+    <div style="font-size:1.15rem;font-weight:700;color:var(--vs-text);margin-bottom:8px;">Reservar Veículo</div>
+    <div style="font-size:.85rem;color:var(--vs-text-light);">Solicite a reserva de um veículo para sua viagem ou compromisso</div>
   </div>
 
   <!-- 2. Reportar Incidente -->
-  <div class="col-md-5">
-    <div class="req-card h-100" onclick="location.href='incident.form.php'">
-      <div class="req-card-icon">⚠️</div>
-      <div class="req-card-title">Reportar Incidente</div>
-      <div class="req-card-desc">Relate acidentes, avarias ou problemas com veículos da frota</div>
-    </div>
+  <div class="vs-card" style="text-align:center; cursor:pointer;" onclick="location.href='../incident.form.php'">
+    <div style="width:64px;height:64px;margin:0 auto 16px;background:var(--vs-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;">⚠️</div>
+    <div style="font-size:1.15rem;font-weight:700;color:var(--vs-text);margin-bottom:8px;">Reportar Incidente</div>
+    <div style="font-size:.85rem;color:var(--vs-text-light);">Relate acidentes, avarias ou problemas com veículos da frota</div>
   </div>
 
 </div>
@@ -81,14 +64,16 @@ $recent = iterator_to_array($DB->request([
 ]));
 $statuses = ['', 'Nova', 'Aprovada', 'Recusada', 'Cancelada'];
 ?>
-<div class="req-recent">
-  <h3>📋 Minhas Últimas Reservas</h3>
+<div class="vs-card">
+  <div class="vs-card-header">
+    <h2>📋 Minhas Últimas Reservas</h2>
+  </div>
   <?php if (empty($recent)): ?>
-    <p style="color:#94a3b8;text-align:center;padding:20px;">Você ainda não possui reservas. Clique em "Reservar Veículo" para começar!</p>
+    <p style="color:var(--vs-text-light);text-align:center;padding:20px;">Você ainda não possui reservas. Clique em "Reservar Veículo" para começar!</p>
   <?php else: ?>
-    <div class="req-list">
+    <div>
       <?php foreach ($recent as $r):
-        $badge_class = ['', 'badge-new', 'badge-approved', 'badge-rejected', 'badge-cancelled'][$r['status']] ?? 'badge-new';
+        $badge_class = ['', 'vs-badge-blue', 'vs-badge-green', 'vs-badge-red', 'vs-badge-gray'][$r['status']] ?? 'vs-badge-blue';
         
         // Buscar nome do veículo
         $veh_name = 'Veículo não informado';
@@ -97,17 +82,17 @@ $statuses = ['', 'Nova', 'Aprovada', 'Recusada', 'Cancelada'];
             if ($veh) $veh_name = htmlspecialchars($veh['name'] . ' (' . $veh['plate'] . ')');
         }
       ?>
-        <div class="req-item">
-          <div class="req-item-left">
-            <i class="ti ti-calendar-event" style="font-size:1.2rem;color:#64748b;"></i>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid var(--vs-border);border-radius:8px;margin-bottom:12px;background:var(--vs-bg);">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <i class="ti ti-calendar-event" style="font-size:1.2rem;color:var(--vs-text-light);"></i>
             <div>
               <div style="font-weight:600;font-size:.9rem;"><?= htmlspecialchars($r['destination']) ?></div>
-              <div style="font-size:.8rem;color:#64748b;"><?= Html::convDate(substr($r['begin_date'],0,10)) ?> → <?= Html::convDate(substr($r['end_date'],0,10)) ?></div>
+              <div style="font-size:.8rem;color:var(--vs-text-light);"><?= Html::convDate(substr($r['begin_date'],0,10)) ?> → <?= Html::convDate(substr($r['end_date'],0,10)) ?></div>
             </div>
           </div>
           <div style="text-align:right;">
-            <span class="req-badge <?= $badge_class ?> d-block mb-2"><?= $statuses[$r['status']] ?? 'N/A' ?></span>
-            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalRecRes<?= $r['id'] ?>" style="font-size: 0.75rem; padding: 2px 8px;">Detalhes</button>
+            <span class="vs-badge <?= $badge_class ?>" style="display:block;margin-bottom:8px;"><?= $statuses[$r['status']] ?? 'N/A' ?></span>
+            <button type="button" class="vs-btn vs-btn-light" data-bs-toggle="modal" data-bs-target="#modalRecRes<?= $r['id'] ?>" style="font-size: 0.75rem; padding: 4px 10px;">Detalhes</button>
           </div>
         </div>
 
@@ -140,13 +125,13 @@ $statuses = ['', 'Nova', 'Aprovada', 'Recusada', 'Cancelada'];
                 </div>
                 <div class="mb-3">
                     <small class="text-muted d-block">Status Atual</small>
-                    <span class="req-badge <?= $badge_class ?>"><?= $statuses[$r['status']] ?? 'N/A' ?></span>
+                    <span class="vs-badge <?= $badge_class ?>"><?= $statuses[$r['status']] ?? 'N/A' ?></span>
                 </div>
-                <?php if (!empty($r['description'])): ?>
+                <?php if (!empty($r['purpose'])): ?>
                 <div class="mb-3">
                     <small class="text-muted d-block">Observações</small>
                     <div class="p-2 bg-light rounded" style="font-size:0.9rem;">
-                        <?= nl2br(htmlspecialchars($r['description'])) ?>
+                        <?= nl2br(htmlspecialchars($r['purpose'])) ?>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -154,9 +139,9 @@ $statuses = ['', 'Nova', 'Aprovada', 'Recusada', 'Cancelada'];
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 <?php if ($r['status'] == 1): // Status Nova ?>
-                    <a href="schedule.form.php?id=<?= $r['id'] ?>" class="btn btn-primary"><i class="ti ti-edit"></i> Editar</a>
+                    <a href="../schedule.form.php?id=<?= $r['id'] ?>" class="btn btn-primary"><i class="ti ti-edit"></i> Editar</a>
                     
-                    <form method="post" action="schedule.form.php" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja cancelar esta solicitação?');">
+                    <form method="post" action="../schedule.form.php" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja cancelar esta solicitação?');">
                         <input type="hidden" name="id" value="<?= $r['id'] ?>">
                         <input type="hidden" name="_glpi_csrf_token" value="<?= Session::getNewCSRFToken() ?>">
                         <button type="submit" name="delete" class="btn btn-danger"><i class="ti ti-trash"></i> Cancelar Reserva</button>
@@ -169,8 +154,8 @@ $statuses = ['', 'Nova', 'Aprovada', 'Recusada', 'Cancelada'];
       <?php endforeach; ?>
     </div>
   <?php endif; ?>
-  <div style="text-align:center;margin-top:16px;">
-    <a href="requester_list.php" style="color:#3b82f6;font-weight:600;font-size:.9rem;">Ver todas as minhas reservas →</a>
+  <div style="text-align:center;margin-top:20px;">
+    <a href="requester_list.php" style="color:var(--vs-primary);font-weight:600;font-size:.9rem;text-decoration:none;">Ver todas as minhas reservas →</a>
   </div>
 </div>
 

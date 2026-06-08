@@ -62,7 +62,14 @@ function plugin_init_vehiclescheduler() {
         $PLUGIN_HOOKS['menu_toadd']['vehiclescheduler']['tools'] = 'PluginVehicleschedulerMenug';
         Plugin::registerClass('PluginVehicleschedulerMenug');
 
+        // Adicionar CSS Oficial
+        $PLUGIN_HOOKS['add_css']['vehiclescheduler'] = [
+            'css/vehiclescheduler-core.css',
+            'css/calendar.css'
+        ];
+
         // Registrar todas as classes
+        Plugin::registerClass('PluginVehicleschedulerDashboard');
         Plugin::registerClass('PluginVehicleschedulerSchedule',       ['notificationtemplates_types' => true]);
         Plugin::registerClass('PluginVehicleschedulerVehicle',        ['notificationtemplates_types' => true]);
         Plugin::registerClass('PluginVehicleschedulerDriver',         ['notificationtemplates_types' => true]);

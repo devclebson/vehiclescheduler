@@ -18,33 +18,28 @@ $vehicle = new PluginVehicleschedulerVehicle();
 
 if (isset($_POST["add"])) {
     $vehicle->check(-1, CREATE, $_POST);
-    
-    if ($newID = $vehicle->add($_POST)) {
-        if ($_SESSION['glpibackcreated']) {
-            Html::redirect($vehicle->getLinkURL());
-        }
-    }
-    Html::back();
+    $vehicle->add($_POST);
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } else if (isset($_POST["delete"])) {
     $vehicle->check($_POST["id"], DELETE);
     $vehicle->delete($_POST);
-    $vehicle->redirectToList();
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } else if (isset($_POST["restore"])) {
     $vehicle->check($_POST["id"], DELETE);
     $vehicle->restore($_POST);
-    $vehicle->redirectToList();
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } else if (isset($_POST["purge"])) {
     $vehicle->check($_POST["id"], PURGE);
     $vehicle->delete($_POST, 1);
-    $vehicle->redirectToList();
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } else if (isset($_POST["update"])) {
     $vehicle->check($_POST["id"], UPDATE);
     $vehicle->update($_POST);
-    Html::back();
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/vehiclescheduler/front/index.php');
 
 } else {
     $vehicle->checkGlobal(READ);

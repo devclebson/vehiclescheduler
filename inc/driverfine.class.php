@@ -16,6 +16,22 @@ class PluginVehicleschedulerDriverfine extends CommonDBChild {
     public $dohistory        = true;
     static $rightname        = 'plugin_vehiclescheduler';
 
+    function canCreateItem(): bool {
+        return Session::haveRight(self::$rightname, UPDATE);
+    }
+    function canUpdateItem(): bool {
+        return Session::haveRight(self::$rightname, UPDATE);
+    }
+    function canDeleteItem(): bool {
+        return Session::haveRight(self::$rightname, UPDATE);
+    }
+    function canPurgeItem(): bool {
+        return Session::haveRight(self::$rightname, PURGE);
+    }
+    function canViewItem(): bool {
+        return Session::haveRight(self::$rightname, READ);
+    }
+
     const SEVERITY_MILD       = 1;
     const SEVERITY_MEDIUM     = 2;
     const SEVERITY_SEVERE     = 3;
@@ -117,15 +133,15 @@ class PluginVehicleschedulerDriverfine extends CommonDBChild {
         }
         echo "</div>";
 
-        echo "<table class='tab_cadre_fixe'>";
-        echo "<tr class='table-row'>";
+        echo "<div class='table-responsive'><table class='table table-hover table-striped align-middle border shadow-sm rounded'>";
+        echo "<thead class='table-light'><tr>";
         foreach (['Data', 'Descrição', 'Severidade', 'Pontos', 'Status', 'Veículo', 'Ações'] as $h) {
-            echo "<th>{$h}</th>";
+            echo "<th class='text-secondary'>{$h}</th>";
         }
-        echo "</tr>";
+        echo "</tr></thead><tbody>";
 
         if (count($fines) === 0) {
-            echo "<tr><td colspan='7' class='center'><i>Nenhuma infração registrada.</i></td></tr>";
+            echo "<tr><td colspan='7' class='text-center text-muted py-4'><i>Nenhuma infração registrada.</i></td></tr>";
         }
 
         $severities = self::getAllSeverities();
@@ -148,64 +164,88 @@ class PluginVehicleschedulerDriverfine extends CommonDBChild {
             $pts       = $points_map[$fine['severity']] ?? '?';
             $sev_label = $severities[$fine['severity']] ?? '?';
             $sta_label = $statuses[$fine['status']]    ?? '?';
-            $row_class = ($fine['status'] == self::STATUS_PAID || $fine['status'] == self::STATUS_CANCELLED)
-                       ? 'table-row' : 'table-row';
+            
+            $text_class = ($fine['status'] == self::STATUS_CANCELLED) ? 'text-decoration-line-through text-muted' : '';
 
-            echo "<tr class='{$row_class}'>";
-            echo "<td>" . Html::convDate($fine['fine_date']) . "</td>";
-            echo "<td>" . htmlspecialchars($fine['description']) . "</td>";
-            echo "<td>{$sev_label}</td>";
-            echo "<td><strong>{$pts}</strong></td>";
-            echo "<td>{$sta_label}</td>";
-            echo "<td>{$veh_name}</td>";
+            echo "<tr>";
+            echo "<td class='{$text_class}'>" . Html::convDate($fine['fine_date']) . "</td>";
+            echo "<td class='{$text_class}'>" . htmlspecialchars($fine['description']) . "</td>";
+            echo "<td><span class='badge bg-secondary'>{$sev_label}</span></td>";
+            echo "<td><strong class='text-danger'>{$pts}</strong></td>";
+            echo "<td><span class='badge bg-light text-dark border'>{$sta_label}</span></td>";
+            echo "<td class='{$text_class}'>{$veh_name}</td>";
             echo "<td>";
             if ($canedit) {
                 $url = Plugin::getWebDir('vehiclescheduler') . '/front/driverfine.form.php?id=' . $fine['id'];
-                echo "<a href='{$url}' class='btn btn-sm btn-ghost-secondary'><i class='ti ti-pencil'></i></a>";
+                echo "<a href='{$url}' class='btn btn-sm btn-outline-primary'><i class='ti ti-pencil'></i></a>";
             }
             echo "</td></tr>";
         }
-        echo "</table>";
+        echo "</tbody></table></div>";
 
         if ($canedit) {
             $form_url = Plugin::getWebDir('vehiclescheduler') . '/front/driverfine.form.php';
-            echo "<br/>";
-            echo "<div style='background:#fff;border:1px solid #dee2e6;border-radius:6px;padding:16px;'>";
-            echo "<h4 style='margin:0 0 12px;'>Registrar Nova Infração</h4>";
+            echo "<div class='card shadow-sm border-0 mt-4'>
+                    <div class='card-header bg-white border-bottom-0 pt-4 pb-2'>
+                        <h5 class='mb-0 text-primary fw-bold'><i class='ti ti-plus'></i> Registrar Nova Infração</h5>
+                    </div>
+                    <div class='card-body'>";
             echo "<form method='post' action='{$form_url}'>";
             echo Html::hidden('plugin_vehiclescheduler_drivers_id', ['value' => $driver_id]);
             echo Html::hidden('_glpi_csrf_token', ['value' => Session::getNewCSRFToken()]);
-            echo "<table class='tab_cadre_fixe'>";
-
-            echo "<tr class='table-row'>";
-            echo "<td>Data <span class='red'>*</span></td><td>";
+            
+            echo "      <div class='row g-4'>";
+            
+            echo "          <div class='col-md-6'>
+                                <label class='form-label text-muted fw-bold'>Data <span class='text-danger'>*</span></label>
+                                <div>";
             Html::showDateField('fine_date', ['value' => date('Y-m-d')]);
-            echo "</td><td>Severidade <span class='red'>*</span></td><td>";
+            echo "              </div>
+                            </div>";
+
+            echo "          <div class='col-md-6'>
+                                <label class='form-label text-muted fw-bold'>Severidade <span class='text-danger'>*</span></label>
+                                <div>";
             Dropdown::showFromArray('severity', self::getAllSeverities(), ['value' => self::SEVERITY_SEVERE]);
-            echo "</td></tr>";
+            echo "              </div>
+                            </div>";
 
-            echo "<tr class='table-row'>";
-            echo "<td>Veículo no momento</td><td>";
+            echo "          <div class='col-md-6'>
+                                <label class='form-label text-muted fw-bold'>Veículo no momento</label>
+                                <div>";
             PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => 0]);
-            echo "</td><td>Status</td><td>";
+            echo "              </div>
+                            </div>";
+
+            echo "          <div class='col-md-6'>
+                                <label class='form-label text-muted fw-bold'>Status</label>
+                                <div>";
             Dropdown::showFromArray('status', self::getAllStatus(), ['value' => self::STATUS_OPEN]);
-            echo "</td></tr>";
+            echo "              </div>
+                            </div>";
 
-            echo "<tr class='table-row'>";
-            echo "<td>Descrição <span class='red'>*</span></td>";
-            echo "<td colspan='3'><textarea name='description' rows='2' style='width:98%;'"
-                . " placeholder='Descreva a infração (não inclua dados pessoais como CPF)'></textarea></td></tr>";
+            echo "          <div class='col-12'>
+                                <label class='form-label text-muted fw-bold'>Descrição <span class='text-danger'>*</span></label>
+                                <textarea name='description' rows='2' class='form-control' placeholder='Descreva a infração (não inclua dados pessoais como CPF)'></textarea>
+                            </div>";
 
-            echo "<tr class='table-row'><td colspan='4'>";
-            echo "<input type='submit' name='add' value='Adicionar Infração' class='btn btn-primary'>";
-            echo "</td></tr>";
-            echo "</table>";
+            echo "          <div class='col-12 text-end mt-4'>
+                                <button type='submit' name='add' class='btn btn-primary'>
+                                    <i class='ti ti-check'></i> Adicionar Infração
+                                </button>
+                            </div>";
+                            
+            echo "      </div>";
             Html::closeForm();
-            echo "</div>";
+            echo "  </div></div>";
         }
     }
 
     function prepareInputForAdd($input) {
+        if (empty($input['plugin_vehiclescheduler_drivers_id'])) {
+            Session::addMessageAfterRedirect('O motorista é obrigatório.', false, ERROR);
+            return false;
+        }
         if (empty(trim($input['description'] ?? ''))) {
             Session::addMessageAfterRedirect('A descrição é obrigatória.', false, ERROR);
             return false;
@@ -226,39 +266,87 @@ class PluginVehicleschedulerDriverfine extends CommonDBChild {
     function showForm($ID, array $options = []) {
         $this->initForm($ID, $options);
         $this->showFormHeader($options);
-        echo "<tr class='table-row'><td colspan='4' class='text-end' style='text-align: right;'><a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'><i class='ti ti-arrow-left'></i> Voltar</a></td></tr>";
+        
+        echo "<tr style='display:none;'><td></td></tr>";
+        echo "<tr><td colspan='4' style='padding:0; border:none; background:transparent;'>";
+        
+        echo "<div class='container-fluid px-3 py-4'>";
+        
+        // Back Button
+        echo "<div class='d-flex justify-content-end mb-3'>
+                <a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'>
+                    <i class='ti ti-arrow-left'></i> Voltar
+                </a>
+              </div>";
 
-        echo "<tr class='table-row'>";
-        echo "<td>Motorista</td><td>";
-        $driver = new PluginVehicleschedulerDriver();
-        if ($driver->getFromDB($this->fields['plugin_vehiclescheduler_drivers_id'])) {
-            echo $driver->getLink();
+        // Card 1: Detalhes da Infração
+        echo "<div class='card shadow-sm border-0 mb-4'>
+                <div class='card-header bg-white border-bottom-0 pt-4 pb-2'>
+                    <h5 class='mb-0 text-danger fw-bold'><i class='ti ti-ticket'></i> Detalhes da Infração</h5>
+                </div>
+                <div class='card-body'>
+                    <div class='row g-4'>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Motorista <span class='text-danger'>*</span></label>";
+        if (!empty($this->fields['plugin_vehiclescheduler_drivers_id']) && $this->fields['plugin_vehiclescheduler_drivers_id'] > 0) {
+            echo "          <div class='form-control bg-light'>";
+            $driver = new PluginVehicleschedulerDriver();
+            if ($driver->getFromDB($this->fields['plugin_vehiclescheduler_drivers_id'])) {
+                echo $driver->getLink();
+            }
+            echo Html::hidden('plugin_vehiclescheduler_drivers_id',
+                ['value' => $this->fields['plugin_vehiclescheduler_drivers_id']]);
+            echo "          </div>";
+        } else {
+            echo "          <div>";
+            PluginVehicleschedulerDriver::dropdown(['name' => 'plugin_vehiclescheduler_drivers_id', 'value' => 0]);
+            echo "          </div>";
         }
-        echo Html::hidden('plugin_vehiclescheduler_drivers_id',
-            ['value' => $this->fields['plugin_vehiclescheduler_drivers_id']]);
-        echo "</td><td>Data</td><td>";
+        echo "          </div>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Data da Infração</label>
+                            <div>";
         Html::showDateField('fine_date', ['value' => $this->fields['fine_date']]);
-        echo "</td></tr>";
+        echo "              </div>
+                        </div>";
 
-        echo "<tr class='table-row'>";
-        echo "<td>Severidade</td><td>";
+        echo "          <div class='col-md-4'>
+                            <label class='form-label text-muted fw-bold'>Severidade</label>
+                            <div>";
         Dropdown::showFromArray('severity', self::getAllSeverities(), ['value' => $this->fields['severity']]);
-        echo "</td><td>Status</td><td>";
-        Dropdown::showFromArray('status', self::getAllStatus(), ['value' => $this->fields['status']]);
-        echo "</td></tr>";
+        echo "              </div>
+                        </div>";
 
-        echo "<tr class='table-row'>";
-        echo "<td>Veículo no momento</td><td>";
+        echo "          <div class='col-md-4'>
+                            <label class='form-label text-muted fw-bold'>Status</label>
+                            <div>";
+        Dropdown::showFromArray('status', self::getAllStatus(), ['value' => $this->fields['status']]);
+        echo "              </div>
+                        </div>";
+
+        echo "          <div class='col-md-4'>
+                            <label class='form-label text-muted fw-bold'>Veículo no Momento</label>
+                            <div>";
         PluginVehicleschedulerVehicle::dropdown([
             'name'  => 'plugin_vehiclescheduler_vehicles_id',
             'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'] ?? 0,
         ]);
-        echo "</td><td colspan='2'></td></tr>";
+        echo "              </div>
+                        </div>";
 
-        echo "<tr class='table-row'>";
-        echo "<td>Descrição</td>";
-        echo "<td colspan='3'><textarea name='description' rows='3' style='width:98%;'>"
-            . htmlspecialchars($this->fields['description'] ?? '') . "</textarea></td></tr>";
+        echo "          <div class='col-12'>
+                            <label class='form-label text-muted fw-bold'>Descrição do Ocorrido</label>
+                            <textarea name='description' class='form-control' rows='3'>".htmlspecialchars($this->fields['description'] ?? '')."</textarea>
+                        </div>";
+
+        echo "      </div>
+                </div>
+              </div>";
+
+        echo "</div>"; // Container End
+        echo "</td></tr>";
 
         $this->showFormButtons($options);
         return true;
@@ -277,6 +365,10 @@ class PluginVehicleschedulerDriverfine extends CommonDBChild {
                   'name' => 'Severidade', 'datatype' => 'specific', 'searchtype' => ['equals']];
         $tab[] = ['id' => '5', 'table' => self::getTable(), 'field' => 'status',
                   'name' => 'Status', 'datatype' => 'specific', 'searchtype' => ['equals']];
+        $tab[] = ['id' => '6', 'table' => 'glpi_plugin_vehiclescheduler_drivers', 'field' => 'name',
+                  'name' => 'Motorista', 'datatype' => 'dropdown'];
+        $tab[] = ['id' => '7', 'table' => 'glpi_plugin_vehiclescheduler_vehicles', 'field' => 'name',
+                  'name' => 'Veículo', 'datatype' => 'dropdown'];
         return $tab;
     }
 

@@ -82,93 +82,161 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
         $this->initForm($ID, $options);
         $this->showFormHeader($options);
 
-        echo "<tr class='table-row'>";
-        echo "<td colspan='4'><div class='d-flex justify-content-between align-items-center'><h3 style='margin:4px 0'>" . __('Relatório de Incidente', 'vehiclescheduler') . "</h3><a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'><i class='ti ti-arrow-left'></i> Voltar</a></div></td>";
-        echo "</tr>";
+        echo "<tr style='display:none;'><td></td></tr>";
+        echo "<tr><td colspan='4' style='padding:0; border:none; background:transparent;'>";
+        
+        echo "<div class='container-fluid px-3 py-4'>";
+        
+        // Back Button
+        echo "<div class='d-flex justify-content-end mb-3'>
+                <a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'>
+                    <i class='ti ti-arrow-left'></i> Voltar
+                </a>
+              </div>";
 
         $is_manager = PluginVehicleschedulerProfile::canViewManagement();
 
+        // Card 1: Relatório de Incidente
+        echo "<div class='card shadow-sm border-0 mb-4'>
+                <div class='card-header bg-white border-bottom-0 pt-4 pb-2'>
+                    <h5 class='mb-0 text-danger fw-bold'><i class='ti ti-alert-triangle'></i> Relatório de Incidente</h5>
+                </div>
+                <div class='card-body'>
+                    <div class='row g-4'>";
+
         // Row 1: Requester / Department
-        echo "<tr class='table-row'>";
-        echo "<td>" . __('Solicitante') . "</td>";
-        echo "<td>";
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Solicitante <span class='text-danger'>*</span></label>";
         if ($is_manager) {
+            echo "          <div>";
             User::dropdown(['name' => 'users_id', 'value' => $this->fields['users_id'] ?: Session::getLoginUserID(), 'right' => 'all']);
+            echo "          </div>";
         } else {
             $u_id = $this->fields['users_id'] ?: Session::getLoginUserID();
-            echo "<input type='hidden' name='users_id' value='$u_id'>";
-            echo "<span style='font-weight:600; padding:6px 12px; background:#f1f5f9; border-radius:4px;'>" . getUserName($u_id) . "</span>";
+            echo "          <input type='hidden' name='users_id' value='$u_id'>";
+            echo "          <div class='form-control bg-light'>" . getUserName($u_id) . "</div>";
         }
-        echo "</td>";
-        echo "<td>" . __('Departamento/Setor', 'vehiclescheduler') . "</td>";
-        echo "<td>" . Html::input('department', ['value' => $this->fields['department'] ?? '', 'size' => 35]) . "</td>";
-        echo "</tr>";
+        echo "          </div>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Departamento/Setor</label>
+                            <input type='text' name='department' value='".htmlspecialchars($this->fields['department'] ?? '')."' class='form-control'>
+                        </div>";
 
         // Row 2: Vehicle / Driver
-        echo "<tr class='table-row'>";
-        echo "<td>" . __('Veículo', 'vehiclescheduler') . " <span class='red'>*</span></td>";
-        echo "<td>"; PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'] ?? 0]); echo "</td>";
-        echo "<td>" . __('Motorista no momento', 'vehiclescheduler') . "</td>";
-        echo "<td>"; PluginVehicleschedulerDriver::dropdown(['name' => 'plugin_vehiclescheduler_drivers_id', 'value' => $this->fields['plugin_vehiclescheduler_drivers_id'] ?? 0]); echo "</td>";
-        echo "</tr>";
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Veículo Envolvido <span class='text-danger'>*</span></label>";
+        echo "              <div>";
+        PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'] ?? 0]);
+        echo "              </div>
+                        </div>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Motorista no Momento</label>";
+        echo "              <div>";
+        PluginVehicleschedulerDriver::dropdown(['name' => 'plugin_vehiclescheduler_drivers_id', 'value' => $this->fields['plugin_vehiclescheduler_drivers_id'] ?? 0]);
+        echo "              </div>
+                        </div>";
 
         // Row 3: Type / Date
-        echo "<tr class='table-row'>";
-        echo "<td>" . __('Tipo de Incidente', 'vehiclescheduler') . " <span class='red'>*</span></td>";
-        echo "<td>"; Dropdown::showFromArray('incident_type', self::getAllTypes(), ['value' => $this->fields['incident_type'] ?? self::TYPE_OTHER]); echo "</td>";
-        echo "<td>" . __('Data do Incidente', 'vehiclescheduler') . " <span class='red'>*</span></td>";
-        echo "<td>"; Html::showDateTimeField('incident_date', ['value' => $this->fields['incident_date'] ?? date('Y-m-d H:i:s')]); echo "</td>";
-        echo "</tr>";
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Tipo de Incidente <span class='text-danger'>*</span></label>";
+        echo "              <div>";
+        Dropdown::showFromArray('incident_type', self::getAllTypes(), ['value' => $this->fields['incident_type'] ?? self::TYPE_OTHER]);
+        echo "              </div>
+                        </div>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>Data e Hora <span class='text-danger'>*</span></label>
+                            <div>";
+        Html::showDateTimeField('incident_date', ['value' => $this->fields['incident_date'] ?? date('Y-m-d H:i:s')]);
+        echo "              </div>
+                        </div>";
 
         // Row 4: Location / Contact Phone
-        echo "<tr class='table-row'>";
-        echo "<td>" . __('Localização/Endereço', 'vehiclescheduler') . "</td>";
-        echo "<td>" . Html::input('location', ['value' => $this->fields['location'] ?? '', 'size' => 40, 'placeholder' => __('Onde aconteceu?', 'vehiclescheduler')]) . "</td>";
-        echo "<td>" . __('Telefone de Contato', 'vehiclescheduler') . "</td>";
-        echo "<td>" . Html::input('contact_phone', ['value' => $this->fields['contact_phone'] ?? '', 'size' => 20]) . "</td>";
-        echo "</tr>";
+        echo "          <div class='col-md-8'>
+                            <label class='form-label text-muted fw-bold'>Localização/Endereço</label>
+                            <input type='text' name='location' value='".htmlspecialchars($this->fields['location'] ?? '')."' placeholder='Onde aconteceu?' class='form-control'>
+                        </div>";
 
-        // Row 5: Status (managers only on edit)
+        echo "          <div class='col-md-4'>
+                            <label class='form-label text-muted fw-bold'>Telefone de Contato</label>
+                            <input type='text' name='contact_phone' value='".htmlspecialchars($this->fields['contact_phone'] ?? '')."' class='form-control'>
+                        </div>";
+
+        // Description (Full width)
+        echo "          <div class='col-12'>
+                            <label class='form-label text-muted fw-bold'>Descrição do Ocorrido <span class='text-danger'>*</span></label>
+                            <textarea name='description' rows='5' class='form-control' placeholder='Descreva detalhadamente o que ocorreu'>".htmlspecialchars($this->fields['description'] ?? '')."</textarea>
+                        </div>";
+
+        echo "      </div>
+                </div>
+              </div>";
+
+        // Card 2: Gestão de Status (Only managers and edit mode)
         if ($ID > 0 && $is_manager) {
-            echo "<tr class='table-row'>";
-            echo "<td>" . __('Status') . "</td>";
-            echo "<td>"; Dropdown::showFromArray('status', self::getAllStatus(), ['value' => $this->fields['status'] ?? self::STATUS_OPEN]); echo "</td>";
-            echo "<td>" . __('Necessita Manutenção?', 'vehiclescheduler') . "</td>";
-            echo "<td>"; Dropdown::showYesNo('needs_maintenance', $this->fields['needs_maintenance'] ?? 0); echo "</td>";
-            echo "</tr>";
+            echo "<div class='card shadow-sm border-0 mb-4'>
+                    <div class='card-header bg-white border-bottom-0 pt-4 pb-2'>
+                        <h5 class='mb-0 text-primary fw-bold'><i class='ti ti-settings'></i> Análise e Gestão do Incidente</h5>
+                    </div>
+                    <div class='card-body'>
+                        <div class='row g-4'>";
 
-            echo "<tr class='table-row'>";
-            echo "<td>" . __('Acionar Seguro?', 'vehiclescheduler') . "</td>";
-            echo "<td>"; Dropdown::showYesNo('needs_insurance', $this->fields['needs_insurance'] ?? 0); echo "</td>";
-            echo "<td colspan='2'></td></tr>";
+            echo "          <div class='col-md-4'>
+                                <label class='form-label text-muted fw-bold'>Status do Incidente</label>";
+            echo "              <div>";
+            Dropdown::showFromArray('status', self::getAllStatus(), ['value' => $this->fields['status'] ?? self::STATUS_OPEN]);
+            echo "              </div>
+                            </div>";
+
+            echo "          <div class='col-md-4'>
+                                <label class='form-label text-muted fw-bold'>Necessita Manutenção?</label>";
+            echo "              <div>";
+            Dropdown::showYesNo('needs_maintenance', $this->fields['needs_maintenance'] ?? 0);
+            echo "              </div>
+                            </div>";
+
+            echo "          <div class='col-md-4'>
+                                <label class='form-label text-muted fw-bold'>Acionar Seguro?</label>";
+            echo "              <div>";
+            Dropdown::showYesNo('needs_insurance', $this->fields['needs_insurance'] ?? 0);
+            echo "              </div>
+                            </div>";
+
+            echo "      </div>
+                    </div>
+                  </div>";
         }
 
-        // Row 6: Description
-        echo "<tr class='table-row'>";
-        echo "<td>" . __('Descrição', 'vehiclescheduler') . " <span class='red'>*</span></td>";
-        echo "<td colspan='3'><textarea name='description' rows='5' style='width:98%;' placeholder='" . __('Descreva detalhadamente o que ocorreu', 'vehiclescheduler') . "'>" . htmlspecialchars($this->fields['description'] ?? '') . "</textarea></td>";
-        echo "</tr>";
-
-        // Show linked records (edit mode)
+        // Linked records
         if ($ID > 0) {
             global $DB;
             $maint_count = countElementsInTable('glpi_plugin_vehiclescheduler_maintenances', ['plugin_vehiclescheduler_incidents_id' => $ID]);
             $claim_count = countElementsInTable('glpi_plugin_vehiclescheduler_insuranceclaims', ['plugin_vehiclescheduler_incidents_id' => $ID]);
+            
             if ($maint_count || $claim_count) {
-                echo "<tr class='table-row'><td colspan='4'>";
-                echo "<small>🔗 ";
-                if ($maint_count) echo "<a href='/plugins/vehiclescheduler/front/maintenance.php?plugin_vehiclescheduler_incidents_id=$ID'>$maint_count " . __('manutenção(ões)', 'vehiclescheduler') . "</a> ";
-                if ($claim_count) echo "<a href='/plugins/vehiclescheduler/front/insuranceclaim.php?plugin_vehiclescheduler_incidents_id=$ID'>$claim_count " . __('sinistro(s)', 'vehiclescheduler') . "</a>";
-                echo "</small></td></tr>";
+                echo "<div class='alert alert-info d-flex align-items-center mb-4 border-0 shadow-sm'>
+                        <i class='ti ti-link me-2 fs-4'></i>
+                        <div>
+                            <strong>Registros Vinculados:</strong> ";
+                if ($maint_count) echo "<a href='/plugins/vehiclescheduler/front/maintenance.php?plugin_vehiclescheduler_incidents_id=$ID' class='alert-link'>$maint_count manutenção(ões)</a> ";
+                if ($maint_count && $claim_count) echo " | ";
+                if ($claim_count) echo "<a href='/plugins/vehiclescheduler/front/insuranceclaim.php?plugin_vehiclescheduler_incidents_id=$ID' class='alert-link'>$claim_count sinistro(s)</a>";
+                echo "          </div>
+                      </div>";
             }
 
             // Quick-action buttons
-            echo "<tr class='table-row'><td colspan='4' style='padding:10px'>";
             $vid = $this->fields['plugin_vehiclescheduler_vehicles_id'];
-            echo "<a href='/plugins/vehiclescheduler/front/maintenance.form.php?plugin_vehiclescheduler_vehicles_id=$vid&plugin_vehiclescheduler_incidents_id=$ID&type=2' class='btn btn-sm btn-secondary'><i class='ti ti-tool'></i> " . __('Criar Manutenção Corretiva', 'vehiclescheduler') . "</a> ";
-            echo "<a href='/plugins/vehiclescheduler/front/insuranceclaim.form.php?plugin_vehiclescheduler_vehicles_id=$vid&plugin_vehiclescheduler_incidents_id=$ID' class='btn btn-sm btn-secondary'><i class='ti ti-shield'></i> " . __('Abrir Sinistro', 'vehiclescheduler') . "</a>";
-            echo "</td></tr>";
+            echo "<div class='d-flex gap-2 mb-4'>
+                    <a href='/plugins/vehiclescheduler/front/maintenance.form.php?plugin_vehiclescheduler_vehicles_id=$vid&plugin_vehiclescheduler_incidents_id=$ID&type=2' class='btn btn-outline-danger'><i class='ti ti-tool'></i> Criar Manutenção Corretiva</a>
+                    <a href='/plugins/vehiclescheduler/front/insuranceclaim.form.php?plugin_vehiclescheduler_vehicles_id=$vid&plugin_vehiclescheduler_incidents_id=$ID' class='btn btn-outline-primary'><i class='ti ti-shield'></i> Abrir Sinistro</a>
+                  </div>";
         }
+
+        echo "</div>"; // Container End
+        echo "</td></tr>";
 
         $this->showFormButtons($options);
         return true;
@@ -258,6 +326,7 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
         $tab[] = ['id' => '4', 'table' => $this->getTable(), 'field' => 'status',        'name' => __('Status'), 'datatype' => 'specific', 'searchtype' => ['equals']];
         $tab[] = ['id' => '5', 'table' => $this->getTable(), 'field' => 'incident_date', 'name' => __('Data', 'vehiclescheduler'), 'datatype' => 'datetime'];
         $tab[] = ['id' => '6', 'table' => $this->getTable(), 'field' => 'department',    'name' => __('Departamento', 'vehiclescheduler'), 'datatype' => 'string'];
+        $tab[] = ['id' => '7', 'table' => $this->getTable(), 'field' => 'id',            'name' => 'ID', 'datatype' => 'integer'];
         return $tab;
     }
 

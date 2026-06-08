@@ -67,74 +67,130 @@ class PluginVehicleschedulerInsuranceclaim extends CommonDBTM {
             if (isset($_GET['plugin_vehiclescheduler_incidents_id'])) $this->fields['plugin_vehiclescheduler_incidents_id'] = (int)$_GET['plugin_vehiclescheduler_incidents_id'];
         }
 
-        echo "<form method='post' action='" . $this->getFormURL() . "' enctype='multipart/form-data'>";
-        echo "<div class='container-fluid mb-4'><div class='card'>";
-        echo "<div class='card-header d-flex justify-content-between align-items-center'><h3 class='card-title'>" . __('Insurance Claim', 'vehiclescheduler') . "</h3> <a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'><i class='ti ti-arrow-left'></i> Voltar</a></div>";
-        echo "<div class='card-body'>";
+        $this->showFormHeader($options);
+        
+        echo "<tr style='display:none;'><td></td></tr>";
+        echo "<tr><td colspan='4' style='padding:0; border:none; background:transparent;'>";
+        
+        echo "<div class='container-fluid px-3 py-4'>";
+        
+        // Back Button
+        echo "<div class='d-flex justify-content-end mb-3'>
+                <a href='javascript:history.back()' class='btn btn-sm btn-outline-secondary'>
+                    <i class='ti ti-arrow-left'></i> Voltar
+                </a>
+              </div>";
 
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>" . __('Claim Number', 'vehiclescheduler') . "</label>";
-        echo Html::input('name', ['value' => $this->fields['name'] ?? '', 'class' => 'form-control', 'placeholder' => __('Insurance claim reference number', 'vehiclescheduler')]);
-        echo "</div>";
-        echo "<div class='col-md-6'><label class='form-label'>" . __('Status') . "</label><br>";
+        // Card 1: Informações do Sinistro
+        echo "<div class='card shadow-sm border-0 mb-4'>
+                <div class='card-header bg-white border-bottom-0 pt-4 pb-2'>
+                    <h5 class='mb-0 text-primary fw-bold'><i class='ti ti-shield-check'></i> Informações do Sinistro</h5>
+                </div>
+                <div class='card-body'>
+                    <div class='row g-4'>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>" . __('Número do Sinistro', 'vehiclescheduler') . "</label>
+                            <input type='text' name='name' value='".htmlspecialchars($this->fields['name'] ?? '')."' class='form-control form-control-lg' placeholder='Ex: 2024/001-A'>
+                        </div>";
+                        
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>" . __('Status do Sinistro', 'vehiclescheduler') . "</label>";
+        echo "              <div>";
         Dropdown::showFromArray('status', self::getAllStatus(), ['value' => $this->fields['status'] ?? self::STATUS_OPENED]);
-        echo "</div></div>";
+        echo "              </div>
+                        </div>";
 
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>" . __('Vehicle', 'vehiclescheduler') . " <span class='red'>*</span></label><br>";
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>" . __('Veículo', 'vehiclescheduler') . " <span class='text-danger'>*</span></label>";
+        echo "              <div>";
         PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'] ?? 0]);
-        echo "</div>";
-        echo "<div class='col-md-6'><label class='form-label'>" . __('Origin Incident', 'vehiclescheduler') . "</label><br>";
+        echo "              </div>
+                        </div>";
+
+        echo "          <div class='col-md-3'>
+                            <label class='form-label text-muted fw-bold'>" . __('Data de Abertura', 'vehiclescheduler') . "</label>
+                            <div>";
+        Html::showDateField('opening_date', ['value' => $this->fields['opening_date'] ?? date('Y-m-d')]);
+        echo "              </div>
+                        </div>";
+
+        echo "          <div class='col-md-3'>
+                            <label class='form-label text-muted fw-bold'>" . __('Data de Fechamento', 'vehiclescheduler') . "</label>
+                            <div>";
+        Html::showDateField('closing_date', ['value' => $this->fields['closing_date'] ?? '']);
+        echo "              </div>
+                        </div>";
+
+        echo "          <div class='col-12'>
+                            <label class='form-label text-muted fw-bold'>" . __('Descrição Detalhada', 'vehiclescheduler') . "</label>
+                            <textarea name='description' class='form-control' rows='4' placeholder='Detalhes do ocorrido e trâmites'>".htmlspecialchars($this->fields['description'] ?? '')."</textarea>
+                        </div>";
+
+        echo "      </div>
+                </div>
+              </div>";
+
+        // Card 2: Seguradora e Financeiro
+        echo "<div class='card shadow-sm border-0 mb-4' style='border-left: 4px solid #3b82f6 !important;'>
+                <div class='card-header bg-white border-bottom-0 pt-4 pb-2'>
+                    <h5 class='mb-0 text-info fw-bold'><i class='ti ti-building-bank'></i> Seguradora e Financeiro</h5>
+                </div>
+                <div class='card-body'>
+                    <div class='row g-4'>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>" . __('Seguradora', 'vehiclescheduler') . "</label>
+                            <input type='text' name='insurance_company' value='".htmlspecialchars($this->fields['insurance_company'] ?? '')."' class='form-control' placeholder='Nome da seguradora'>
+                        </div>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>" . __('Contato na Seguradora (Corretor/Analista)', 'vehiclescheduler') . "</label>
+                            <input type='text' name='insurer_contact' value='".htmlspecialchars($this->fields['insurer_contact'] ?? '')."' class='form-control'>
+                        </div>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>" . __('Valor Estimado do Prejuízo (R$)', 'vehiclescheduler') . "</label>
+                            <div class='input-group'>
+                                <span class='input-group-text'>R$</span>
+                                <input type='number' name='estimated_value' value='".htmlspecialchars($this->fields['estimated_value'] ?? '')."' class='form-control' step='0.01' min='0'>
+                            </div>
+                        </div>";
+
+        echo "          <div class='col-md-6'>
+                            <label class='form-label text-muted fw-bold'>" . __('Valor Aprovado/Indenizado (R$)', 'vehiclescheduler') . "</label>
+                            <div class='input-group'>
+                                <span class='input-group-text'>R$</span>
+                                <input type='number' name='approved_value' value='".htmlspecialchars($this->fields['approved_value'] ?? '')."' class='form-control' step='0.01' min='0'>
+                            </div>
+                        </div>";
+
+        echo "      </div>
+                </div>
+              </div>";
+
+        // Card 3: Vínculo com Incidente
         $inc_id = $this->fields['plugin_vehiclescheduler_incidents_id'] ?? 0;
+        
         if ($inc_id) {
+            echo "<div class='alert alert-secondary d-flex align-items-center border-0 shadow-sm'>
+                    <i class='ti ti-alert-triangle me-2 fs-4 text-warning'></i>
+                    <div>
+                        <strong>" . __('Incidente de Origem', 'vehiclescheduler') . ":</strong> ";
             $inc = new PluginVehicleschedulerIncident();
             if ($inc->getFromDB($inc_id)) echo $inc->getLink();
             echo Html::hidden('plugin_vehiclescheduler_incidents_id', ['value' => $inc_id]);
+            echo "  </div>
+                  </div>";
         } else {
-            echo Html::input('plugin_vehiclescheduler_incidents_id', ['value' => 0, 'type' => 'number', 'class' => 'form-control', 'placeholder' => 'ID']);
+            // Hidden by default, rarely linked manually
+            echo Html::input('plugin_vehiclescheduler_incidents_id', ['value' => 0, 'type' => 'hidden']);
         }
-        echo "</div></div>";
 
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>" . __('Opening Date', 'vehiclescheduler') . "</label><br>";
-        Html::showDateField('opening_date', ['value' => $this->fields['opening_date'] ?? date('Y-m-d')]);
-        echo "</div>";
-        echo "<div class='col-md-6'><label class='form-label'>" . __('Closing Date', 'vehiclescheduler') . "</label><br>";
-        Html::showDateField('closing_date', ['value' => $this->fields['closing_date'] ?? '']);
-        echo "</div></div>";
+        echo "</div>"; // Container End
+        echo "</td></tr>";
 
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>" . __('Insurance Company', 'vehiclescheduler') . "</label>";
-        echo Html::input('insurance_company', ['value' => $this->fields['insurance_company'] ?? '', 'class' => 'form-control']);
-        echo "</div>";
-        echo "<div class='col-md-6'><label class='form-label'>" . __('Estimated Value (R$)', 'vehiclescheduler') . "</label>";
-        echo Html::input('estimated_value', ['value' => $this->fields['estimated_value'] ?? '', 'type' => 'number', 'step' => '0.01', 'min' => 0, 'class' => 'form-control']);
-        echo "</div></div>";
-
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>" . __('Approved Value (R$)', 'vehiclescheduler') . "</label>";
-        echo Html::input('approved_value', ['value' => $this->fields['approved_value'] ?? '', 'type' => 'number', 'step' => '0.01', 'min' => 0, 'class' => 'form-control']);
-        echo "</div>";
-        echo "<div class='col-md-6'><label class='form-label'>" . __('Contact at Insurer', 'vehiclescheduler') . "</label>";
-        echo Html::input('insurer_contact', ['value' => $this->fields['insurer_contact'] ?? '', 'class' => 'form-control']);
-        echo "</div></div>";
-
-        echo "<div class='row mb-3'>";
-        echo "<div class='col-md-12'><label class='form-label'>" . __('Description', 'vehiclescheduler') . "</label>";
-        echo "<textarea name='description' class='form-control' rows='4'>" . htmlspecialchars($this->fields['description'] ?? '') . "</textarea>";
-        echo "</div></div>";
-
-        echo "</div>"; // card-body
-        echo "<div class='card-footer text-end'>";
-        if ($ID > 0) {
-            echo "<button type='submit' name='update' class='btn btn-primary'>" . __('Save') . "</button>";
-        } else {
-            echo "<button type='submit' name='add' class='btn btn-success'>" . __('Add') . "</button>";
-        }
-        echo "<input type='hidden' name='id' value='$ID'>";
-        echo Html::hidden('_glpi_csrf_token', ['value' => Session::getNewCSRFToken()]);
-        echo "</div></div></div></form>";
-
+        $this->showFormButtons($options);
         return true;
     }
 
@@ -158,6 +214,7 @@ class PluginVehicleschedulerInsuranceclaim extends CommonDBTM {
         $tab[] = ['id' => '4', 'table' => $this->getTable(), 'field' => 'opening_date',     'name' => __('Opening Date', 'vehiclescheduler'), 'datatype' => 'date'];
         $tab[] = ['id' => '5', 'table' => $this->getTable(), 'field' => 'insurance_company','name' => __('Insurance Company', 'vehiclescheduler'), 'datatype' => 'string'];
         $tab[] = ['id' => '6', 'table' => $this->getTable(), 'field' => 'approved_value',   'name' => __('Approved Value', 'vehiclescheduler'), 'datatype' => 'decimal'];
+        $tab[] = ['id' => '7', 'table' => $this->getTable(), 'field' => 'id',               'name' => 'ID', 'datatype' => 'integer'];
         return $tab;
     }
 
