@@ -8,6 +8,17 @@ include('../../../inc/includes.php');
 
 Session::checkRight('plugin_vehiclescheduler', UPDATE);
 
+if (!PluginVehicleschedulerProfile::canViewManagement()) {
+    Html::displayRightError();
+    exit;
+}
+
+if ((isset($_POST['add']) || isset($_POST['update']) || isset($_POST['delete']) || isset($_POST['restore']) || isset($_POST['purge']))
+    && !PluginVehicleschedulerProfile::canEditManagement()) {
+    Html::displayRightError();
+    exit;
+}
+
 $driver = new PluginVehicleschedulerDriver();
 
 if (isset($_POST['add'])) {

@@ -1,7 +1,29 @@
 <?php
 include('../../../inc/includes.php');
 Session::checkRight('plugin_vehiclescheduler', UPDATE);
+
+// Verificar permissão básica de acesso ao portal ou gestão
+if (!PluginVehicleschedulerProfile::canAccessRequester() && !PluginVehicleschedulerProfile::canViewManagement()) {
+    Html::displayRightError();
+    exit;
+}
+
 $item = new PluginVehicleschedulerIncident();
+$id = isset($_REQUEST["id"]) ? (int)$_REQUEST["id"] : 0;
+
+if ($id > 0) {
+    if (!$item->getFromDB($id)) {
+        Html::displayNotFoundError();
+        exit;
+    }
+    
+    // Se não for gestor, só pode ver/alterar o próprio incidente
+    if (!PluginVehicleschedulerProfile::canViewManagement() && $item->fields['users_id'] != Session::getLoginUserID()) {
+        Html::displayRightError();
+        exit;
+    }
+}
+
 if (isset($_POST['add'])) {
     $item->check(-1, CREATE, $_POST);
     $item->add($_POST);

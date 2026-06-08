@@ -18,9 +18,16 @@ class PluginVehicleschedulerDashboard extends CommonGLPI {
     function defineTabs($options = []) {
         $ong = [];
 
-        // Abas disponíveis para todos (desde que tenham permissão do plugin)
-        $ong['PluginVehicleschedulerDashboard$1'] = '🏠 Portal';
-        $ong['PluginVehicleschedulerDashboard$2'] = '🗓️ Agendamento';
+        // Abas disponíveis para quem tem permissão de portal de reservas
+        if (PluginVehicleschedulerProfile::canAccessRequester()) {
+            $ong['PluginVehicleschedulerDashboard$1'] = '🏠 Portal';
+            
+            if (PluginVehicleschedulerProfile::canViewManagement()) {
+                $ong['PluginVehicleschedulerDashboard$2'] = '🗓️ Agendamento';
+            } else {
+                $ong['PluginVehicleschedulerDashboard$10'] = '📋 Meus Agendamentos';
+            }
+        }
 
         // Abas exclusivas dos gestores
         if (PluginVehicleschedulerProfile::canViewManagement()) {
@@ -116,6 +123,9 @@ class PluginVehicleschedulerDashboard extends CommonGLPI {
                 }
                 Search::show('PluginVehicleschedulerDriverfine');
                 break;
+            case 10:
+                self::showMySchedules();
+                break;
         }
         return true;
     }
@@ -142,5 +152,13 @@ class PluginVehicleschedulerDashboard extends CommonGLPI {
     static function showManagement() {
         $_GET['is_tab'] = 1;
         include(Plugin::getPhpDir('vehiclescheduler') . '/front/dashboards/management.php');
+    }
+
+    /**
+     * Exibe a lista de reservas do próprio requerente
+     */
+    static function showMySchedules() {
+        $_GET['is_tab'] = 1;
+        include(Plugin::getPhpDir('vehiclescheduler') . '/front/pages/requester_list.php');
     }
 }

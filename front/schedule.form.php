@@ -14,7 +14,27 @@ include ('../../../inc/includes.php');
 
 Session::checkRight('plugin_vehiclescheduler', UPDATE);
 
+// Verificar permissão básica de acesso ao portal ou gestão
+if (!PluginVehicleschedulerProfile::canAccessRequester() && !PluginVehicleschedulerProfile::canViewManagement()) {
+    Html::displayRightError();
+    exit;
+}
+
 $schedule = new PluginVehicleschedulerSchedule();
+$id = isset($_REQUEST["id"]) ? (int)$_REQUEST["id"] : 0;
+
+if ($id > 0) {
+    if (!$schedule->getFromDB($id)) {
+        Html::displayNotFoundError();
+        exit;
+    }
+    
+    // Se não for gestor, só pode ver/alterar a própria reserva
+    if (!PluginVehicleschedulerProfile::canViewManagement() && $schedule->fields['users_id'] != Session::getLoginUserID()) {
+        Html::displayRightError();
+        exit;
+    }
+}
 
 if (isset($_POST["add"])) {
     $schedule->check(-1, CREATE, $_POST);
@@ -55,9 +75,9 @@ if (isset($_POST["add"])) {
     );
     
     $id = isset($_GET["id"]) ? $_GET["id"] : 0;
-    $schedule->display([
-        'id' => $id
-    ]);
+    $options = $_GET;
+    $options['id'] = $id;
+    $schedule->display($options);
 
     Html::footer();
 }

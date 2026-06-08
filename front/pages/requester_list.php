@@ -11,17 +11,18 @@ if (!PluginVehicleschedulerProfile::canAccessRequester()) {
     exit;
 }
 
-// Carregar CSS glassmorphism
-include_once(__DIR__ . '/../../inc/helpers/common.inc.php');
+$is_tab = isset($_GET['is_tab']) || isset($_POST['is_tab']);
 
-if (Session::getCurrentInterface() == "helpdesk") {
-    Html::helpHeader(__('Minhas Reservas', 'vehiclescheduler'));
-} else {
-    Html::header('Minhas Reservas', $_SERVER['PHP_SELF'], 'helpdesk', 'PluginVehicleschedulerMenui');
-}
-
-if (Session::getCurrentInterface() != "helpdesk") {
-    vs_render_navbar('requester');
+if (!$is_tab) {
+    if (Session::getCurrentInterface() == "helpdesk") {
+        Html::helpHeader(__('Minhas Reservas', 'vehiclescheduler'));
+    } else {
+        Html::header('Minhas Reservas', $_SERVER['PHP_SELF'], 'helpdesk', 'PluginVehicleschedulerMenui');
+    }
+    
+    if (Session::getCurrentInterface() != "helpdesk") {
+        vs_render_navbar('requester');
+    }
 }
 
 global $DB;
@@ -137,5 +138,31 @@ $statuses = ['', 'Nova', 'Aprovada', 'Recusada', 'Cancelada'];
         <?php endif; ?>
     </div>
 </div>
+<script>
+(function() {
+    function applyTabBackground() {
+        const view = document.querySelector('.vs-app-view');
+        if (view) {
+            let parent = view.parentElement;
+            while (parent && !parent.classList.contains('tab-content') && parent.tagName !== 'BODY') {
+                parent.style.setProperty('background', '#f1f5f9', 'important');
+                parent.style.setProperty('background-color', '#f1f5f9', 'important');
+                if (parent.classList.contains('card') || parent.classList.contains('tab_cadre_fixe') || parent.classList.contains('card-body')) {
+                    parent.style.setProperty('border', 'none', 'important');
+                    parent.style.setProperty('box-shadow', 'none', 'important');
+                }
+                parent = parent.parentElement;
+            }
+        }
+    }
+    applyTabBackground();
+    setTimeout(applyTabBackground, 50);
+    setTimeout(applyTabBackground, 200);
+})();
+</script>
 
-<?php Html::footer(); ?>
+<?php
+if (!$is_tab) {
+    Html::footer();
+}
+?>

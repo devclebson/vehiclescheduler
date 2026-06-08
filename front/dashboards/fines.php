@@ -90,7 +90,7 @@ $severities = PluginVehicleschedulerDriverfine::getAllSeverities();
 </div>
 
 <!-- Tabela -->
-<div class="vs-card" style="padding:0;">
+<div class="vs-card" style="padding:0 !important;">
   <?php if (empty($open_fines)): ?>
     <div style="padding:40px; text-align:center; color:var(--vs-text-light);">✅ Nenhuma multa em aberto</div>
   <?php else: ?>
