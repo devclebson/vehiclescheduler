@@ -55,6 +55,11 @@ Diferente da interface padrão engessada do GLPI, este plugin foi remodelado usa
 5. Localize o "Gestão de Frotas", clique em **Instalar** e em seguida em **Ativar**.
 6. Atribua os direitos de acesso adequados aos seus perfis em **Administração > Perfis > (Escolha o perfil) > Gestão de Frota**.
 
+## 📚 Documentação Técnica
+
+Para detalhes sobre o funcionamento interno das integrações com chamados e regras de negócio, consulte:
+- [Manual de Integrações e Fluxo de Viagem](file:///var/www/glpi/plugins/vehiclescheduler/docs/integracao_chamados.md): Detalhamento do esquema de banco de dados, integrações de chamados por módulo, fluxos de Check-in/Check-out e validações lógicas.
+
 ---
 
 ## 🌐 Internacionalização (i18n)

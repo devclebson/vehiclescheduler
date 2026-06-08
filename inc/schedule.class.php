@@ -545,6 +545,11 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
     }
 
     function prepareInputForUpdate($input) {
+        // Se for uma atualização de início ou fim de viagem, permitir para condutores comuns
+        if (isset($input['_bypass_driver_check']) && $input['_bypass_driver_check']) {
+            return $input;
+        }
+
         $is_manager = PluginVehicleschedulerProfile::canViewManagement();
         
         // Bloquear alterações de condutores comuns que não sejam as ações de viagem
@@ -769,11 +774,12 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
         
         // Update database record
         $this->update([
-            'id'               => $id,
-            'real_begin_date'  => $now,
-            'initial_mileage'  => $initial_mileage,
-            'initial_fuel'     => $initial_fuel,
-            'status'           => self::STATUS_ONGOING
+            'id'                   => $id,
+            'real_begin_date'      => $now,
+            'initial_mileage'      => $initial_mileage,
+            'initial_fuel'         => $initial_fuel,
+            'status'               => self::STATUS_ONGOING,
+            '_bypass_driver_check' => true
         ]);
         
         // Add followup to ticket and assign ticket
@@ -825,13 +831,14 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
         
         // Update database record
         $this->update([
-            'id'               => $id,
-            'real_end_date'    => $now,
-            'final_mileage'    => $final_mileage,
-            'final_fuel'       => $final_fuel,
-            'return_checklist' => $return_checklist,
-            'return_comment'   => $return_comment,
-            'status'           => self::STATUS_RETURNED
+            'id'                   => $id,
+            'real_end_date'        => $now,
+            'final_mileage'        => $final_mileage,
+            'final_fuel'           => $final_fuel,
+            'return_checklist'     => $return_checklist,
+            'return_comment'       => $return_comment,
+            'status'               => self::STATUS_RETURNED,
+            '_bypass_driver_check' => true
         ]);
         
         // Update vehicle mileage
