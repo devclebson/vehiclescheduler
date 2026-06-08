@@ -21,6 +21,7 @@ function plugin_vehiclescheduler_install() {
         `model` varchar(100) NOT NULL DEFAULT '',
         `year` int NOT NULL DEFAULT '2020',
         `seats` int NOT NULL DEFAULT '5',
+        `mileage` int NOT NULL DEFAULT '0',
         `is_active` tinyint NOT NULL DEFAULT '1',
         `comment` text,
         `date_creation` timestamp NULL DEFAULT NULL,
@@ -32,10 +33,11 @@ function plugin_vehiclescheduler_install() {
         KEY `is_active` (`is_active`)
     ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation};");
     
-    // Motoristas (COM APROVAÇÃO)
+    // Motoristas (COM APROVAÇÃO E VÍNCULO DE USUÁRIO)
     $DB->doQuery("CREATE TABLE IF NOT EXISTS `glpi_plugin_vehiclescheduler_drivers` (
         `id` int unsigned NOT NULL AUTO_INCREMENT,
         `name` varchar(255) NOT NULL DEFAULT '',
+        `users_id` int unsigned NOT NULL DEFAULT '0',
         `entities_id` int unsigned NOT NULL DEFAULT '0',
         `is_recursive` tinyint NOT NULL DEFAULT '0',
         `registration` varchar(50) NOT NULL DEFAULT '',
@@ -52,6 +54,7 @@ function plugin_vehiclescheduler_install() {
         `date_mod` timestamp NULL DEFAULT NULL,
         PRIMARY KEY (`id`),
         KEY `name` (`name`),
+        KEY `users_id` (`users_id`),
         KEY `entities_id` (`entities_id`),
         KEY `cnh_expiry` (`cnh_expiry`),
         KEY `is_active` (`is_active`),
@@ -77,6 +80,14 @@ function plugin_vehiclescheduler_install() {
         `department` varchar(255) NOT NULL DEFAULT '',
         `contact_phone` varchar(50) NOT NULL DEFAULT '',
         `comment` text,
+        `real_begin_date` timestamp NULL DEFAULT NULL,
+        `real_end_date` timestamp NULL DEFAULT NULL,
+        `initial_mileage` int NOT NULL DEFAULT '0',
+        `final_mileage` int NOT NULL DEFAULT '0',
+        `initial_fuel` int NOT NULL DEFAULT '0',
+        `final_fuel` int NOT NULL DEFAULT '0',
+        `return_checklist` text,
+        `return_comment` text,
         `date_creation` timestamp NULL DEFAULT NULL,
         `date_mod` timestamp NULL DEFAULT NULL,
         PRIMARY KEY (`id`),
@@ -88,7 +99,7 @@ function plugin_vehiclescheduler_install() {
         KEY `groups_id` (`groups_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation};");
     
-    // Incidentes (COM groups_id)
+    // Incidentes (COM groups_id E tickets_id)
     $DB->doQuery("CREATE TABLE IF NOT EXISTS `glpi_plugin_vehiclescheduler_incidents` (
         `id` int unsigned NOT NULL AUTO_INCREMENT,
         `name` varchar(255) NOT NULL DEFAULT '',
@@ -97,6 +108,7 @@ function plugin_vehiclescheduler_install() {
         `users_id` int unsigned NOT NULL DEFAULT '0',
         `entities_id` int unsigned NOT NULL DEFAULT '0',
         `groups_id` int unsigned NOT NULL DEFAULT '0',
+        `tickets_id` int unsigned NOT NULL DEFAULT '0',
         `incident_type` int NOT NULL DEFAULT '6',
         `status` int NOT NULL DEFAULT '1',
         `incident_date` timestamp NULL DEFAULT NULL,
@@ -114,7 +126,8 @@ function plugin_vehiclescheduler_install() {
         KEY `users_id` (`users_id`),
         KEY `entities_id` (`entities_id`),
         KEY `status` (`status`),
-        KEY `groups_id` (`groups_id`)
+        KEY `groups_id` (`groups_id`),
+        KEY `tickets_id` (`tickets_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation};");
     
     // Manutenções
@@ -123,6 +136,7 @@ function plugin_vehiclescheduler_install() {
         `name` varchar(255) NOT NULL DEFAULT '',
         `plugin_vehiclescheduler_vehicles_id` int unsigned NOT NULL DEFAULT '0',
         `plugin_vehiclescheduler_incidents_id` int unsigned NOT NULL DEFAULT '0',
+        `tickets_id` int unsigned NOT NULL DEFAULT '0',
         `type` int NOT NULL DEFAULT '1',
         `status` int NOT NULL DEFAULT '1',
         `scheduled_date` date DEFAULT NULL,
@@ -136,7 +150,8 @@ function plugin_vehiclescheduler_install() {
         PRIMARY KEY (`id`),
         KEY `plugin_vehiclescheduler_vehicles_id` (`plugin_vehiclescheduler_vehicles_id`),
         KEY `status` (`status`),
-        KEY `scheduled_date` (`scheduled_date`)
+        KEY `scheduled_date` (`scheduled_date`),
+        KEY `tickets_id` (`tickets_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation};");
     
     // Sinistros
@@ -170,6 +185,7 @@ function plugin_vehiclescheduler_install() {
         `fine_date` date DEFAULT NULL,
         `severity` int NOT NULL DEFAULT '1',
         `status` int NOT NULL DEFAULT '1',
+        `tickets_id` int unsigned NOT NULL DEFAULT '0',
         `description` text,
         `date_creation` timestamp NULL DEFAULT NULL,
         `date_mod` timestamp NULL DEFAULT NULL,
@@ -177,7 +193,8 @@ function plugin_vehiclescheduler_install() {
         KEY `plugin_vehiclescheduler_drivers_id` (`plugin_vehiclescheduler_drivers_id`),
         KEY `plugin_vehiclescheduler_vehicles_id` (`plugin_vehiclescheduler_vehicles_id`),
         KEY `status` (`status`),
-        KEY `fine_date` (`fine_date`)
+        KEY `fine_date` (`fine_date`),
+        KEY `tickets_id` (`tickets_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation};");
     
     // Permissões

@@ -171,7 +171,7 @@ class PluginVehicleschedulerMaintenance extends CommonDBTM {
                 </div>
               </div>";
 
-        // Card 3: Vínculo com Incidente
+        // Card 3: Vínculo com Incidente ou Chamado
         $inc_id = $this->fields['plugin_vehiclescheduler_incidents_id'] ?? 0;
         if (isset($_GET['plugin_vehiclescheduler_incidents_id'])) {
             $inc_id = $_GET['plugin_vehiclescheduler_incidents_id'];
@@ -179,18 +179,77 @@ class PluginVehicleschedulerMaintenance extends CommonDBTM {
         }
         
         if ($inc_id) {
-            echo "<div class='alert alert-secondary d-flex align-items-center border-0 shadow-sm'>
+            echo "<div class='alert alert-secondary d-flex align-items-center border-0 shadow-sm mb-4'>
                     <i class='ti ti-alert-triangle me-2 fs-4 text-warning'></i>
                     <div>
                         <strong>" . __('Origem do Serviço', 'vehiclescheduler') . ":</strong> Incidente Reportado — ";
             $inc = new PluginVehicleschedulerIncident();
-            if ($inc->getFromDB($inc_id)) echo $inc->getLink();
+            if ($inc->getFromDB($inc_id)) {
+                echo $inc->getLink();
+                if ($inc->fields['tickets_id'] > 0) {
+                    $ticket = new Ticket();
+                    if ($ticket->getFromDB($inc->fields['tickets_id'])) {
+                        echo " (Chamado Relacionado: " . $ticket->getLink() . ")";
+                    }
+                }
+            }
             echo "  </div>
                   </div>";
         }
 
+        if (($this->fields['tickets_id'] ?? 0) > 0) {
+            $ticket = new Ticket();
+            if ($ticket->getFromDB($this->fields['tickets_id'])) {
+                echo "<div class='alert alert-info d-flex align-items-center border-0 shadow-sm mb-4'>
+                        <i class='ti ti-ticket me-2 fs-4 text-info'></i>
+                        <div>
+                            <strong>" . __('Chamado Relacionado (Preventiva)', 'vehiclescheduler') . ":</strong> " . $ticket->getLink() . "
+                        </div>
+                      </div>";
+            }
+        }
+
         echo "</div>"; // Container End
         echo "</td></tr>";
+
+        // Inject JS to enforce Flatpickr date rules
+        echo "<script>
+        $(document).ready(function() {
+            var scheduled_input = $('input[name=\"scheduled_date\"]');
+            var completion_input = $('input[name=\"completion_date\"]');
+            
+            function setupFlatpickr() {
+                var scheduled_wrapper = scheduled_input.closest('.flatpickr');
+                var completion_wrapper = completion_input.closest('.flatpickr');
+                
+                if (scheduled_wrapper.length && scheduled_wrapper[0]._flatpickr) {
+                    var scheduled_picker = scheduled_wrapper[0]._flatpickr;
+                    var completion_picker = completion_wrapper.length ? completion_wrapper[0]._flatpickr : null;
+                    
+                    var isNew = " . (($ID > 0) ? 'false' : 'true') . ";
+                    if (isNew) {
+                        scheduled_picker.set('minDate', 'today');
+                    }
+                    
+                    scheduled_input.on('change', function() {
+                        var val = $(this).val();
+                        if (val && completion_picker) {
+                            completion_picker.set('minDate', val);
+                        }
+                    });
+                    
+                    var initial_val = scheduled_input.val();
+                    if (initial_val && completion_picker) {
+                        completion_picker.set('minDate', initial_val);
+                    }
+                } else {
+                    // Try again in 100ms if Flatpickr isn't initialized yet
+                    setTimeout(setupFlatpickr, 100);
+                }
+            }
+            setupFlatpickr();
+        });
+        </script>";
 
         $this->showFormButtons($options);
         return true;
@@ -205,13 +264,246 @@ class PluginVehicleschedulerMaintenance extends CommonDBTM {
             Session::addMessageAfterRedirect(__('Vehicle is required.', 'vehiclescheduler'), false, ERROR);
             return false;
         }
+        if (empty($input['scheduled_date'])) {
+            Session::addMessageAfterRedirect(__('Scheduled date is required.', 'vehiclescheduler'), false, ERROR);
+            return false;
+        }
+        
+        // Data agendada não pode ser no passado na criação
+        $today = date('Y-m-d');
+        $scheduled_day = date('Y-m-d', strtotime($input['scheduled_date']));
+        if ($scheduled_day < $today) {
+            Session::addMessageAfterRedirect(__('Scheduled date cannot be in the past.', 'vehiclescheduler'), false, ERROR);
+            return false;
+        }
+
+        // Data de conclusão não pode ser menor que data agendada
+        if (!empty($input['completion_date'])) {
+            $completion_day = date('Y-m-d', strtotime($input['completion_date']));
+            if ($completion_day < $scheduled_day) {
+                Session::addMessageAfterRedirect(__('Completion date cannot be before scheduled date.', 'vehiclescheduler'), false, ERROR);
+                return false;
+            }
+        }
+
         if (!isset($input['status']))           $input['status'] = self::STATUS_SCHEDULED;
         if (!isset($input['entities_id']))       $input['entities_id'] = $_SESSION['glpiactive_entity'];
-        if (!isset($input['type']))  $input['type'] = self::TYPE_PREVENTIVE;
+        if (!isset($input['type']))              $input['type'] = self::TYPE_PREVENTIVE;
         return $input;
     }
 
-    function prepareInputForUpdate($input) { return $this->prepareInputForAdd($input); }
+    function prepareInputForUpdate($input) {
+        if (empty(trim($input['name'] ?? ''))) {
+            Session::addMessageAfterRedirect(__('Title is required.', 'vehiclescheduler'), false, ERROR);
+            return false;
+        }
+        if (empty($input['plugin_vehiclescheduler_vehicles_id'])) {
+            Session::addMessageAfterRedirect(__('Vehicle is required.', 'vehiclescheduler'), false, ERROR);
+            return false;
+        }
+
+        // Se data agendada está sendo alterada, validar contra hoje
+        if (isset($input['scheduled_date'])) {
+            $scheduled_day = date('Y-m-d', strtotime($input['scheduled_date']));
+            if (isset($this->fields['scheduled_date']) && $this->fields['scheduled_date'] !== $input['scheduled_date']) {
+                $today = date('Y-m-d');
+                if ($scheduled_day < $today) {
+                    Session::addMessageAfterRedirect(__('Scheduled date cannot be in the past.', 'vehiclescheduler'), false, ERROR);
+                    return false;
+                }
+            }
+
+            // Validar data de conclusão contra data agendada
+            $comp_date = $input['completion_date'] ?? $this->fields['completion_date'] ?? '';
+            if (!empty($comp_date)) {
+                $completion_day = date('Y-m-d', strtotime($comp_date));
+                if ($completion_day < $scheduled_day) {
+                    Session::addMessageAfterRedirect(__('Completion date cannot be before scheduled date.', 'vehiclescheduler'), false, ERROR);
+                    return false;
+                }
+            }
+        }
+
+        return $input;
+    }
+
+    function post_addItem() {
+        parent::post_addItem();
+
+        $inc_id = $this->fields['plugin_vehiclescheduler_incidents_id'] ?? 0;
+
+        if ($inc_id > 0) {
+            // Corretiva: criar tarefa no chamado do incidente original
+            $inc = new PluginVehicleschedulerIncident();
+            if ($inc->getFromDB($inc_id) && $inc->fields['tickets_id'] > 0) {
+                $task = new TicketTask();
+                $task->add([
+                    'tickets_id' => $inc->fields['tickets_id'],
+                    'content'    => sprintf(
+                        "🔧 Manutenção Corretiva Agendada\nOficina: %s\nCusto Estimado: R$ %s\nData Agendada: %s\nDescrição: %s",
+                        $this->fields['supplier'] ?? '',
+                        $this->fields['cost'] ?? '0.00',
+                        Html::convDateTime($this->fields['scheduled_date']),
+                        $this->fields['description'] ?? ''
+                    ),
+                    'state'      => 1, // TODO (Planejado)
+                    'actiontime' => 0
+                ]);
+            }
+        } else {
+            // Preventiva: criar chamado de requisição
+            $this->createTicketFromMaintenance();
+        }
+    }
+
+    function post_updateItem($history = true) {
+        parent::post_updateItem($history);
+
+        if (in_array('status', $this->updates)) {
+            $inc_id = $this->fields['plugin_vehiclescheduler_incidents_id'] ?? 0;
+
+            if ($inc_id > 0) {
+                // Corretiva
+                $inc = new PluginVehicleschedulerIncident();
+                if ($inc->getFromDB($inc_id) && $inc->fields['tickets_id'] > 0) {
+                    $ticket_id = $inc->fields['tickets_id'];
+                    
+                    if ($this->fields['status'] == self::STATUS_DONE) {
+                        // 1. Concluir a tarefa no GLPI
+                        global $DB;
+                        $iterator = $DB->request([
+                            'FROM'   => 'glpi_tickettasks',
+                            'WHERE'  => [
+                                'tickets_id' => $ticket_id,
+                                'content'    => ['LIKE', '%Manutenção Corretiva Agendada%']
+                            ],
+                            'LIMIT'  => 1
+                        ]);
+                        if (count($iterator)) {
+                            $row = $iterator->current();
+                            $task = new TicketTask();
+                            $task->update([
+                                'id'    => $row['id'],
+                                'state' => 2 // Done
+                            ]);
+                        }
+
+                        // Buscar dados do veículo
+                        $vehicle = new PluginVehicleschedulerVehicle();
+                        $vname = '';
+                        if ($vehicle->getFromDB($this->fields['plugin_vehiclescheduler_vehicles_id'])) {
+                            $vname = $vehicle->fields['name'] . ' (' . $vehicle->fields['plate'] . ')';
+                        }
+
+                        // 2. Adicionar acompanhamento com custo final
+                        $followup = new ITILFollowup();
+                        $followup->add([
+                            'itemtype'   => 'Ticket',
+                            'items_id'   => $ticket_id,
+                            'users_id'   => Session::getLoginUserID(),
+                            'content'    => sprintf(
+                                "✅ Manutenção Corretiva Concluída!\nVeículo: %s\nData de Conclusão: %s\nCusto Real: R$ %s\nOficina: %s\nDescrição: %s",
+                                $vname,
+                                Html::convDateTime($this->fields['completion_date']),
+                                $this->fields['cost'] ?? '0.00',
+                                $this->fields['supplier'] ?? '',
+                                $this->fields['description'] ?? ''
+                            ),
+                            'is_private' => 0
+                        ]);
+                    }
+                }
+            } else {
+                // Preventiva
+                if ($this->fields['tickets_id'] > 0) {
+                    $this->updatePreventiveTicketStatus();
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Cria chamado para Manutenção Preventiva
+     */
+    function createTicketFromMaintenance() {
+        $vehicle = new PluginVehicleschedulerVehicle();
+        $vname = '';
+        if ($vehicle->getFromDB($this->fields['plugin_vehiclescheduler_vehicles_id'])) {
+            $vname = $vehicle->fields['name'] . ' (' . $vehicle->fields['plate'] . ')';
+        }
+
+        $title = "Manutenção Preventiva de Veículo: {$vname}";
+        $content = "Solicitação de Manutenção Preventiva:\n\n"
+            . "Veículo: {$vname}\n"
+            . "Data Agendada: " . Html::convDateTime($this->fields['scheduled_date']) . "\n"
+            . "Oficina/Fornecedor: " . ($this->fields['supplier'] ?? '') . "\n"
+            . "Custo Estimado: R$ " . ($this->fields['cost'] ?? '0.00') . "\n\n"
+            . "Descrição:\n" . $this->fields['description'];
+
+        $ticket = new Ticket();
+        $ticket_id = $ticket->add([
+            'name'                => $title,
+            'content'             => $content,
+            'entities_id'         => $this->fields['entities_id'],
+            'type'                => Ticket::REQUEST_TYPE,
+            'urgency'             => 3,
+            'impact'              => 2,
+            'priority'            => CommonITILObject::computePriority(3, 2),
+            '_users_id_requester' => Session::getLoginUserID(),
+        ]);
+
+        if ($ticket_id) {
+            global $DB;
+            $DB->update(
+                $this->getTable(),
+                ['tickets_id' => $ticket_id],
+                ['id' => $this->fields['id']]
+            );
+        }
+    }
+
+    /**
+     * Atualiza o status do chamado da preventiva
+     */
+    function updatePreventiveTicketStatus() {
+        $ticket = new Ticket();
+        if (!$ticket->getFromDB($this->fields['tickets_id'])) {
+            return false;
+        }
+
+        $statuses = self::getAllStatus();
+        $status_label = $statuses[$this->fields['status']] ?? 'Desconhecido';
+
+        $ticket_status_map = [
+            self::STATUS_SCHEDULED   => CommonITILObject::INCOMING,
+            self::STATUS_IN_PROGRESS => CommonITILObject::ASSIGNED,
+            self::STATUS_DONE        => CommonITILObject::SOLVED,
+            self::STATUS_CANCELLED   => CommonITILObject::CLOSED,
+        ];
+
+        $new_ticket_status = $ticket_status_map[$this->fields['status']] ?? $ticket->fields['status'];
+
+        $messages = [
+            self::STATUS_IN_PROGRESS => '⚙️ A manutenção preventiva foi iniciada pela oficina/técnico.',
+            self::STATUS_DONE        => '✅ A manutenção preventiva foi concluída com sucesso.',
+            self::STATUS_CANCELLED   => '❌ A manutenção preventiva foi cancelada.',
+        ];
+
+        if (isset($messages[$this->fields['status']])) {
+            $followup = new ITILFollowup();
+            $followup->add([
+                'itemtype'   => 'Ticket',
+                'items_id'   => $this->fields['tickets_id'],
+                'users_id'   => Session::getLoginUserID(),
+                'content'    => sprintf("Status da Manutenção Preventiva alterado para: %s\n\n%s", strtoupper($status_label), $messages[$this->fields['status']]),
+                'is_private' => 0,
+            ]);
+        }
+
+        $ticket->update(['id' => $this->fields['tickets_id'], 'status' => $new_ticket_status]);
+        return true;
+    }
 
     function rawSearchOptions() {
         $tab = [];

@@ -80,7 +80,45 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
 
     function showForm($ID, array $options = []) {
         $this->initForm($ID, $options);
+        
+        // Ativar multipart para upload de arquivos
+        $options['multipart'] = true;
         $this->showFormHeader($options);
+
+        // Definir valores padrão para auto-preenchimento
+        $default_driver_id = 0;
+        $default_phone = '';
+        $default_dept = '';
+        $default_vehicle_id = 0;
+
+        if ($ID <= 0) {
+            $user_id = Session::getLoginUserID();
+            // Buscar perfil do motorista vinculado ao usuário logado
+            $drv = PluginVehicleschedulerDriver::getDriverByUserId($user_id);
+            if ($drv) {
+                $default_driver_id = $drv['id'];
+                $default_phone = $drv['contact_phone'];
+                $default_dept = $drv['department'];
+            }
+            
+            // Buscar reserva ativa nesse exato momento para preencher o veículo automaticamente
+            global $DB;
+            $now = date('Y-m-d H:i:s');
+            $res_iterator = $DB->request([
+                'FROM'  => 'glpi_plugin_vehiclescheduler_schedules',
+                'WHERE' => [
+                    'users_id' => $user_id,
+                    'status'   => [5, 2], // Em Viagem (5) ou Aprovada (2)
+                    'begin_date' => ['<=', $now],
+                    'end_date'   => ['>=', $now]
+                ]
+            ]);
+            if (count($res_iterator) > 0) {
+                $res_data = $res_iterator->current();
+                $default_vehicle_id = $res_data['plugin_vehiclescheduler_vehicles_id'];
+                $default_driver_id = $res_data['plugin_vehiclescheduler_drivers_id'];
+            }
+        }
 
         echo "<tr style='display:none;'><td></td></tr>";
         echo "<tr><td colspan='4' style='padding:0; border:none; background:transparent;'>";
@@ -93,6 +131,20 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
                     <i class='ti ti-arrow-left'></i> Voltar
                 </a>
               </div>";
+
+        // Exibir link do chamado se houver
+        if ($ID > 0 && !empty($this->fields['tickets_id'])) {
+            echo "<div class='alert alert-info d-flex align-items-center mb-4 border-0 shadow-sm'>
+                    <i class='ti ti-ticket me-2 fs-4'></i>
+                    <div>";
+            echo "      <strong>Chamado Relacionado:</strong> ";
+            $ticket = new Ticket();
+            if ($ticket->getFromDB($this->fields['tickets_id'])) {
+                echo $ticket->getLink();
+            }
+            echo "  </div>
+                  </div>";
+        }
 
         $is_manager = PluginVehicleschedulerProfile::canViewManagement();
 
@@ -120,21 +172,21 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
 
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Departamento/Setor</label>
-                            <input type='text' name='department' value='".htmlspecialchars($this->fields['department'] ?? '')."' class='form-control'>
+                            <input type='text' name='department' value='".htmlspecialchars($this->fields['department'] ?: $default_dept)."' class='form-control'>
                         </div>";
 
         // Row 2: Vehicle / Driver
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Veículo Envolvido <span class='text-danger'>*</span></label>";
         echo "              <div>";
-        PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'] ?? 0]);
+        PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'] ?: $default_vehicle_id]);
         echo "              </div>
                         </div>";
 
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Motorista no Momento</label>";
         echo "              <div>";
-        PluginVehicleschedulerDriver::dropdown(['name' => 'plugin_vehiclescheduler_drivers_id', 'value' => $this->fields['plugin_vehiclescheduler_drivers_id'] ?? 0]);
+        PluginVehicleschedulerDriver::dropdown(['name' => 'plugin_vehiclescheduler_drivers_id', 'value' => $this->fields['plugin_vehiclescheduler_drivers_id'] ?: $default_driver_id]);
         echo "              </div>
                         </div>";
 
@@ -161,13 +213,21 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
 
         echo "          <div class='col-md-4'>
                             <label class='form-label text-muted fw-bold'>Telefone de Contato</label>
-                            <input type='text' name='contact_phone' value='".htmlspecialchars($this->fields['contact_phone'] ?? '')."' class='form-control'>
+                            <input type='text' name='contact_phone' value='".htmlspecialchars($this->fields['contact_phone'] ?: $default_phone)."' class='form-control'>
                         </div>";
 
         // Description (Full width)
         echo "          <div class='col-12'>
                             <label class='form-label text-muted fw-bold'>Descrição do Ocorrido <span class='text-danger'>*</span></label>
                             <textarea name='description' rows='5' class='form-control' placeholder='Descreva detalhadamente o que ocorreu'>".htmlspecialchars($this->fields['description'] ?? '')."</textarea>
+                        </div>";
+
+        // Fotos / Anexos
+        echo "          <div class='col-12'>
+                            <label class='form-label text-muted fw-bold'>Fotos / Anexos do Ocorrido</label>
+                            <div>";
+        Html::file(['name' => 'filename']);
+        echo "              </div>
                         </div>";
 
         echo "      </div>
@@ -268,7 +328,37 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
      */
     function post_addItem() {
         parent::post_addItem();
+        
+        // 1. Processar anexos de arquivos
+        if (isset($_FILES['filename']) && $_FILES['filename']['error'] == UPLOAD_ERR_OK) {
+            $doc = new Document();
+            $doc_id = $doc->add([
+                'name'        => 'Anexo de Incidente — ' . $this->fields['name'],
+                'entities_id' => $this->fields['entities_id'],
+                '_uploader'   => ['filename']
+            ]);
+            if ($doc_id) {
+                $doc_item = new Document_Item();
+                $doc_item->add([
+                    'documents_id' => $doc_id,
+                    'itemtype'     => self::class,
+                    'items_id'     => $this->fields['id'],
+                    'entities_id'  => $this->fields['entities_id']
+                ]);
+            }
+        }
+        
+        // 2. Criar chamado no GLPI
         $this->createTicketFromIncident();
+    }
+
+    function post_updateItem($history = true) {
+        parent::post_updateItem($history);
+        
+        if (in_array('status', $this->updates) && $this->fields['tickets_id'] > 0) {
+            $this->updateTicketStatus();
+        }
+        return true;
     }
 
     /**
@@ -310,11 +400,52 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
         ]);
 
         if ($ticket_id) {
-            // Não temos campo tickets_id em incidents, mas poderíamos adicionar
-            // Por ora apenas criamos o chamado
+            $this->update([
+                'id'         => $this->fields['id'],
+                'tickets_id' => $ticket_id
+            ]);
         }
 
         return $ticket_id;
+    }
+
+    function updateTicketStatus() {
+        $ticket = new Ticket();
+        if (!$ticket->getFromDB($this->fields['tickets_id'])) {
+            return false;
+        }
+
+        $statuses = self::getAllStatus();
+        $status_label = $statuses[$this->fields['status']] ?? 'Desconhecido';
+
+        $ticket_status_map = [
+            self::STATUS_OPEN      => CommonITILObject::INCOMING,  // Aberto -> Novo
+            self::STATUS_ANALYZING => CommonITILObject::ASSIGNED,  // Em Análise -> Atribuído
+            self::STATUS_RESOLVED  => CommonITILObject::SOLVED,    // Resolvido -> Solucionado
+            self::STATUS_CLOSED    => CommonITILObject::CLOSED,    // Fechado -> Fechado
+        ];
+
+        $new_ticket_status = $ticket_status_map[$this->fields['status']] ?? $ticket->fields['status'];
+
+        $messages = [
+            self::STATUS_ANALYZING => '🔍 O incidente está sob análise pela gestão de frota.',
+            self::STATUS_RESOLVED  => '✅ O incidente foi RESOLVIDO pela equipe de frotas.',
+            self::STATUS_CLOSED    => '🔒 O processo do incidente foi concluído e encerrado.',
+        ];
+
+        if (isset($messages[$this->fields['status']])) {
+            $followup = new ITILFollowup();
+            $followup->add([
+                'itemtype'   => 'Ticket',
+                'items_id'   => $this->fields['tickets_id'],
+                'users_id'   => Session::getLoginUserID(),
+                'content'    => sprintf("Status do Incidente alterado para: %s\n\n%s", strtoupper($status_label), $messages[$this->fields['status']]),
+                'is_private' => 0,
+            ]);
+        }
+
+        $ticket->update(['id' => $this->fields['tickets_id'], 'status' => $new_ticket_status]);
+        return true;
     }
 
     function rawSearchOptions() {
@@ -326,6 +457,7 @@ class PluginVehicleschedulerIncident extends CommonDBTM {
         $tab[] = ['id' => '4', 'table' => $this->getTable(), 'field' => 'status',        'name' => __('Status'), 'datatype' => 'specific', 'searchtype' => ['equals']];
         $tab[] = ['id' => '5', 'table' => $this->getTable(), 'field' => 'incident_date', 'name' => __('Data', 'vehiclescheduler'), 'datatype' => 'datetime'];
         $tab[] = ['id' => '6', 'table' => $this->getTable(), 'field' => 'department',    'name' => __('Departamento', 'vehiclescheduler'), 'datatype' => 'string'];
+        $tab[] = ['id' => '8', 'table' => 'glpi_tickets', 'field' => 'name', 'name' => 'Chamado Relacionado', 'datatype' => 'dropdown'];
         $tab[] = ['id' => '7', 'table' => $this->getTable(), 'field' => 'id',            'name' => 'ID', 'datatype' => 'integer'];
         return $tab;
     }

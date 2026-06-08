@@ -174,17 +174,30 @@ class PluginVehicleschedulerDriver extends CommonDBTM {
                 </div>
                 <div class='card-body'>
                     <div class='row g-4'>";
-        
         // Row 1
-        echo "          <div class='col-md-6'>
+        echo "          <div class='col-md-4'>
                             <label class='form-label text-muted fw-bold'>Nome Completo <span class='text-danger'>*</span></label>
                             <input type='text' name='name' value='".htmlspecialchars($this->fields['name'] ?? '')."' class='form-control form-control-lg'>
                         </div>";
-        echo "          <div class='col-md-6'>
+
+        echo "          <div class='col-md-4'>
+                            <label class='form-label text-muted fw-bold'>Usuário do GLPI</label>
+                            <div>";
+        User::dropdown([
+            'name'        => 'users_id',
+            'value'       => $this->fields['users_id'] ?? 0,
+            'right'       => 'all',
+            'entity'      => $this->fields['entities_id'] ?? $_SESSION['glpiactive_entity'],
+            'entity_sons' => true
+        ]);
+        echo "              </div>
+                        </div>";
+
+        echo "          <div class='col-md-4'>
                             <label class='form-label text-muted fw-bold'>Matrícula Interna</label>
                             <input type='text' name='registration' value='".htmlspecialchars($this->fields['registration'] ?? '')."' placeholder='ex: EMP-0042' class='form-control form-control-lg'>
                         </div>";
-        
+
         // Row 2
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Departamento/Setor</label>
@@ -196,7 +209,7 @@ class PluginVehicleschedulerDriver extends CommonDBTM {
                         </div>";
 
         // Row 3
-        echo "          <div class='col-md-4'>
+        echo "          <div class='col-md-3'>
                             <label class='form-label text-muted fw-bold'>Categoria CNH <span class='text-danger'>*</span></label>
                             <select name='cnh_category' class='form-select'>";
                             foreach (self::getCNHCategories() as $cat_key => $cat_val) {
@@ -205,15 +218,22 @@ class PluginVehicleschedulerDriver extends CommonDBTM {
                             }
         echo "              </select>
                         </div>";
-        echo "          <div class='col-md-4'>
+        echo "          <div class='col-md-3'>
                             <label class='form-label text-muted fw-bold'>Vencimento da CNH <span class='text-danger'>*</span></label>
                             <input type='date' name='cnh_expiry' value='".htmlspecialchars($this->fields['cnh_expiry'] ?? '')."' class='form-control'>
                         </div>";
-        echo "          <div class='col-md-4'>
+        echo "          <div class='col-md-3'>
                             <label class='form-label text-muted fw-bold'>Ativo</label>
                             <select name='is_active' class='form-select'>
                                 <option value='1' ".($this->fields['is_active'] == 1 ? 'selected' : '').">Sim</option>
                                 <option value='0' ".($this->fields['is_active'] == 0 ? 'selected' : '').">Não</option>
+                            </select>
+                        </div>";
+        echo "          <div class='col-md-3'>
+                            <label class='form-label text-muted fw-bold'>Aprovado pela Gestão</label>
+                            <select name='is_approved' class='form-select'>
+                                <option value='1' ".($this->fields['is_approved'] == 1 ? 'selected' : '').">Sim</option>
+                                <option value='0' ".($this->fields['is_approved'] == 0 ? 'selected' : '').">Não</option>
                             </select>
                         </div>";
         
@@ -260,6 +280,12 @@ class PluginVehicleschedulerDriver extends CommonDBTM {
         if (!isset($input['is_active'])) {
             $input['is_active'] = 1;
         }
+        if (!isset($input['is_approved'])) {
+            $input['is_approved'] = 1; // Padrão aprovado se cadastrado manualmente por gestor
+        }
+        if (!isset($input['users_id'])) {
+            $input['users_id'] = 0;
+        }
         if (!isset($input['entities_id'])) {
             $input['entities_id'] = $_SESSION['glpiactive_entity'];
         }
@@ -280,6 +306,146 @@ class PluginVehicleschedulerDriver extends CommonDBTM {
             return false;
         }
         return $input;
+    }
+
+    function post_updateItem($history = true) {
+        parent::post_updateItem($history);
+        
+        // Se is_approved mudou de 0 para 1, finaliza chamado de solicitação
+        if (in_array('is_approved', $this->updates) && $this->fields['is_approved'] == 1) {
+            global $DB;
+            $users_id = $this->fields['users_id'];
+            if ($users_id > 0) {
+                // Procurar chamados abertos de solicitação criados por esse usuário
+                $iterator = $DB->request([
+                    'SELECT' => 'id',
+                    'FROM'   => 'glpi_tickets',
+                    'WHERE'  => [
+                        'name' => ['LIKE', 'Solicitação de Cadastro de Motorista: %'],
+                        '_users_id_requester' => $users_id,
+                        'status' => [
+                            CommonITILObject::INCOMING,
+                            CommonITILObject::ASSIGNED,
+                            CommonITILObject::PLANNING,
+                            CommonITILObject::WAITING
+                        ]
+                    ]
+                ]);
+                
+                foreach ($iterator as $row) {
+                    $ticket = new Ticket();
+                    if ($ticket->getFromDB($row['id'])) {
+                        // Solucionar o chamado
+                        $ticket->update([
+                            'id'     => $row['id'],
+                            'status' => CommonITILObject::SOLVED
+                        ]);
+                        
+                        // Adicionar acompanhamento notificando o condutor
+                        $followup = new ITILFollowup();
+                        $followup->add([
+                            'itemtype'   => 'Ticket',
+                            'items_id'   => $row['id'],
+                            'users_id'   => Session::getLoginUserID(),
+                            'content'    => "✅ Seu cadastro de motorista foi aprovado! Seu acesso ao agendamento de veículos está liberado.",
+                            'is_private' => 0
+                        ]);
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    static function getDriverByUserId($users_id) {
+        global $DB;
+        $iterator = $DB->request([
+            'FROM'  => 'glpi_plugin_vehiclescheduler_drivers',
+            'WHERE' => [
+                'users_id' => $users_id
+            ]
+        ]);
+        if (count($iterator) > 0) {
+            return $iterator->current();
+        }
+        return false;
+    }
+
+    static function getActiveDriverByUserId($users_id) {
+        global $DB;
+        $iterator = $DB->request([
+            'FROM'  => 'glpi_plugin_vehiclescheduler_drivers',
+            'WHERE' => [
+                'users_id'    => $users_id,
+                'is_active'   => 1,
+                'is_approved' => 1
+            ]
+        ]);
+        if (count($iterator) > 0) {
+            return $iterator->current();
+        }
+        return false;
+    }
+
+    static function requestDriverRegistration($input) {
+        $user_id = Session::getLoginUserID();
+        
+        $existing = self::getDriverByUserId($user_id);
+        if ($existing) {
+            Session::addMessageAfterRedirect('Você já possui uma solicitação ou cadastro de motorista.', false, ERROR);
+            return false;
+        }
+        
+        $driver = new self();
+        $name = getUserName($user_id);
+        
+        $data = [
+            'name'          => $name,
+            'users_id'      => $user_id,
+            'registration'  => $input['registration'] ?? '',
+            'cnh_category'  => $input['cnh_category'] ?? 'B',
+            'cnh_expiry'    => $input['cnh_expiry'] ?? '',
+            'department'    => $input['department'] ?? '',
+            'contact_phone' => $input['contact_phone'] ?? '',
+            'is_active'     => 1,
+            'is_approved'   => 0, // Pendente de aprovação
+            'comment'       => $input['comment'] ?? '',
+            'entities_id'   => $_SESSION['glpiactive_entity'] ?? 0
+        ];
+        
+        $driver_id = $driver->add($data);
+        if ($driver_id) {
+            // Criar chamado automático para avisar os gestores
+            $ticket = new Ticket();
+            $title = "Solicitação de Cadastro de Motorista: " . $name;
+            $link = Plugin::getWebDir('vehiclescheduler') . "/front/driver.form.php?id=" . $driver_id;
+            
+            $content = "Nova solicitação de cadastro de motorista realizada pelo portal do colaborador.\n\n"
+                . "Dados enviados:\n"
+                . "Motorista: " . $name . "\n"
+                . "Matrícula: " . $data['registration'] . "\n"
+                . "Categoria CNH: " . $data['cnh_category'] . "\n"
+                . "Vencimento CNH: " . $data['cnh_expiry'] . "\n"
+                . "Departamento/Setor: " . $data['department'] . "\n"
+                . "Telefone para Contato: " . $data['contact_phone'] . "\n"
+                . "Observações: " . $data['comment'] . "\n\n"
+                . "Acesse o link a seguir para analisar e aprovar este cadastro:\n"
+                . $link;
+                
+            $ticket->add([
+                'name'                => $title,
+                'content'             => $content,
+                'entities_id'         => $data['entities_id'],
+                'type'                => Ticket::DEMAND_TYPE,
+                'urgency'             => 3,
+                'impact'              => 3,
+                'priority'            => CommonITILObject::computePriority(3, 3),
+                '_users_id_requester' => $user_id,
+            ]);
+            
+            return $driver_id;
+        }
+        return false;
     }
 
     function rawSearchOptions() {
@@ -313,6 +479,14 @@ class PluginVehicleschedulerDriver extends CommonDBTM {
         $tab[] = [
             'id' => '7', 'table' => $this->getTable(), 'field' => 'is_active',
             'name' => 'Ativo', 'datatype' => 'bool',
+        ];
+        $tab[] = [
+            'id' => '9', 'table' => 'glpi_users', 'field' => 'name',
+            'name' => 'Usuário do GLPI', 'datatype' => 'dropdown',
+        ];
+        $tab[] = [
+            'id' => '10', 'table' => $this->getTable(), 'field' => 'is_approved',
+            'name' => 'Aprovado', 'datatype' => 'bool',
         ];
         $tab[] = [
             'id' => '8', 'table' => $this->getTable(), 'field' => 'id',

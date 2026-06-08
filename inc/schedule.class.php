@@ -17,6 +17,8 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
     const STATUS_APPROVED  = 2;
     const STATUS_REJECTED  = 3;
     const STATUS_CANCELLED = 4;
+    const STATUS_ONGOING   = 5;
+    const STATUS_RETURNED  = 6;
 
     static function getTypeName($nb = 0) {
         return ($nb === 1) ? 'Agendamento' : 'Agendamentos';
@@ -36,6 +38,8 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
             self::STATUS_APPROVED  => 'Aprovada',
             self::STATUS_REJECTED  => 'Recusada',
             self::STATUS_CANCELLED => 'Cancelada',
+            self::STATUS_ONGOING   => 'Em Viagem',
+            self::STATUS_RETURNED  => 'Devolvido',
         ];
     }
 
@@ -91,6 +95,7 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
               </div>";
 
         $is_manager = PluginVehicleschedulerProfile::canViewManagement();
+        $disabled = ($ID > 0 && !$is_manager) ? "disabled='disabled'" : "";
 
         // Card 1: Detalhes da Solicitação
         echo "<div class='card shadow-sm border-0 mb-4'>
@@ -115,48 +120,64 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
 
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Departamento/Setor <span class='text-danger'>*</span></label>
-                            <input type='text' name='department' value='".htmlspecialchars($this->fields['department'] ?? '')."' class='form-control'>
+                            <input type='text' name='department' value='".htmlspecialchars($this->fields['department'] ?? '')."' class='form-control' $disabled>
                         </div>";
 
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Telefone para Contato <span class='text-danger'>*</span></label>
-                            <input type='text' name='contact_phone' value='".htmlspecialchars($this->fields['contact_phone'] ?? '')."' class='form-control'>
+                            <input type='text' name='contact_phone' value='".htmlspecialchars($this->fields['contact_phone'] ?? '')."' class='form-control' $disabled>
                         </div>";
 
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Veículo Solicitado <span class='text-danger'>*</span></label>";
-        echo "              <div>";
-        PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'], 'entity' => $this->fields['entities_id']]);
-        echo "              </div>";
+        if ($ID > 0 && !$is_manager) {
+            $v_id = $this->fields['plugin_vehiclescheduler_vehicles_id'];
+            echo "          <input type='hidden' name='plugin_vehiclescheduler_vehicles_id' value='$v_id'>";
+            echo "          <div class='form-control bg-light'>" . Dropdown::getDropdownName('glpi_plugin_vehiclescheduler_vehicles', $v_id) . "</div>";
+        } else {
+            echo "          <div>";
+            PluginVehicleschedulerVehicle::dropdown(['name' => 'plugin_vehiclescheduler_vehicles_id', 'value' => $this->fields['plugin_vehiclescheduler_vehicles_id'], 'entity' => $this->fields['entities_id']]);
+            echo "          </div>";
+        }
         echo "          </div>";
 
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Data/Hora de Saída <span class='text-danger'>*</span></label>
                             <div>";
-        Html::showDateTimeField('begin_date', ['value' => $this->fields['begin_date']]);
+        if ($ID > 0 && !$is_manager) {
+            echo "          <input type='hidden' name='begin_date' value='{$this->fields['begin_date']}'>";
+            echo "          <div class='form-control bg-light'>" . Html::convDateTime($this->fields['begin_date']) . "</div>";
+        } else {
+            Html::showDateTimeField('begin_date', ['value' => $this->fields['begin_date']]);
+        }
         echo "              </div>
                         </div>";
 
         echo "          <div class='col-md-6'>
                             <label class='form-label text-muted fw-bold'>Data/Hora de Retorno <span class='text-danger'>*</span></label>
                             <div>";
-        Html::showDateTimeField('end_date', ['value' => $this->fields['end_date']]);
+        if ($ID > 0 && !$is_manager) {
+            echo "          <input type='hidden' name='end_date' value='{$this->fields['end_date']}'>";
+            echo "          <div class='form-control bg-light'>" . Html::convDateTime($this->fields['end_date']) . "</div>";
+        } else {
+            Html::showDateTimeField('end_date', ['value' => $this->fields['end_date']]);
+        }
         echo "              </div>
                         </div>";
 
         echo "          <div class='col-md-8'>
                             <label class='form-label text-muted fw-bold'>Destino <span class='text-danger'>*</span></label>
-                            <input type='text' name='destination' value='".htmlspecialchars($this->fields['destination'] ?? '')."' class='form-control'>
+                            <input type='text' name='destination' value='".htmlspecialchars($this->fields['destination'] ?? '')."' class='form-control' $disabled>
                         </div>";
         
         echo "          <div class='col-md-4'>
                             <label class='form-label text-muted fw-bold'>Nº de Passageiros</label>
-                            <input type='number' name='passengers' value='".($this->fields['passengers'] ?: 1)."' min='1' class='form-control'>
+                            <input type='number' name='passengers' value='".($this->fields['passengers'] ?: 1)."' min='1' class='form-control' $disabled>
                         </div>";
 
         echo "          <div class='col-12'>
                             <label class='form-label text-muted fw-bold'>Descrição / Finalidade <span class='text-danger'>*</span></label>
-                            <textarea name='purpose' rows='3' class='form-control' placeholder='Descreva a finalidade desta reserva'>".htmlspecialchars($this->fields['purpose'] ?? '')."</textarea>
+                            <textarea name='purpose' rows='3' class='form-control' placeholder='Descreva a finalidade desta reserva' $disabled>".htmlspecialchars($this->fields['purpose'] ?? '')."</textarea>
                         </div>";
 
         echo "      </div>
@@ -193,11 +214,17 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
                                 <label class='form-label text-muted fw-bold'>Motorista Designado</label>
                                 <div class='form-control bg-light'>".Dropdown::getDropdownName('glpi_plugin_vehiclescheduler_drivers', $this->fields['plugin_vehiclescheduler_drivers_id'])."</div>
                             </div>";
+                // Show status as read-only badge/alert
+                echo "      <div class='col-md-6'>
+                                <label class='form-label text-muted fw-bold'>Status</label>
+                                <div class='form-control bg-light'>" . (self::getAllStatus()[$this->fields['status']] ?? 'Desconhecido') . "</div>
+                            </div>";
             }
 
+            $comment_readonly = !$is_manager ? "readonly='readonly'" : "";
             echo "          <div class='col-12'>
                                 <label class='form-label text-muted fw-bold'>Comentários Adicionais</label>
-                                <textarea name='comment' rows='2' class='form-control' placeholder='Anotações do gestor'>".htmlspecialchars($this->fields['comment'] ?? '')."</textarea>
+                                <textarea name='comment' rows='2' class='form-control' placeholder='Anotações do gestor' $comment_readonly>".htmlspecialchars($this->fields['comment'] ?? '')."</textarea>
                             </div>";
 
             echo "      </div>
@@ -205,10 +232,182 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
                   </div>";
         }
 
+        // Se a reserva estiver em viagem ou já retornou, mostrar informações de devolução/checklist
+        if (!empty($this->fields['real_begin_date'])) {
+            $fuel_labels = [1 => '1/4', 2 => '2/4', 3 => '3/4', 4 => '4/4 (Cheio)'];
+            
+            echo "<div class='card shadow-sm border-0 mb-4' style='border-left: 4px solid #3b82f6 !important;'>
+                    <div class='card-header bg-white border-bottom-0 pt-4 pb-2'>
+                        <h5 class='mb-0 text-primary fw-bold'><i class='ti ti-steering-wheel'></i> Registro de Viagem</h5>
+                    </div>
+                    <div class='card-body'>
+                        <div class='row g-4'>
+                            <div class='col-md-6'>
+                                <label class='form-label text-muted fw-bold'>Retirada (Check-out)</label>
+                                <div class='form-control bg-light'>
+                                    <strong>Data/Hora:</strong> " . Html::convDateTime($this->fields['real_begin_date']) . "<br>
+                                    <strong>Odômetro Inicial:</strong> " . $this->fields['initial_mileage'] . " km<br>
+                                    <strong>Nível Combustível:</strong> " . ($fuel_labels[$this->fields['initial_fuel']] ?? 'Não informado') . "
+                                </div>
+                            </div>";
+                            
+            if (!empty($this->fields['real_end_date'])) {
+                $chk = json_decode($this->fields['return_checklist'] ?? '{}', true);
+                $clean_txt = (isset($chk['clean']) && $chk['clean'] == '1') ? 'Sim' : 'Não';
+                $damage_txt = (isset($chk['damage']) && $chk['damage'] == '1') ? 'Sim' : 'Não';
+                
+                echo "<div class='col-md-6'>
+                        <label class='form-label text-muted fw-bold'>Devolução (Check-in)</label>
+                        <div class='form-control bg-light'>
+                            <strong>Data/Hora:</strong> " . Html::convDateTime($this->fields['real_end_date']) . "<br>
+                            <strong>Odômetro Final:</strong> " . $this->fields['final_mileage'] . " km (Total rodado: " . ($this->fields['final_mileage'] - $this->fields['initial_mileage']) . " km)<br>
+                            <strong>Nível Combustível:</strong> " . ($fuel_labels[$this->fields['final_fuel']] ?? 'Não informado') . "<br>
+                            <strong>Veículo Limpo:</strong> " . $clean_txt . "<br>
+                            <strong>Com Avaria:</strong> " . $damage_txt . "<br>
+                            <strong>Observações:</strong> " . htmlspecialchars($this->fields['return_comment'] ?? '') . "
+                        </div>
+                      </div>";
+            }
+            
+            echo "      </div>
+                    </div>
+                  </div>";
+        }
+
+        // Botões de Viagem (Retirada / Devolução)
+        if ($ID > 0) {
+            $is_driver = false;
+            $active_driver = PluginVehicleschedulerDriver::getActiveDriverByUserId(Session::getLoginUserID());
+            if ($active_driver && $this->fields['plugin_vehiclescheduler_drivers_id'] == $active_driver['id']) {
+                $is_driver = true;
+            }
+            // Se for gestor ou o motorista designado
+            if ($is_manager || $is_driver || $this->fields['users_id'] == Session::getLoginUserID()) {
+                if ($this->fields['status'] == self::STATUS_APPROVED) {
+                    $v_mileage = 0;
+                    if ($this->fields['plugin_vehiclescheduler_vehicles_id'] > 0) {
+                        $v = new PluginVehicleschedulerVehicle();
+                        if ($v->getFromDB($this->fields['plugin_vehiclescheduler_vehicles_id'])) {
+                            $v_mileage = (int)$v->fields['mileage'];
+                        }
+                    }
+                    
+                    echo "<div class='text-center my-4'>
+                            <button type='button' class='btn btn-lg btn-success shadow-sm fw-bold px-4' data-bs-toggle='modal' data-bs-target='#startTripModal'>
+                                <i class='ti ti-steering-wheel fs-4 me-2'></i> Iniciar Viagem (Retirar Chave)
+                            </button>
+                          </div>";
+                          
+                    echo "
+                    <div class='modal fade' id='startTripModal' tabindex='-1' aria-labelledby='startTripModalLabel' aria-hidden='true'>
+                      <div class='modal-dialog'>
+                        <div class='modal-content border-0 shadow-lg'>
+                          <div class='modal-header bg-success text-white'>
+                            <h5 class='modal-title fw-bold' id='startTripModalLabel'><i class='ti ti-steering-wheel me-2'></i> Iniciar Viagem</h5>
+                            <button type='button' class='btn-close btn-close-white' data-bs-dismiss='modal' aria-label='Close'></button>
+                          </div>
+                          <form method='post' action='schedule.form.php'>
+                            <input type='hidden' name='_glpi_csrf_token' value='" . Session::getNewCSRFToken() . "'>
+                            <div class='modal-body'>
+                              <input type='hidden' name='id' value='{$this->fields['id']}'>
+                              <div class='mb-3'>
+                                <label class='form-label fw-bold'>Odômetro Inicial (km) <span class='text-danger'>*</span></label>
+                                <input type='number' name='initial_mileage' value='{$v_mileage}' class='form-control' required min='0'>
+                              </div>
+                              <div class='mb-3'>
+                                <label class='form-label fw-bold'>Nível de Combustível Inicial <span class='text-danger'>*</span></label>
+                                <select name='initial_fuel' class='form-select' required>
+                                  <option value='4'>4/4 (Cheio)</option>
+                                  <option value='3'>3/4</option>
+                                  <option value='2'>2/4</option>
+                                  <option value='1'>1/4</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div class='modal-footer bg-light'>
+                              <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Cancelar</button>
+                              <button type='submit' name='start_trip' class='btn btn-success fw-bold'>Confirmar Retirada</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>";
+                }
+                
+                if ($this->fields['status'] == self::STATUS_ONGOING) {
+                    $init_mileage = (int)$this->fields['initial_mileage'];
+                    echo "<div class='text-center my-4'>
+                            <button type='button' class='btn btn-lg btn-danger shadow-sm fw-bold px-4' data-bs-toggle='modal' data-bs-target='#endTripModal'>
+                                <i class='ti ti-flag fs-4 me-2'></i> Concluir Viagem (Devolver Veículo)
+                            </button>
+                          </div>";
+                          
+                    echo "
+                    <div class='modal fade' id='endTripModal' tabindex='-1' aria-labelledby='endTripModalLabel' aria-hidden='true'>
+                      <div class='modal-dialog'>
+                        <div class='modal-content border-0 shadow-lg'>
+                          <div class='modal-header bg-danger text-white'>
+                            <h5 class='modal-title fw-bold' id='endTripModalLabel'><i class='ti ti-flag me-2'></i> Devolução do Veículo</h5>
+                            <button type='button' class='btn-close btn-close-white' data-bs-dismiss='modal' aria-label='Close'></button>
+                          </div>
+                          <form method='post' action='schedule.form.php'>
+                            <input type='hidden' name='_glpi_csrf_token' value='" . Session::getNewCSRFToken() . "'>
+                            <div class='modal-body'>
+                              <input type='hidden' name='id' value='{$this->fields['id']}'>
+                              <div class='mb-3'>
+                                <label class='form-label fw-bold'>Odômetro Final (km) <span class='text-danger'>*</span></label>
+                                <input type='number' name='final_mileage' value='{$init_mileage}' class='form-control' required min='{$init_mileage}'>
+                                <div class='form-text'>Deve ser maior ou igual a {$init_mileage} km.</div>
+                              </div>
+                              <div class='mb-3'>
+                                <label class='form-label fw-bold'>Nível de Combustível Final <span class='text-danger'>*</span></label>
+                                <select name='final_fuel' class='form-select' required>
+                                  <option value='4'>4/4 (Cheio)</option>
+                                  <option value='3'>3/4</option>
+                                  <option value='2'>2/4</option>
+                                  <option value='1'>1/4</option>
+                                </select>
+                              </div>
+                              
+                              <div class='card bg-light border-0 mb-3'>
+                                <div class='card-body py-3'>
+                                  <h6 class='fw-bold mb-3'><i class='ti ti-checkbox'></i> Checklist de Devolução</h6>
+                                  <div class='form-check mb-2'>
+                                    <input class='form-check-input' type='checkbox' name='return_checklist[clean]' value='1' id='chkClean' checked>
+                                    <label class='form-check-label' for='chkClean'>
+                                      O veículo está limpo por dentro e por fora?
+                                    </label>
+                                  </div>
+                                  <div class='form-check'>
+                                    <input class='form-check-input' type='checkbox' name='return_checklist[damage]' value='1' id='chkDamage'>
+                                    <label class='form-check-label text-danger fw-bold' for='chkDamage'>
+                                      Houve alguma avaria / problema durante a viagem?
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div class='mb-3'>
+                                <label class='form-label fw-bold'>Comentários / Observações</label>
+                                <textarea name='return_comment' class='form-control' rows='2' placeholder='Descreva avarias ou observações gerais'></textarea>
+                              </div>
+                            </div>
+                            <div class='modal-footer bg-light'>
+                              <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Cancelar</button>
+                              <button type='submit' name='end_trip' class='btn btn-danger fw-bold'>Confirmar Devolução</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>";
+                }
+            }
+        }
+
         // Ticket Relation
         if (!empty($this->fields['tickets_id']) && $this->fields['tickets_id'] > 0) {
             echo "<div class='alert alert-info d-flex align-items-center mb-4 border-0 shadow-sm'>
-                    <i class='ti ti-ticket me-2 fs-4'></i>
+                    <i class='ti ti-ticket me-2 fs-4 text-info'></i>
                     <div>";
             echo "      <strong>Chamado Relacionado:</strong> ";
             $ticket = new Ticket();
@@ -221,8 +420,56 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
 
         echo "</div>"; // Container End
         echo "</td></tr>";
+
+        // Inject JS to enforce Flatpickr date rules
+        echo "<script>
+        $(document).ready(function() {
+            var begin_input = $('input[name=\"begin_date\"]');
+            var end_input = $('input[name=\"end_date\"]');
+            
+            function setupFlatpickr() {
+                var begin_wrapper = begin_input.closest('.flatpickr');
+                var end_wrapper = end_input.closest('.flatpickr');
+                
+                if (begin_wrapper.length && begin_wrapper[0]._flatpickr) {
+                    var begin_picker = begin_wrapper[0]._flatpickr;
+                    var end_picker = end_wrapper.length ? end_wrapper[0]._flatpickr : null;
+                    
+                    var isNew = " . (($ID > 0) ? 'false' : 'true') . ";
+                    if (isNew) {
+                        begin_picker.set('minDate', new Date());
+                    }
+                    
+                    begin_input.on('change', function() {
+                        var val = $(this).val();
+                        if (val && end_picker) {
+                            end_picker.set('minDate', val);
+                        }
+                    });
+                    
+                    var initial_val = begin_input.val();
+                    if (initial_val && end_picker) {
+                        end_picker.set('minDate', initial_val);
+                    }
+                } else {
+                    setTimeout(setupFlatpickr, 100);
+                }
+            }
+            setupFlatpickr();
+        });
+        </script>";
         
-        $this->showFormButtons($options);
+        if ($ID == 0 || $is_manager) {
+            $this->showFormButtons($options);
+        } else {
+            echo "<tr style='display:none;'><td></td></tr>";
+            if ($this->fields['status'] == self::STATUS_NEW) {
+                echo "<div class='d-flex justify-content-center gap-3 mb-4'>";
+                echo "<button type='submit' name='delete' class='btn btn-danger shadow-sm' onclick='return confirm(\"Deseja realmente cancelar esta reserva?\")'><i class='ti ti-trash me-2'></i> Cancelar Reserva</button>";
+                echo "</div>";
+            }
+            Html::closeForm();
+        }
         return true;
     }
 
@@ -263,6 +510,88 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
             Session::addMessageAfterRedirect('A descrição/finalidade é obrigatória.', false, ERROR);
             return false;
         }
+
+        // Validação de datas
+        if (empty($input['begin_date'])) {
+            Session::addMessageAfterRedirect('A data de saída é obrigatória.', false, ERROR);
+            return false;
+        }
+        if (empty($input['end_date'])) {
+            Session::addMessageAfterRedirect('A data de retorno é obrigatória.', false, ERROR);
+            return false;
+        }
+        $now = date('Y-m-d H:i:s');
+        $begin = date('Y-m-d H:i:s', strtotime($input['begin_date']));
+        $end = date('Y-m-d H:i:s', strtotime($input['end_date']));
+
+        if ($begin < $now) {
+            Session::addMessageAfterRedirect('A data de saída não pode ser no passado.', false, ERROR);
+            return false;
+        }
+        if ($end < $begin) {
+            Session::addMessageAfterRedirect('A data de retorno não pode ser anterior à data de saída.', false, ERROR);
+            return false;
+        }
+
+        // Se for condutor comum, o motorista é ele mesmo
+        if (!PluginVehicleschedulerProfile::canViewManagement()) {
+            $active_driver = PluginVehicleschedulerDriver::getActiveDriverByUserId(Session::getLoginUserID());
+            if ($active_driver) {
+                $input['plugin_vehiclescheduler_drivers_id'] = $active_driver['id'];
+            }
+        }
+
+        return $input;
+    }
+
+    function prepareInputForUpdate($input) {
+        $is_manager = PluginVehicleschedulerProfile::canViewManagement();
+        
+        // Bloquear alterações de condutores comuns que não sejam as ações de viagem
+        // (as ações de viagem rodam métodos específicos startTrip/endTrip, não o standard update)
+        if (!$is_manager) {
+            Session::addMessageAfterRedirect('Você não tem permissão para editar agendamentos.', false, ERROR);
+            return false;
+        }
+
+        if (empty(trim($input['department'] ?? ''))) {
+            Session::addMessageAfterRedirect('O departamento é obrigatório.', false, ERROR);
+            return false;
+        }
+        if (empty(trim($input['contact_phone'] ?? ''))) {
+            Session::addMessageAfterRedirect('O telefone para contato é obrigatório.', false, ERROR);
+            return false;
+        }
+        if (empty(trim($input['destination'] ?? ''))) {
+            Session::addMessageAfterRedirect('O destino é obrigatório.', false, ERROR);
+            return false;
+        }
+        if (empty(trim($input['purpose'] ?? ''))) {
+            Session::addMessageAfterRedirect('A descrição/finalidade é obrigatória.', false, ERROR);
+            return false;
+        }
+
+        // Validação de datas
+        if (isset($input['begin_date'])) {
+            $begin = date('Y-m-d H:i:s', strtotime($input['begin_date']));
+            if (isset($this->fields['begin_date']) && $this->fields['begin_date'] !== $input['begin_date']) {
+                $now = date('Y-m-d H:i:s');
+                if ($begin < $now) {
+                    Session::addMessageAfterRedirect('A data de saída não pode ser no passado.', false, ERROR);
+                    return false;
+                }
+            }
+            
+            $end_date = $input['end_date'] ?? $this->fields['end_date'] ?? '';
+            if (!empty($end_date)) {
+                $end = date('Y-m-d H:i:s', strtotime($end_date));
+                if ($end < $begin) {
+                    Session::addMessageAfterRedirect('A data de retorno não pode ser anterior à data de saída.', false, ERROR);
+                    return false;
+                }
+            }
+        }
+
         return $input;
     }
 
@@ -422,6 +751,134 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
 
         // Atualizar status do chamado
         $ticket->update(['id' => $this->fields['tickets_id'], 'status' => $new_ticket_status]);
+        return true;
+    }
+
+    /**
+     * Inicia a viagem (Check-out)
+     */
+    function startTrip($input) {
+        $id = (int)$input['id'];
+        if (!$this->getFromDB($id)) {
+            return false;
+        }
+        
+        $now = date('Y-m-d H:i:s');
+        $initial_mileage = (int)$input['initial_mileage'];
+        $initial_fuel = (int)$input['initial_fuel'];
+        
+        // Update database record
+        $this->update([
+            'id'               => $id,
+            'real_begin_date'  => $now,
+            'initial_mileage'  => $initial_mileage,
+            'initial_fuel'     => $initial_fuel,
+            'status'           => self::STATUS_ONGOING
+        ]);
+        
+        // Add followup to ticket and assign ticket
+        if ($this->fields['tickets_id'] > 0) {
+            $fuel_labels = [1 => '1/4', 2 => '2/4', 3 => '3/4', 4 => '4/4 (Cheio)'];
+            $fuel_txt = $fuel_labels[$initial_fuel] ?? 'Não informado';
+            
+            $followup = new ITILFollowup();
+            $followup->add([
+                'itemtype'   => 'Ticket',
+                'items_id'   => $this->fields['tickets_id'],
+                'users_id'   => Session::getLoginUserID(),
+                'content'    => sprintf("🚗 Viagem iniciada! Chave retirada com odômetro de %d km e nível de combustível %s.", $initial_mileage, $fuel_txt),
+                'is_private' => 0
+            ]);
+            
+            $ticket = new Ticket();
+            if ($ticket->getFromDB($this->fields['tickets_id'])) {
+                $ticket->update([
+                    'id'     => $this->fields['tickets_id'],
+                    'status' => CommonITILObject::ASSIGNED
+                ]);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Conclui a viagem (Check-in)
+     */
+    function endTrip($input) {
+        $id = (int)$input['id'];
+        if (!$this->getFromDB($id)) {
+            return false;
+        }
+        
+        $final_mileage = (int)$input['final_mileage'];
+        $initial_mileage = (int)($this->fields['initial_mileage'] ?: 0);
+        
+        if ($final_mileage < $initial_mileage) {
+            Session::addMessageAfterRedirect('O odômetro final não pode ser menor que o inicial (' . $initial_mileage . ' km).', false, ERROR);
+            return false;
+        }
+        
+        $now = date('Y-m-d H:i:s');
+        $final_fuel = (int)$input['final_fuel'];
+        $return_checklist = json_encode($input['return_checklist'] ?? []);
+        $return_comment = $input['return_comment'] ?? '';
+        
+        // Update database record
+        $this->update([
+            'id'               => $id,
+            'real_end_date'    => $now,
+            'final_mileage'    => $final_mileage,
+            'final_fuel'       => $final_fuel,
+            'return_checklist' => $return_checklist,
+            'return_comment'   => $return_comment,
+            'status'           => self::STATUS_RETURNED
+        ]);
+        
+        // Update vehicle mileage
+        if ($this->fields['plugin_vehiclescheduler_vehicles_id'] > 0) {
+            $vehicle = new PluginVehicleschedulerVehicle();
+            if ($vehicle->getFromDB($this->fields['plugin_vehiclescheduler_vehicles_id'])) {
+                $vehicle->update([
+                    'id'      => $this->fields['plugin_vehiclescheduler_vehicles_id'],
+                    'mileage' => $final_mileage
+                ]);
+            }
+        }
+        
+        // Add detailed followup and solve the ticket
+        if ($this->fields['tickets_id'] > 0) {
+            $fuel_labels = [1 => '1/4', 2 => '2/4', 3 => '3/4', 4 => '4/4 (Cheio)'];
+            $fuel_txt = $fuel_labels[$final_fuel] ?? 'Não informado';
+            
+            $chk = $input['return_checklist'] ?? [];
+            $clean_txt = (isset($chk['clean']) && $chk['clean'] == '1') ? 'Sim' : 'Não';
+            $damage_txt = (isset($chk['damage']) && $chk['damage'] == '1') ? 'Sim (Avaria/problema reportado)' : 'Não';
+            
+            $followup = new ITILFollowup();
+            $followup->add([
+                'itemtype'   => 'Ticket',
+                'items_id'   => $this->fields['tickets_id'],
+                'users_id'   => Session::getLoginUserID(),
+                'content'    => sprintf(
+                    "🏁 Viagem concluída e veículo devolvido!\n\nOdômetro Final: %d km (Total rodado: %d km)\nNível de Combustível: %s\nVeículo Limpo: %s\nNova Avaria: %s\nObservações: %s",
+                    $final_mileage,
+                    ($final_mileage - $initial_mileage),
+                    $fuel_txt,
+                    $clean_txt,
+                    $damage_txt,
+                    $return_comment
+                ),
+                'is_private' => 0
+            ]);
+            
+            $ticket = new Ticket();
+            if ($ticket->getFromDB($this->fields['tickets_id'])) {
+                $ticket->update([
+                    'id'     => $this->fields['tickets_id'],
+                    'status' => CommonITILObject::SOLVED
+                ]);
+            }
+        }
         return true;
     }
 }

@@ -263,6 +263,100 @@ class PluginVehicleschedulerDriverfine extends CommonDBChild {
         return $input;
     }
 
+    function post_addItem() {
+        parent::post_addItem();
+        $this->createTicketFromFine();
+    }
+
+    function post_updateItem($history = true) {
+        parent::post_updateItem($history);
+
+        if (in_array('status', $this->updates) && $this->fields['tickets_id'] > 0) {
+            $statuses = self::getAllStatus();
+            $status_label = $statuses[$this->fields['status']] ?? 'Desconhecido';
+            
+            $messages = [
+                self::STATUS_PAID      => '✅ A multa foi registrada como PAGA.',
+                self::STATUS_APPEALED  => '⚖️ Um recurso foi aberto contra a autuação.',
+                self::STATUS_CANCELLED => '❌ A infração foi CANCELADA.',
+            ];
+            
+            if (isset($messages[$this->fields['status']])) {
+                $followup = new ITILFollowup();
+                $followup->add([
+                    'itemtype'   => 'Ticket',
+                    'items_id'   => $this->fields['tickets_id'],
+                    'users_id'   => Session::getLoginUserID(),
+                    'content'    => sprintf("Status da Multa alterado para: %s\n\n%s", strtoupper($status_label), $messages[$this->fields['status']]),
+                    'is_private' => 0,
+                ]);
+            }
+        }
+        return true;
+    }
+
+    function createTicketFromFine() {
+        if (!empty($this->fields['tickets_id']) && $this->fields['tickets_id'] > 0) {
+            return false;
+        }
+
+        // 1. Obter informações do motorista
+        $driver = new PluginVehicleschedulerDriver();
+        $driver_name = '';
+        $requester_user_id = Session::getLoginUserID();
+        if ($driver->getFromDB($this->fields['plugin_vehiclescheduler_drivers_id'])) {
+            $driver_name = $driver->fields['name'];
+            if ($driver->fields['users_id'] > 0) {
+                $requester_user_id = $driver->fields['users_id'];
+            }
+        }
+
+        // 2. Obter veículo
+        $vehicle = new PluginVehicleschedulerVehicle();
+        $vname = '';
+        if ($vehicle->getFromDB($this->fields['plugin_vehiclescheduler_vehicles_id'])) {
+            $vname = $vehicle->fields['name'] . ' (' . $vehicle->fields['plate'] . ')';
+        }
+
+        $points_map = self::getSeverityPoints();
+        $points = $points_map[$this->fields['severity']] ?? 0;
+        $severities = self::getAllSeverities();
+        $sev_label = $severities[$this->fields['severity']] ?? 'Desconhecida';
+
+        $title = "Notificação de Infração de Trânsito: {$driver_name} — {$vname}";
+        $content = "Prezado(a) {$driver_name},\n\n"
+            . "Foi registrada uma nova infração de trânsito em seu nome associada ao uso do veículo corporativo.\n\n"
+            . "Detalhes da Autuação:\n"
+            . "Data da Infração: " . Html::convDate($this->fields['fine_date']) . "\n"
+            . "Veículo: {$vname}\n"
+            . "Gravidade: {$sev_label} ({$points} pontos)\n"
+            . "Descrição: " . $this->fields['description'] . "\n\n"
+            . "Orientações:\n"
+            . "Por favor, atente-se às regras de trânsito e condução segura de veículos.\n"
+            . "Caso necessite recorrer ou realizar o pagamento, entre em contato com o departamento de frotas.";
+
+        $ticket = new Ticket();
+        $ticket_id = $ticket->add([
+            'name'                => $title,
+            'content'             => $content,
+            'entities_id'         => $this->fields['entities_id'],
+            'type'                => Ticket::REQUEST_TYPE,
+            'urgency'             => 2, // Média
+            'impact'              => 2,
+            'priority'            => CommonITILObject::computePriority(2, 2),
+            '_users_id_requester' => $requester_user_id,
+        ]);
+
+        if ($ticket_id) {
+            global $DB;
+            $DB->update(
+                $this->getTable(),
+                ['tickets_id' => $ticket_id],
+                ['id' => $this->fields['id']]
+            );
+        }
+    }
+
     function showForm($ID, array $options = []) {
         $this->initForm($ID, $options);
         $this->showFormHeader($options);
@@ -344,6 +438,19 @@ class PluginVehicleschedulerDriverfine extends CommonDBChild {
         echo "      </div>
                 </div>
               </div>";
+
+        if (($this->fields['tickets_id'] ?? 0) > 0) {
+            echo "<div class='alert alert-info d-flex align-items-center mb-4 border-0 shadow-sm'>
+                    <i class='ti ti-ticket me-2 fs-4 text-info'></i>
+                    <div>";
+            echo "      <strong>Chamado Relacionado:</strong> ";
+            $ticket = new Ticket();
+            if ($ticket->getFromDB($this->fields['tickets_id'])) {
+                echo $ticket->getLink();
+            }
+            echo "  </div>
+                  </div>";
+        }
 
         echo "</div>"; // Container End
         echo "</td></tr>";
