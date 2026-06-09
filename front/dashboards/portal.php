@@ -478,8 +478,8 @@ function vs_vehicle_label(int $id): string {
         if (view) {
             let parent = view.parentElement;
             while (parent && !parent.classList.contains('tab-content') && parent.tagName !== 'BODY') {
-                parent.style.setProperty('background', '#f1f5f9', 'important');
-                parent.style.setProperty('background-color', '#f1f5f9', 'important');
+                parent.style.setProperty('background', 'var(--vs-bg)', 'important');
+                parent.style.setProperty('background-color', 'var(--vs-bg)', 'important');
                 if (parent.classList.contains('card') || parent.classList.contains('tab_cadre_fixe') || parent.classList.contains('card-body')) {
                     parent.style.setProperty('border', 'none', 'important');
                     parent.style.setProperty('box-shadow', 'none', 'important');
