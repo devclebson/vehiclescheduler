@@ -667,7 +667,11 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
         ]);
 
         if ($ticket_id) {
-            $this->update(['id' => $this->fields['id'], 'tickets_id' => $ticket_id]);
+            $this->update([
+                'id' => $this->fields['id'], 
+                'tickets_id' => $ticket_id,
+                '_bypass_driver_check' => true
+            ]);
             return true;
         }
         return false;
