@@ -293,15 +293,15 @@ class PluginVehicleschedulerDriver extends CommonDBTM {
     }
 
     function prepareInputForUpdate($input) {
-        if (empty(trim($input['name'] ?? ''))) {
+        if (isset($input['name']) && empty(trim($input['name']))) {
             Session::addMessageAfterRedirect('O nome do motorista é obrigatório.', false, ERROR);
             return false;
         }
-        if (empty($input['cnh_category'])) {
+        if (isset($input['cnh_category']) && empty($input['cnh_category'])) {
             Session::addMessageAfterRedirect('A categoria da CNH é obrigatória.', false, ERROR);
             return false;
         }
-        if (empty($input['cnh_expiry'])) {
+        if (isset($input['cnh_expiry']) && empty($input['cnh_expiry'])) {
             Session::addMessageAfterRedirect('O vencimento da CNH é obrigatório.', false, ERROR);
             return false;
         }

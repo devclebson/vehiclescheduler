@@ -559,24 +559,27 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
             return false;
         }
 
-        if (empty(trim($input['department'] ?? ''))) {
+        if (isset($input['department']) && empty(trim($input['department']))) {
             Session::addMessageAfterRedirect('O departamento é obrigatório.', false, ERROR);
             return false;
         }
-        if (empty(trim($input['contact_phone'] ?? ''))) {
+        if (isset($input['contact_phone']) && empty(trim($input['contact_phone']))) {
             Session::addMessageAfterRedirect('O telefone para contato é obrigatório.', false, ERROR);
             return false;
         }
-        if (empty(trim($input['destination'] ?? ''))) {
+        if (isset($input['destination']) && empty(trim($input['destination']))) {
             Session::addMessageAfterRedirect('O destino é obrigatório.', false, ERROR);
             return false;
         }
-        if (empty(trim($input['purpose'] ?? ''))) {
+        if (isset($input['purpose']) && empty(trim($input['purpose']))) {
             Session::addMessageAfterRedirect('A descrição/finalidade é obrigatória.', false, ERROR);
             return false;
         }
 
         // Validação de datas
+        $begin_date = $input['begin_date'] ?? $this->fields['begin_date'] ?? '';
+        $end_date = $input['end_date'] ?? $this->fields['end_date'] ?? '';
+
         if (isset($input['begin_date'])) {
             $begin = date('Y-m-d H:i:s', strtotime($input['begin_date']));
             if (isset($this->fields['begin_date']) && $this->fields['begin_date'] !== $input['begin_date']) {
@@ -586,14 +589,14 @@ class PluginVehicleschedulerSchedule extends CommonDBTM {
                     return false;
                 }
             }
-            
-            $end_date = $input['end_date'] ?? $this->fields['end_date'] ?? '';
-            if (!empty($end_date)) {
-                $end = date('Y-m-d H:i:s', strtotime($end_date));
-                if ($end < $begin) {
-                    Session::addMessageAfterRedirect('A data de retorno não pode ser anterior à data de saída.', false, ERROR);
-                    return false;
-                }
+        }
+
+        if (!empty($begin_date) && !empty($end_date)) {
+            $begin = date('Y-m-d H:i:s', strtotime($begin_date));
+            $end = date('Y-m-d H:i:s', strtotime($end_date));
+            if ($end < $begin) {
+                Session::addMessageAfterRedirect('A data de retorno não pode ser anterior à data de saída.', false, ERROR);
+                return false;
             }
         }
 

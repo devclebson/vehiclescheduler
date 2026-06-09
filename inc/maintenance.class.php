@@ -293,11 +293,11 @@ class PluginVehicleschedulerMaintenance extends CommonDBTM {
     }
 
     function prepareInputForUpdate($input) {
-        if (empty(trim($input['name'] ?? ''))) {
+        if (isset($input['name']) && empty(trim($input['name']))) {
             Session::addMessageAfterRedirect(__('Title is required.', 'vehiclescheduler'), false, ERROR);
             return false;
         }
-        if (empty($input['plugin_vehiclescheduler_vehicles_id'])) {
+        if (isset($input['plugin_vehiclescheduler_vehicles_id']) && empty($input['plugin_vehiclescheduler_vehicles_id'])) {
             Session::addMessageAfterRedirect(__('Vehicle is required.', 'vehiclescheduler'), false, ERROR);
             return false;
         }

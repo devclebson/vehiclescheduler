@@ -118,7 +118,7 @@ $severities = PluginVehicleschedulerDriverfine::getAllSeverities();
           <td><?= htmlspecialchars(substr($f['description'], 0, 50)) ?><?= strlen($f['description']) > 50 ? '...' : '' ?></td>
           <td><span class="vs-badge vs-badge-red">Em Aberto</span></td>
           <td>
-            <form method="post" style="display:inline; display:flex; gap:6px;">
+            <form method="post" action="<?= Plugin::getWebDir('vehiclescheduler') ?>/front/dashboards/fines.php" style="display:inline; display:flex; gap:6px;">
               <input type="hidden" name="fine_id" value="<?= $f['id'] ?>">
               <input type="hidden" name="_glpi_csrf_token" value="<?= Session::getNewCSRFToken() ?>">
               <button type="submit" name="quick_fine_action" value="paid" class="vs-btn vs-btn-light" style="color:#166534 !important; padding:4px 8px; font-size:.8rem;" title="Marcar como paga">💰 Pagar</button>

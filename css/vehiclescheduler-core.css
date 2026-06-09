@@ -8,7 +8,7 @@
   --vs-warning-hover: #d97706;
   --vs-danger: #ef4444;
   --vs-danger-hover: #dc2626;
-  --vs-bg: #f8fafc;
+  --vs-bg: #7ab2e9;
   --vs-card-bg: rgba(255, 255, 255, 0.85);
   --vs-border: #e2e8f0;
   --vs-text: #1e293b;
@@ -24,7 +24,7 @@ body.vs-app-view {
 
 /* Style parent tab container in GLPI to match the dashboard theme */
 .tab-pane:has(.vs-app-view) {
-  background-color: #f1f5f9 !important;
+  background-color: #ffffff !important;
 }
 
 /* Navbar */

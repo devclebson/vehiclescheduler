@@ -352,7 +352,7 @@ if (!$is_tab) {
                 
                 <!-- Action Buttons -->
                 <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; margin-left:12px; flex-shrink:0;">
-                  <form method="post" onsubmit="return handleManagementAction(this, event);" style="display:flex; gap:6px;">
+                  <form method="post" action="<?= Plugin::getWebDir('vehiclescheduler') ?>/front/dashboards/management.php" onsubmit="return handleManagementAction(this, event);" style="display:flex; gap:6px;">
                     <input type="hidden" name="_glpi_csrf_token" value="<?= Session::getNewCSRFToken() ?>">
                     <input type="hidden" name="id" value="<?= $row['id'] ?>">
                     <input type="hidden" name="comment" value="" class="action-comment">
