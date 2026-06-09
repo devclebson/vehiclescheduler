@@ -2,7 +2,10 @@
 /**
  * Portal do Requerente - 3 ações principais
  */
-include('../../../../inc/includes.php');
+if (!defined('GLPI_ROOT')) {
+    define('GLPI_ROOT', dirname(__DIR__, 4));
+}
+include_once(GLPI_ROOT . '/inc/includes.php');
 
 // Verificar permissão de acesso ao portal
 if (!PluginVehicleschedulerProfile::canAccessRequester()) {

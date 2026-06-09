@@ -3,7 +3,10 @@
  * Lista de Reservas do Requerente
  * Interface simplificada para o usuário final
  */
-include('../../../../inc/includes.php');
+if (!defined('GLPI_ROOT')) {
+    define('GLPI_ROOT', dirname(__DIR__, 4));
+}
+include_once(GLPI_ROOT . '/inc/includes.php');
 
 // Verificar permissão básica
 if (!PluginVehicleschedulerProfile::canAccessRequester()) {

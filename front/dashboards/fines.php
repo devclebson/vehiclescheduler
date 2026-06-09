@@ -2,7 +2,10 @@
 /**
  * Gestão de Multas
  */
-include('../../../../inc/includes.php');
+if (!defined('GLPI_ROOT')) {
+    define('GLPI_ROOT', dirname(__DIR__, 4));
+}
+include_once(GLPI_ROOT . '/inc/includes.php');
 if (!class_exists('PluginVehicleschedulerProfile') || !PluginVehicleschedulerProfile::canViewManagement()) {
     Html::displayRightError();
 }
